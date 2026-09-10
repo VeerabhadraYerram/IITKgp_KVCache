@@ -12,8 +12,8 @@
 ## 🌐 Public Artifact & Repository Access
 
 - **Live Interactive Essay (Public, Zero Sign-In Required):**  
-  👉 **[https://veerabhadrayerram.github.io/IITKgp_KVCache/web/](https://veerabhadrayerram.github.io/IITKgp_KVCache/web/)**  
-  *(Alternative local preview: `python -m http.server 8765 --directory web` &rarr; `http://localhost:8765/`)*
+  👉 **[https://iit-kgp-kv-cache.vercel.app/](https://iit-kgp-kv-cache.vercel.app/)**  
+  *(GitHub Pages Mirror: [https://veerabhadrayerram.github.io/IITKgp_KVCache/web/](https://veerabhadrayerram.github.io/IITKgp_KVCache/web/) · Local preview: `python -m http.server 8765 --directory web`)*
 - **Public Source Code Repository:**  
   👉 **[https://github.com/VeerabhadraYerram/IITKgp_KVCache](https://github.com/VeerabhadraYerram/IITKgp_KVCache)**
 - **Publication-Grade Document (Vector PDF):**  
@@ -300,7 +300,7 @@ Every component, third-party asset, mathematical library, and font used in this 
 
 ## 📄 Formal Submission Deliverables Checklist
 
-- [x] **Public Artifact URL (zero sign-in):** [https://veerabhadrayerram.github.io/IITKgp_KVCache/web/](https://veerabhadrayerram.github.io/IITKgp_KVCache/web/)
+- [x] **Public Artifact URL (zero sign-in):** [https://iit-kgp-kv-cache.vercel.app/](https://iit-kgp-kv-cache.vercel.app/) (Mirror: [GitHub Pages](https://veerabhadrayerram.github.io/IITKgp_KVCache/web/))
 - [x] **Public Source Code Repository:** [https://github.com/VeerabhadraYerram/IITKgp_KVCache](https://github.com/VeerabhadraYerram/IITKgp_KVCache)
 - [x] **Blog Publication PDF:** [`What_does_an_AI_mean_by_remembering.pdf`](What_does_an_AI_mean_by_remembering.pdf) (10-page vector export)
 - [x] **Complete Technical README:** [`README.md`](README.md) (Rigorous technical release document)

@@ -11,7 +11,7 @@
 
 | # | Requirement | Deliverable Location / Link | Description |
 |---|---|---|---|
-| **1** | **Public Artifact URL (No Sign-In)** | [https://veerabhadrayerram.github.io/IITKgp_KVCache/web/](https://veerabhadrayerram.github.io/IITKgp_KVCache/web/) | Hosted interactive visual essay with 6 chapters, Three.js spatial projections, live client-side micro-benchmarks, and 3-knob surgery HUD. Zero sign-in or login required. |
+| **1** | **Public Artifact URL (No Sign-In)** | [https://iit-kgp-kv-cache.vercel.app/](https://iit-kgp-kv-cache.vercel.app/) (Mirror: [GitHub Pages](https://veerabhadrayerram.github.io/IITKgp_KVCache/web/)) | Hosted interactive visual essay with 6 chapters, Three.js spatial projections, live client-side micro-benchmarks, and 3-knob surgery HUD. Zero sign-in or login required. |
 | **2** | **Public Source Code Repository** | [https://github.com/VeerabhadraYerram/IITKgp_KVCache](https://github.com/VeerabhadraYerram/IITKgp_KVCache) | Complete Git repository containing full web engine, PyTorch verification suite, PDF monograph, and technical summary. |
 | **3** | **Blog as a PDF File** | [`What_does_an_AI_mean_by_remembering.pdf`](What_does_an_AI_mean_by_remembering.pdf) | High-resolution 10-page publication monograph exported directly from the interactive essay with vector typography, live benchmark outputs, and full derivations. |
 | **4** | **Complete README** | [`README.md`](README.md) | In-depth, publication-grade documentation explaining the central thesis, mathematical derivations, hardware roofline parameters, architecture comparisons, and setup. |
