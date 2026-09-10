@@ -1175,3 +1175,554 @@ body::before {
   line-height: 1.6;
 }
 
+/* ══════════════════════════════════════════════════════════════ */
+/* CHAPTER 3: VRAM SANDBOX & 3D STRUCTURAL TENSOR STYLES         */
+/* ══════════════════════════════════════════════════════════════ */
+
+/* Architecture Progression Card (MHA -> GQA -> MLA) */
+.architecture-progression-card {
+  background: #ffffff;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.progression-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 6px;
+}
+
+.progression-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.progression-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.progression-col {
+  background: #fafafa;
+  border: 1px solid #eeeeee;
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progression-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.progression-badge.mha {
+  background: #000000;
+  color: #ffffff;
+}
+
+.progression-badge.gqa {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #000000;
+}
+
+.progression-badge.mla {
+  background: #f0f0f0;
+  color: #000000;
+  border: 1px solid #777777;
+}
+
+.progression-math {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #000000;
+}
+
+.progression-text {
+  font-size: 0.82rem;
+  color: #444444;
+  line-height: 1.55;
+}
+
+/* Formula Card */
+.formula-card {
+  background: #ffffff;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 28px;
+}
+
+.formula-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 16px;
+}
+
+.formula-split-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.formula-box {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: var(--radius-sm);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.formula-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.formula-arch-tag {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #000000;
+}
+
+.formula-cite-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  background: #f0f0f0;
+  border: 1px solid #dcdcdc;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #333333;
+}
+
+.formula-math-display {
+  font-family: var(--font-mono);
+  font-size: 0.98rem;
+  font-weight: 700;
+  background: #fafafa;
+  border: 1px solid #eeeeee;
+  padding: 10px 12px;
+  border-radius: 4px;
+  color: #000000;
+}
+
+.formula-expl {
+  font-size: 0.82rem;
+  color: #555555;
+  line-height: 1.55;
+}
+
+.formula-footnote {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 8px;
+}
+
+/* VRAM Sandbox Container */
+.sandbox-container {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: var(--radius-md);
+  padding: 28px;
+  margin-bottom: 28px;
+}
+
+.sandbox-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-bottom: 1px solid #eeeeee;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.sandbox-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #000000;
+}
+
+.sandbox-unit-note {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  padding: 3px 8px;
+  border-radius: 4px;
+  color: #333333;
+}
+
+/* Sandbox Controls Grid */
+.sandbox-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.sandbox-control-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sandbox-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #000000;
+}
+
+.slider-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.slider-val-badge {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.slider-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  padding: 2px 2px 0;
+}
+
+.tech-select {
+  width: 100%;
+  padding: 8px 12px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  border: 1px solid #000000;
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  color: #000000;
+  cursor: pointer;
+  outline: none;
+}
+
+.control-help {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.precision-btn-group {
+  display: flex;
+  border: 1px solid #000000;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.prec-btn {
+  flex: 1;
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 7px 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.prec-btn:not(:last-child) {
+  border-right: 1px solid #000000;
+}
+
+.prec-btn.active {
+  background: #000000;
+  color: #ffffff;
+}
+
+/* VRAM Allocation Section */
+.vram-allocation-section {
+  background: #fafafa;
+  border: 1px solid #eeeeee;
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  margin-bottom: 28px;
+}
+
+.allocation-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.alloc-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #000000;
+}
+
+.alloc-total {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #000000;
+}
+
+/* Track & Segments */
+.vram-bar-track {
+  width: 100%;
+  height: 28px;
+  background: #e8e8e8;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  border: 1px solid #cccccc;
+  margin-bottom: 16px;
+}
+
+.vram-bar-segment {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.25s ease;
+  overflow: hidden;
+}
+
+.vram-bar-segment.weights {
+  background: #555555;
+  color: #ffffff;
+}
+
+.vram-bar-segment.kv {
+  background: #000000;
+  color: #ffffff;
+}
+
+.vram-bar-segment.overflow {
+  background: repeating-linear-gradient(
+    45deg,
+    #000000,
+    #000000 10px,
+    #ffffff 10px,
+    #ffffff 20px
+  );
+  color: #000000;
+  border-left: 2px solid #000000;
+}
+
+.bar-seg-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  padding: 0 6px;
+}
+
+/* Warnings & Notices */
+.capacity-warning-card {
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+
+.warning-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 4px;
+}
+
+.warning-desc {
+  font-size: 0.8rem;
+  color: #333333;
+  line-height: 1.5;
+}
+
+.aggregate-note-card {
+  background: #ffffff;
+  border: 1px solid #000000;
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.aggregate-text {
+  font-size: 0.8rem;
+  color: #333333;
+  line-height: 1.5;
+}
+
+/* Breakdown Cards */
+.vram-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.breakdown-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.breakdown-card.highlight {
+  border: 1.5px solid #000000;
+  background: #ffffff;
+}
+
+.breakdown-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.breakdown-val {
+  font-family: var(--font-mono);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #000000;
+}
+
+.breakdown-sub {
+  font-size: 0.75rem;
+  color: #666666;
+  font-family: var(--font-mono);
+}
+
+.breakdown-formula {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #222222;
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+/* 3D Structural KV Cache Section */
+.kv3d-section {
+  border-top: 1px solid #eeeeee;
+  padding-top: 24px;
+}
+
+.kv3d-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.kv3d-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #000000;
+}
+
+.kv3d-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.kv3d-viewport-wrapper {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.kv-3d-viewport {
+  width: 100%;
+  height: 100%;
+}
+
+.axis-legend-overlay {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.axis-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.axis-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.axis-indicator.z-axis {
+  background: #000000;
+}
+
+.axis-indicator.y-axis {
+  background: #444444;
+}
+
+.axis-indicator.x-axis {
+  background: #888888;
+}
+
+.axis-text {
+  font-size: 0.75rem;
+  color: #222222;
+}
+
+.kv3d-honesty-caption {
+  margin-top: 12px;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.5;
+}
+
+

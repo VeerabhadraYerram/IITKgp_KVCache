@@ -1,10 +1,13 @@
-// app.js — Chapters 1 & 2 Controller
+// app.js — Chapters 1, 2, & 3 Controller
 // Chapter 1: Typewriter hero + Dilemma widget
 // Chapter 2: Live TypedArray Benchmark + 2D Runtime Canvas + 3D Attention Microscope
+// Chapter 3: Architecture-Aware VRAM Sandbox + 3D Structural KV Cache Tensor Visualizer
 
 import { MicroTransformerEngine } from './engine/micro_transformer.js';
 import { BenchmarkCanvas } from './visualizers/benchmark_canvas.js';
 import { AttentionMicroscope3D } from './visualizers/benchmark_3d.js';
+import { calculateKVCacheMemory, MODEL_PRESETS, GPU_SPECS, PRECISIONS } from './engine/gpu_calculator.js';
+import { KV3DVisualizer } from './visualizers/kv_3d_visualizer.js';
 
 // ─── Chapter 1: Typewriter Animation ───────────────────────────
 function initTypewriter() {
@@ -296,11 +299,150 @@ function initChapter2() {
   runBenchmarkExecution();
 }
 
+// ─── Chapter 3: VRAM Sandbox & 3D Structural Visualizer ───────
+function initChapter3() {
+  const modelPresetSelect = document.getElementById('select-model-preset');
+  const presetHelpText = document.getElementById('preset-help-text');
+  const contextSlider = document.getElementById('slider-context-len');
+  const badgeContextLen = document.getElementById('badge-context-len');
+  const batchSlider = document.getElementById('slider-batch-size');
+  const badgeBatchSize = document.getElementById('badge-batch-size');
+  const precButtons = document.querySelectorAll('.prec-btn');
+  const gpuSelect = document.getElementById('select-gpu-target');
+  const btnResetCam = document.getElementById('btn-kv3d-reset');
+
+  // Breakdown DOM
+  const allocTotalText = document.getElementById('alloc-total-text');
+  const vramBarWeights = document.getElementById('vram-bar-weights');
+  const vramBarKv = document.getElementById('vram-bar-kv');
+  const vramBarOverflow = document.getElementById('vram-bar-overflow');
+  const capacityWarningCard = document.getElementById('capacity-warning-card');
+  const aggregateNoteCard = document.getElementById('aggregate-note-card');
+
+  const valWeightsGiB = document.getElementById('val-weights-gib');
+  const valWeightsSub = document.getElementById('val-weights-sub');
+  const valKvGiB = document.getElementById('val-kv-gib');
+  const valKvSub = document.getElementById('val-kv-sub');
+  const valTotalGiB = document.getElementById('val-total-gib');
+  const valTotalSub = document.getElementById('val-total-sub');
+  const valFormulaText = document.getElementById('val-formula-text');
+
+  // 3D Visualizer
+  const kv3dContainer = document.getElementById('kv-3d-container');
+  let kv3dVisualizer = null;
+  if (kv3dContainer) {
+    kv3dVisualizer = new KV3DVisualizer(kv3dContainer);
+  }
+
+  const contextLengths = [512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072];
+  let activePrecision = 'fp16';
+
+  function updateSandbox() {
+    if (!modelPresetSelect || !contextSlider || !batchSlider || !gpuSelect) return;
+
+    const presetKey = modelPresetSelect.value;
+    const seqLen = contextLengths[parseInt(contextSlider.value, 10)] || 8192;
+    const batchSize = parseInt(batchSlider.value, 10) || 1;
+    const precisionKey = activePrecision;
+    const gpuKey = gpuSelect.value;
+
+    // Run exact arithmetic calculation
+    const res = calculateKVCacheMemory({
+      presetKey,
+      seqLen,
+      batchSize,
+      precisionKey,
+      gpuKey
+    });
+
+    // Update help text
+    if (presetHelpText) {
+      presetHelpText.textContent = `${res.model.archName} · ${res.weightsGiB.toFixed(2)} GiB weights (${res.precision.name})`;
+    }
+
+    // Update Badges
+    if (badgeContextLen) badgeContextLen.textContent = `${seqLen.toLocaleString('en-US')} tokens`;
+    if (badgeBatchSize) badgeBatchSize.textContent = batchSize;
+
+    // Update Breakdown numbers (in GiB)
+    if (valWeightsGiB) valWeightsGiB.textContent = `${res.weightsGiB.toFixed(2)} GiB`;
+    if (valWeightsSub) valWeightsSub.textContent = `${res.precision.name} (${res.precision.bytes} B/elem)`;
+
+    if (valKvGiB) valKvGiB.textContent = `${res.totalKVGiB.toFixed(2)} GiB`;
+    if (valKvSub) valKvSub.textContent = `${res.bytesPerTokenPerLayer} B/token/layer · ${res.totalKVBytes.toLocaleString('en-US')} B`;
+
+    if (valTotalGiB) valTotalGiB.textContent = `${res.totalRequiredGiB.toFixed(2)} GiB`;
+    if (valTotalSub) valTotalSub.textContent = `${res.totalPercentOfGpu.toFixed(1)}% of ${res.gpuCeilingGiB} GiB GPU ceiling`;
+
+    if (allocTotalText) allocTotalText.textContent = `${res.totalRequiredGiB.toFixed(2)} GiB / ${res.gpuCeilingGiB} GiB (${res.gpu.name})`;
+    if (valFormulaText) valFormulaText.textContent = `${res.formulaUsed} → ${res.formulaMath}`;
+
+    // Update VRAM Bar
+    if (vramBarWeights && vramBarKv) {
+      const weightsPct = Math.min(100, res.weightsPercentOfGpu);
+      const kvPct = Math.min(Math.max(0, 100 - weightsPct), res.kvPercentOfGpu);
+
+      vramBarWeights.style.width = `${weightsPct}%`;
+      vramBarKv.style.width = `${kvPct}%`;
+    }
+
+    if (capacityWarningCard && vramBarOverflow) {
+      if (res.isExceeded) {
+        const overflowPct = Math.min(50, Math.max(5, res.totalPercentOfGpu - 100));
+        vramBarOverflow.style.display = 'flex';
+        vramBarOverflow.style.width = `${overflowPct}%`;
+        capacityWarningCard.style.display = 'block';
+      } else {
+        vramBarOverflow.style.display = 'none';
+        capacityWarningCard.style.display = 'none';
+      }
+    }
+
+    if (aggregateNoteCard) {
+      if (res.isAggregate) {
+        aggregateNoteCard.style.display = 'block';
+      } else {
+        aggregateNoteCard.style.display = 'none';
+      }
+    }
+
+    // Update 3D Visualizer
+    if (kv3dVisualizer) {
+      kv3dVisualizer.updateState(res);
+    }
+  }
+
+  // Listeners
+  if (modelPresetSelect) modelPresetSelect.addEventListener('change', updateSandbox);
+  if (contextSlider) contextSlider.addEventListener('input', updateSandbox);
+  if (batchSlider) batchSlider.addEventListener('input', updateSandbox);
+  if (gpuSelect) gpuSelect.addEventListener('change', updateSandbox);
+
+  precButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      precButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activePrecision = btn.dataset.prec;
+      updateSandbox();
+    });
+  });
+
+  if (btnResetCam) {
+    btnResetCam.addEventListener('click', () => {
+      if (kv3dVisualizer) kv3dVisualizer.resetCamera();
+    });
+  }
+
+  // Initial update
+  updateSandbox();
+}
+
 // ─── Main Initialization ───────────────────────────────────────
 function init() {
   initTypewriter();
   initDilemmaWidget();
   initChapter2();
+  initChapter3();
 }
 
 if (document.readyState === 'loading') {

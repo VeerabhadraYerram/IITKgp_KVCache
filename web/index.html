@@ -497,6 +497,266 @@
 
     </section>
     <!-- END CHAPTER 2 -->
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- CHAPTER 3: THE COST: WHAT YOU'RE ACTUALLY STORING           -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <section class="act" id="chapter-3">
+      <div class="act-header">
+        <div class="act-number">Chapter 3</div>
+        <h2 class="act-title">The Cost: What You're Actually Storing</h2>
+        <p class="act-description">
+          Every token passed into an autoregressive model leaves behind Key and Value activations that must be retained in GPU memory. As sequence length and batch size scale, this cache expands until it rivals or dwarfs the parameter count of the model itself.
+        </p>
+      </div>
+
+      <!-- Conceptual Progression: MHA -> GQA -> MLA -->
+      <div class="architecture-progression-card">
+        <h3 class="progression-title">Architectural Evolution: Reducing the KV Footprint</h3>
+        <p class="progression-desc">Different attention architectures mitigate the memory cost of KV storage in fundamentally different ways:</p>
+        
+        <div class="progression-grid">
+          <div class="progression-col">
+            <div class="progression-badge mha">MHA · Multi-Head Attention</div>
+            <div class="progression-math">n<sub>KV</sub> = n<sub>Q</sub></div>
+            <p class="progression-text">
+              Every query head has an independent key and value head. High expressiveness, but maximum memory footprint (e.g. GPT-3 175B with 96 KV heads).
+            </p>
+          </div>
+
+          <div class="progression-col">
+            <div class="progression-badge gqa">GQA · Grouped-Query Attention</div>
+            <div class="progression-math">n<sub>KV</sub> &lt; n<sub>Q</sub></div>
+            <p class="progression-text">
+              Multiple query heads share each key-value head (e.g. Llama-3-8B with 32 Q heads sharing 8 KV heads). Cuts KV cache size by the grouping ratio (4:1 or 8:1).
+            </p>
+          </div>
+
+          <div class="progression-col">
+            <div class="progression-badge mla">MLA · Multi-Head Latent Attention</div>
+            <div class="progression-math">c<sub>t</sub><sup>KV</sup> ∈ ℝ⁵¹² + k<sub>t</sub><sup>R</sup> ∈ ℝ⁶⁴</div>
+            <p class="progression-text">
+              Replaces per-head K/V tensors with a low-rank compressed latent vector plus decoupled RoPE key (576 elements total per layer). Dramatically compresses cache without losing multi-head capacity.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Architecture-Aware Capacity Formula Card -->
+      <div class="formula-card">
+        <h3 class="formula-title">Governing KV Cache Capacity Formulas</h3>
+        
+        <div class="formula-split-grid">
+          <div class="formula-box">
+            <div class="formula-box-header">
+              <span class="formula-arch-tag">Conventional MHA / GQA (Llama-3, GPT-3)</span>
+              <span class="formula-cite-badge">Pope et al. 2023</span>
+            </div>
+            <div class="formula-math-display">
+              VRAM<sub>KV</sub> = 2 × L × n<sub>KV</sub> × d<sub>head</sub> × T × B × s
+            </div>
+            <p class="formula-expl">
+              The factor of <strong>2</strong> accounts for separate Key and Value tensors. <strong>L</strong> is decoder layers, <strong>n<sub>KV</sub></strong> is KV head count, <strong>d<sub>head</sub></strong> is head dimension, <strong>T</strong> is context length, <strong>B</strong> is batch size, and <strong>s</strong> is bytes per element.
+            </p>
+            <div class="formula-footnote">
+              Attributed to <em>Pope et al. 2023 (Efficiently Scaling Transformer Inference on TPU v4)</em>.
+            </div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-box-header">
+              <span class="formula-arch-tag">DeepSeek-V2 MLA (Low-Rank Latent Cache)</span>
+              <span class="formula-cite-badge">DeepSeek-AI 2024</span>
+            </div>
+            <div class="formula-math-display">
+              VRAM<sub>MLA</sub> = L × (d<sub>c</sub> + d<sub>r</sub>) × T × B × s
+            </div>
+            <p class="formula-expl">
+              Compresses Keys and Values into a single shared latent vector <strong>d<sub>c</sub> = 512</strong> plus decoupled RoPE key <strong>d<sub>r</sub> = 64</strong> (total <strong>576 elements</strong> per token per layer). <strong>No factor of 2</strong> is applied.
+            </p>
+            <div class="formula-footnote">
+              Attributed to <em>DeepSeek-AI 2024 (DeepSeek-V2 Technical Report)</em>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive VRAM Sandbox -->
+      <div class="sandbox-container">
+        <div class="sandbox-header">
+          <h3 class="sandbox-title">Interactive VRAM Sandbox</h3>
+          <span class="sandbox-unit-note">Memory calculations shown in GiB (1 GiB = 2³⁰ bytes)</span>
+        </div>
+
+        <div class="sandbox-controls-grid">
+          <!-- Control: Model Preset -->
+          <div class="sandbox-control-item">
+            <label for="select-model-preset" class="sandbox-label">Model Architecture Preset</label>
+            <select id="select-model-preset" class="tech-select">
+              <option value="llama-3-8b" selected>Llama-3-8B — GQA: 8 KV heads, 32 layers</option>
+              <option value="llama-3-70b">Llama-3-70B — GQA: 8 KV heads, 80 layers</option>
+              <option value="gpt3-175b">GPT-3 (175B) — MHA: 96 KV heads, 96 layers</option>
+              <option value="deepseek-v2">DeepSeek-V2 — MLA: 512D KV latent + 64D decoupled RoPE key, 60 layers</option>
+            </select>
+            <span class="control-help" id="preset-help-text">GQA (8 KV heads, 4:1 ratio) · 14.96 GiB weights</span>
+          </div>
+
+          <!-- Control: Sequence Length T -->
+          <div class="sandbox-control-item">
+            <div class="slider-label-row">
+              <label for="slider-context-len" class="sandbox-label">Context Length (T)</label>
+              <span class="slider-val-badge" id="badge-context-len">8,192 tokens</span>
+            </div>
+            <input type="range" id="slider-context-len" min="0" max="8" step="1" value="4" class="tech-slider">
+            <div class="slider-ticks">
+              <span>512</span>
+              <span>2k</span>
+              <span>8k</span>
+              <span>32k</span>
+              <span>128k</span>
+            </div>
+          </div>
+
+          <!-- Control: Batch Size B -->
+          <div class="sandbox-control-item">
+            <div class="slider-label-row">
+              <label for="slider-batch-size" class="sandbox-label">Batch Size (B)</label>
+              <span class="slider-val-badge" id="badge-batch-size">1</span>
+            </div>
+            <input type="range" id="slider-batch-size" min="1" max="64" step="1" value="1" class="tech-slider">
+            <div class="slider-ticks">
+              <span>1</span>
+              <span>16</span>
+              <span>32</span>
+              <span>48</span>
+              <span>64</span>
+            </div>
+          </div>
+
+          <!-- Control: Precision & GPU -->
+          <div class="sandbox-control-item">
+            <label class="sandbox-label">Numeric Precision (bytes/element)</label>
+            <div class="precision-btn-group">
+              <button class="prec-btn active" data-prec="fp16">FP16 (2 B)</button>
+              <button class="prec-btn" data-prec="fp8">FP8 (1 B)</button>
+              <button class="prec-btn" data-prec="int4">INT4 (0.5 B)</button>
+            </div>
+
+            <label for="select-gpu-target" class="sandbox-label" style="margin-top: 12px;">Target GPU Ceiling</label>
+            <select id="select-gpu-target" class="tech-select">
+              <option value="rtx-4090">NVIDIA RTX 4090 (24 GB)</option>
+              <option value="a100-80gb" selected>NVIDIA A100 (80 GB)</option>
+              <option value="8x-h100">8× H100 — 640 GB aggregate HBM</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Live VRAM Allocation Bar & Breakdown -->
+        <div class="vram-allocation-section">
+          <div class="allocation-bar-header">
+            <span class="alloc-title">Estimated VRAM Allocation</span>
+            <span class="alloc-total" id="alloc-total-text">-- GiB / -- GiB</span>
+          </div>
+
+          <!-- Visual Horizontal Allocation Bar -->
+          <div class="vram-bar-track">
+            <div class="vram-bar-segment weights" id="vram-bar-weights" style="width: 20%;">
+              <span class="bar-seg-label">Weights</span>
+            </div>
+            <div class="vram-bar-segment kv" id="vram-bar-kv" style="width: 10%;">
+              <span class="bar-seg-label">KV Cache</span>
+            </div>
+            <div class="vram-bar-segment overflow" id="vram-bar-overflow" style="display: none;">
+              <span class="bar-seg-label">Over Ceiling</span>
+            </div>
+          </div>
+
+          <!-- Capacity Exceeded Warning Box -->
+          <div class="capacity-warning-card" id="capacity-warning-card" style="display: none;">
+            <div class="warning-title">⚠ Capacity exceeded in simplified model</div>
+            <p class="warning-desc">
+              Simplified capacity estimate (model weights + KV cache only) exceeds the selected GPU memory ceiling. Actual inference memory additionally requires activations, temporary workspaces, communication buffers, and CUDA runtime allocations.
+            </p>
+          </div>
+
+          <!-- Multi-GPU Aggregate Note Box -->
+          <div class="aggregate-note-card" id="aggregate-note-card" style="display: none;">
+            <p class="aggregate-text">
+              <strong>Aggregate Memory Notice:</strong> This is aggregate memory across eight GPUs, not a single contiguous 640 GB memory pool. Actual usable capacity depends on the tensor/pipeline parallelism sharding strategy.
+            </p>
+          </div>
+
+          <!-- Exact Breakdown Cards -->
+          <div class="vram-breakdown-grid">
+            <div class="breakdown-card">
+              <span class="breakdown-label">Model Weights</span>
+              <div class="breakdown-val" id="val-weights-gib">-- GiB</div>
+              <span class="breakdown-sub" id="val-weights-sub">FP16 baseline</span>
+            </div>
+            <div class="breakdown-card">
+              <span class="breakdown-label">KV Cache Footprint</span>
+              <div class="breakdown-val" id="val-kv-gib">-- GiB</div>
+              <span class="breakdown-sub" id="val-kv-sub">-- bytes/token</span>
+            </div>
+            <div class="breakdown-card highlight">
+              <span class="breakdown-label">Total Estimated VRAM</span>
+              <div class="breakdown-val" id="val-total-gib">-- GiB</div>
+              <span class="breakdown-sub" id="val-total-sub">--% of GPU ceiling</span>
+            </div>
+            <div class="breakdown-card">
+              <span class="breakdown-label">Formula Evaluated</span>
+              <div class="breakdown-formula" id="val-formula-text">--</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3D Structural KV Cache Visualizer -->
+        <div class="kv3d-section">
+          <div class="kv3d-header">
+            <div class="kv3d-title-group">
+              <h4 class="kv3d-title">Structural Tensor Dimensions of the KV Cache</h4>
+              <span class="kv3d-subtitle">Layers (L) × Attention Channels/Heads (n<sub>KV</sub>) × Context Tokens (T)</span>
+            </div>
+            <button id="btn-kv3d-reset" class="tech-button mini">⟲ Reset Camera</button>
+          </div>
+
+          <div class="kv3d-viewport-wrapper">
+            <div id="kv-3d-container" class="kv-3d-viewport"></div>
+            
+            <!-- Axis Legend Overlay -->
+            <div class="axis-legend-overlay">
+              <div class="axis-item">
+                <span class="axis-indicator z-axis"></span>
+                <span class="axis-text"><strong>Z-Axis:</strong> Context Sequence Length (T)</span>
+              </div>
+              <div class="axis-item">
+                <span class="axis-indicator y-axis"></span>
+                <span class="axis-text"><strong>Y-Axis:</strong> Transformer Layers (L)</span>
+              </div>
+              <div class="axis-item">
+                <span class="axis-indicator x-axis"></span>
+                <span class="axis-text"><strong>X-Axis:</strong> KV Representation Channels / Heads</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scientific Honesty Caption -->
+          <div class="kv3d-honesty-caption">
+            "The 3D geometry visualizes the tensor structure of the cached representation. The VRAM calculation additionally accounts for representation width, batch size, and bytes per element. It is not a literal physical map of GPU memory addresses."
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bridge Sentence to Chapter 4 -->
+      <div class="bridge-card">
+        <p class="bridge-text">
+          This growing buffer isn't just a storage problem — it changes how fast the GPU can actually run.
+        </p>
+      </div>
+
+    </section>
+    <!-- END CHAPTER 3 -->
   </main>
 
   <script type="module" src="app.js"></script>
