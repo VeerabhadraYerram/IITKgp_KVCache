@@ -1,64 +1,70 @@
 # When Attention Becomes Memory: KV-Caches, Fast Weights, and Synapses
 
-## The Claim
+*DataForge 2026 — Pathway Track: Explain the Frontier (IIT Kharagpur)*
 
-Fixed-state associative memory can replace sequence-length-growing token storage, but its finite capacity creates an interference trade-off: sparse, non-negative representations reduce expected overlap between stored associations (E[overlap] ∝ p²), while excessive compression or dense overlap causes retrieval failures.
+---
 
-## The Problem
+## 1. The Central Thesis
 
-Standard Transformers retain historical context via a Key-Value (KV) cache. During autoregressive inference, every past token's key and value vectors are stored explicitly, creating memory and bandwidth costs that grow proportionally with sequence length *T*: O(*T* · *d*). At 100K+ tokens, this becomes a dominant infrastructure bottleneck (Dao et al., 2022).
+Transformers "remember" by verbatim caching every historical Key-Value token in VRAM — an exact but memory-bandwidth-choking strategy scaling as \(\mathcal{O}(T \cdot d)\). Replacing this with fixed-state associative memory (\(\mathcal{O}(d^2)\) constant in \(T\)) achieves constant memory and fast recurrence, but introduces a fundamental physical trade-off: **sparse non-negative representations reduce expected crosstalk (\(\mathbb{E}[\text{overlap}] \propto p^2\)), while finite capacity bounds verbatim precision.**
 
-## The Mechanism
+---
 
-Matrix multiplication is associative. In unnormalized (linear) attention, the retrieval operation Σ(q · kᵀ) · v can be regrouped as q · Σ(kᵀ · v) = q · S (Katharopoulos et al., 2020). The state matrix S ∈ ℝ^(N×D) accumulates all historical key-value associations into a single structure whose dimensions depend on model width — not sequence length. This eliminates the linear memory dependency on *T*.
+## 2. Naive Recompute vs. KV-Caching (\(\mathcal{O}(n^2)\) vs \(\mathcal{O}(n)\))
 
-The state update S ← S + kᵀv takes the exact mathematical form of a Hebbian outer-product learning rule: ΔW_ij ∝ pre_i × post_j (Hebb, 1949; Schmidhuber, 1992). This formal correspondence connects attention mechanisms to fast-weight memory systems from the neural network literature.
+Autoregressive inference predicts token \(n\) conditioned on tokens \(1 \dots n-1\):
+- **Without caching (Naive Full Recompute):** Generating token \(n\) recomputes Key and Value projections for all past tokens from scratch: \(\sum_{t=1}^n \mathcal{O}(t \cdot d^2) = \mathcal{O}(n^2 \cdot d^2)\).
+- **With KV-Caching:** Key and Value vectors are computed once per token and stored in VRAM. Marginal step compute drops to \(\mathcal{O}(1 \cdot d^2 + n \cdot d)\), resulting in \(\mathcal{O}(n)\) total projection compute.
 
-**Critical caveat:** This re-association applies to unnormalized/linear attention. Standard softmax attention couples queries and keys non-linearly, preventing exact regrouping.
+---
 
-## The Trade-Off
+## 3. The Physical Cost: GPU VRAM Scaling
 
-| Dimension | Transformer KV-Cache | Fixed-State Associative Memory |
-|---|---|---|
-| Memory scaling | O(T · d) — grows with sequence length | O(d² or N·d) — constant w.r.t. *T* |
-| Recall fidelity | Exact token-level retrieval | Approximate; subject to interference |
-| Capacity | Unbounded (limited by hardware) | Bounded by state dimensions |
-| Failure mode | Memory/bandwidth exhaustion | Associative crosstalk (interference) |
+The exact memory footprint required to hold the KV cache across layers and heads is:
+$$\text{VRAM}_{\text{KV}} = 2 \times L \times n_{\text{KV}} \times d_{\text{head}} \times T \times B \times \text{bytes\_per\_element}$$
 
-Dense fixed-state memory suffers catastrophic associative interference: when multiple stored keys share overlapping active dimensions, retrieval produces corrupted blends of stored values. For random non-negative sparse vectors with activation probability *p*, expected pairwise overlap scales as E[⟨k_i, k_j⟩] ∝ p², meaning that reducing density quadratically suppresses interference — but at the cost of reduced representational capacity at extremely low density.
+For an 80-layer model (e.g. Llama-3-70B) running at context length \(T=128\text{k}\) with batch size \(B=16\) in FP16, the KV cache alone demands **~160 GB of VRAM** — exceeding two full NVIDIA A100 (80GB) GPUs purely for caching past tokens.
 
-## BDH Connection
+---
 
-Pathway's Dragon Hatchling (BDH) architecture (Kosowski et al., 2025, arXiv:2509.26507) implements these principles at scale. BDH uses a GPU-friendly state-space formulation with sparse non-negative activations (observed at ~5% average activity, varying with predictability) and RoPE-modulated linear attention. The architecture matches GPT-2-scale Transformers on language and translation tasks at 10M–1B parameters while maintaining interpretable, sparse activations.
+## 4. Production Bottleneck: Prefill vs. Decode
 
-BDH-CQ (Pathway, 2026, arXiv:2608.09888) extends this recurrent memory to enable latent reasoning without verbal Chain-of-Thought token generation. A 150M-parameter configuration achieves 29.5% pass@2 on ARC-AGI-1 at a developer-computed inference cost of $0.0007/task. This score was independently audited by Bielik/NYU co-authors on the public evaluation set.
+Serving systems (vLLM, DistServe) split execution into two distinct hardware regimes:
+1. **Prefill (Compute-Bound):** Prompt tokens are processed in parallel via GEMM with high arithmetic intensity (\(>200\text{ FLOPs/Byte}\)), saturating GPU Tensor Cores.
+2. **Decode (Memory-Bandwidth Bound):** Autoregressive token generation executes sequential GEMV with arithmetic intensity collapsed to \(\approx 1\text{–}2\text{ FLOPs/Byte}\). For every single token generated, multi-gigabyte KV caches must be repeatedly transferred across high-bandwidth memory (HBM).
 
-## Evidence Classification
+---
 
-| Claim | Classification |
-|---|---|
-| Associativity of linear attention | 🟢 Mathematically proven (Katharopoulos 2020) |
-| Hebbian correspondence of outer-product update | 🟢 Formal equivalence (Hebb 1949, Schmidhuber 1992) |
-| BDH ~5% sparsity, Transformer-scale performance | 🟢 Peer-reviewed (Kosowski et al. 2025) |
-| BDH-CQ 29.5% ARC-AGI score | 🟣 Developer-reported, independently audited score |
-| BDH-CQ $0.0007/task cost | 🟣 Developer-computed estimate ($3/H200-hr) |
-| E[overlap] ∝ p² for sparse non-negative codes | 🟡 Derivable analytical property, verified in our toy |
-| Latent recurrence counts in BDH-CQ | 🔴 Proprietary; not disclosed |
+## 5. Alternate Approaches, Compared Honestly
 
-## Limitations
+| Approach | Mechanism | Memory Scaling | Trade-offs & Limitations |
+|---|---|---|---|
+| **Standard KV-Cache** | Explicit past token buffer | \(\mathcal{O}(T \cdot d)\) | Unbounded VRAM growth; memory bandwidth decode bottleneck |
+| **Eviction / Sinks (StreamingLLM)** | Retain sink tokens + sliding window | \(\mathcal{O}(W)\) constant | **Zero recall for evicted middle context**; cannot perform long-range retrieval |
+| **Low-Rank Latents (DeepSeek MLA)** | Compress K,V into latent vector \(c_t\) | \(\mathcal{O}(T \cdot d_c)\) | Reduces memory per token by 4–8×, but still scales linearly with \(T\) |
+| **Linear Attention (Katharopoulos 2020)** | Unnormalized associative regrouping \(q(k^\top v) = qS\) | \(\mathcal{O}(d^2)\) constant | Lacks sharp softmax attention focus; high associative interference |
+| **State-Space Models (Mamba)** | Continuous selective recurrence \(h_t = Ah_{t-1} + Bx_t\) | \(\mathcal{O}(d \cdot N)\) constant | Fixed state saturates on precise verbatim associative retrieval |
+| **Dragon Hatchling (BDH, Kosowski 2025)** | Hebbian edge-reweighting on sparse graph | \(\mathcal{O}(N \cdot D)\) constant | Bounded capacity; mean-field GPU approximation vs discrete theoretical particles |
 
-- Linear attention ≠ softmax attention: the normalization constant is absent, changing retrieval semantics.
-- Finite state capacity implies interference under high load (T ≫ N); selective forgetting/decay mechanisms remain an open research question.
-- BDH-CQ architectural internals (recurrence depth, update dynamics) are proprietary.
-- Real hardware speedups with sparse Hebbian updates may require specialized sparse kernels or neuromorphic substrates beyond standard GPU GEMM operations.
+---
 
-## Primary Sources
+## 6. BDH as an Integrated Redesign (The 5 Interlocking Differences)
 
-[1] Kosowski, A. et al. (2025). *The Dragon Hatchling.* arXiv:2509.26507.
-[2] Pathway (2026). *BDH-CQ: In-Context Learning with Recurrent Latent Reasoning.* arXiv:2608.09888.
-[3] Katharopoulos, A. et al. (2020). *Transformers are RNNs.* ICML 2020.
-[4] Schlag, I. et al. (2021). *Linear Transformers Are Secretly Fast Weight Programmers.* ICML 2021.
-[5] Dao, T. et al. (2022). *FlashAttention.* NeurIPS 2022.
-[6] Gu, A. & Dao, T. (2023). *Mamba.* arXiv:2312.00752.
-[7] Sun, Y. et al. (2023). *Retentive Network.* arXiv:2307.08621.
-[8] Vaswani, A. et al. (2017). *Attention Is All You Need.* NeurIPS 2017.
+Primary author Adrian Kosowski clarified that BDH cannot be reduced to isolated tweaks ("removed softmax, added ReLU"): BDH has **five interlocking differences** that function only as an integrated architecture (arXiv:2509.26507):
+1. **Synaptic Plasticity vs Buffer Storage:** Inference working memory is dynamic edge-reweighting (\(\Delta S = k^\top v\)) on a fixed graph topology.
+2. **High-Dimensional Sparse Projection:** Non-negative Top-\(k\) / ReLU projection (\(D \rightarrow N\), \(N=8192\)) enforcing ~5% active sparsity, driving \(\mathbb{E}[\text{overlap}] \propto p^2\).
+3. **Bilinear Gated Sparse MLP:** Direct elementwise gating (\(xy\_sparse = x\_sparse \odot y\_sparse\)) without dense LayerNorm barriers.
+4. **RoPE Phases on Sparse Latents:** Rotary position frequency modulation applied directly to sparse neuron particle activations.
+5. **Recurrent In-Place State:** State evolves continuously in \(\mathbf{S}_t\), enabling multi-step latent reasoning without emitting verbal tokens.
+
+### Disclosed Technical Caveats
+- **Mean-Field Approximation:** Theoretical BDH defines discrete spiking neuron particles with strict local dynamics; the baseline GPU implementation (`bdh.py` / BDH-GPU) uses a continuous mean-field approximation for Tensor Core efficiency.
+- **BDH-CQ Disambiguation & Evaluated Numbers:** BDH-CQ is a separate reasoning model built on BDH for in-context latent reasoning. A 150M-parameter BDH-CQ achieves **29.5% pass@2 on ARC-AGI-1** at **~$0.0007 per task** ($3/H200-hr). Frontier massive dense models with extensive verbal Chain-of-Thought (e.g. Claude 3.5 Sonnet / o1) achieve higher raw accuracy (>40–70%), reflecting a Pareto cost-efficiency trade-off rather than raw ceiling accuracy.
+
+---
+
+## 7. The Epilogue: Closing the Thesis Loop
+
+When an AI stops remembering explicitly:
+- **You Gain:** Constant \(\mathcal{O}(1)\) memory footprint w.r.t. sequence length \(T\), elimination of the decoding memory-bandwidth transfer bottleneck, and high concurrent serving batch size.
+- **You Surrender:** Literal verbatim replay of historical token strings, trading exact storage for bounded associative capacity subject to \(\mathbb{E}[\text{overlap}] \propto p^2\) interference.

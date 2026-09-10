@@ -1,6 +1,6 @@
 // memory_wall_canvas.js
 // Canvas visualizer comparing KV-cache buffer growth vs fixed synaptic state.
-// Used in Act I to demonstrate O(T·d) vs O(d²) memory scaling.
+// Used in Act I to demonstrate O(T·d) vs O(d²) memory scaling in Black & White theme.
 
 export class MemoryWallCanvas {
   constructor(canvasId) {
@@ -56,11 +56,9 @@ export class MemoryWallCanvas {
     // Clear
     ctx.clearRect(0, 0, width, height);
 
-    // Background
-    ctx.fillStyle = 'rgba(15, 15, 25, 0.6)';
-    ctx.beginPath();
-    ctx.roundRect(0, 0, width, height, 12);
-    ctx.fill();
+    // Background: Pure Black
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, width, height);
 
     const maxT = Math.max(...data.lengths);
     const maxMem = Math.max(...data.transformerMemory);
@@ -69,7 +67,7 @@ export class MemoryWallCanvas {
     const yScale = (m) => pad.top + plotH - (m / maxMem) * plotH;
 
     // Grid lines
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
       const y = pad.top + (i / 4) * plotH;
@@ -82,38 +80,8 @@ export class MemoryWallCanvas {
     const progress = this.animationProgress;
     const visibleCount = Math.ceil(data.lengths.length * progress);
 
-    // Transformer memory line (red/orange gradient)
-    ctx.strokeStyle = '#ff6b6b';
-    ctx.lineWidth = 3;
-    ctx.shadowColor = '#ff6b6b';
-    ctx.shadowBlur = 8;
-    ctx.beginPath();
-    for (let i = 0; i < visibleCount; i++) {
-      const x = xScale(data.lengths[i]);
-      const y = yScale(data.transformerMemory[i]);
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-
-    // BDH memory line (green, flat)
-    ctx.strokeStyle = '#51cf66';
-    ctx.lineWidth = 3;
-    ctx.shadowColor = '#51cf66';
-    ctx.shadowBlur = 8;
-    ctx.beginPath();
-    for (let i = 0; i < visibleCount; i++) {
-      const x = xScale(data.lengths[i]);
-      const y = yScale(data.bdhMemory[i]);
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-
     // Fill under Transformer line
-    ctx.fillStyle = 'rgba(255, 107, 107, 0.08)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.beginPath();
     ctx.moveTo(xScale(data.lengths[0]), yScale(0));
     for (let i = 0; i < visibleCount; i++) {
@@ -125,9 +93,35 @@ export class MemoryWallCanvas {
     ctx.closePath();
     ctx.fill();
 
+    // Transformer memory line (Dashed White Line)
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    for (let i = 0; i < visibleCount; i++) {
+      const x = xScale(data.lengths[i]);
+      const y = yScale(data.transformerMemory[i]);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // BDH memory line (Solid White Line)
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    for (let i = 0; i < visibleCount; i++) {
+      const x = xScale(data.lengths[i]);
+      const y = yScale(data.bdhMemory[i]);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
     // Labels
-    ctx.font = '13px "Inter", system-ui, sans-serif';
-    ctx.fillStyle = '#adb5bd';
+    ctx.font = '500 13px "Inter", system-ui, sans-serif';
+    ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
     ctx.fillText('Sequence Length (T)', pad.left + plotW / 2, height - 8);
 
@@ -138,22 +132,34 @@ export class MemoryWallCanvas {
     ctx.restore();
 
     // Legend
-    const legendY = pad.top - 12;
-    ctx.font = '12px "Inter", system-ui, sans-serif';
+    const legendY = pad.top - 14;
+    ctx.font = '600 12px "Inter", system-ui, sans-serif';
 
-    ctx.fillStyle = '#ff6b6b';
-    ctx.fillRect(pad.left, legendY - 8, 14, 3);
-    ctx.fillStyle = '#e9ecef';
+    // Dashed line legend
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, legendY - 5);
+    ctx.lineTo(pad.left + 16, legendY - 5);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'left';
-    ctx.fillText('Transformer KV-Cache: O(T · d)', pad.left + 20, legendY - 3);
+    ctx.fillText('Transformer KV-Cache: O(T · d) [Dashed]', pad.left + 22, legendY - 1);
 
-    ctx.fillStyle = '#51cf66';
-    ctx.fillRect(pad.left + 230, legendY - 8, 14, 3);
-    ctx.fillStyle = '#e9ecef';
-    ctx.fillText('BDH Synaptic State: O(d²)', pad.left + 250, legendY - 3);
+    // Solid line legend
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(pad.left + 290, legendY - 5);
+    ctx.lineTo(pad.left + 306, legendY - 5);
+    ctx.stroke();
+
+    ctx.fillText('BDH Synaptic State: O(d²) [Solid]', pad.left + 312, legendY - 1);
 
     // Axis ticks
-    ctx.fillStyle = '#868e96';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
     ctx.font = '11px "Inter", system-ui, sans-serif';
     ctx.textAlign = 'center';
     for (let i = 0; i <= 4; i++) {
@@ -173,17 +179,16 @@ export class MemoryWallCanvas {
       const tMem = data.transformerMemory[lastIdx];
       const bMem = data.bdhMemory[lastIdx];
 
-      ctx.font = 'bold 13px "Inter", system-ui, sans-serif';
+      ctx.font = 'bold 12px "JetBrains Mono", monospace';
       ctx.textAlign = 'right';
-      ctx.fillStyle = '#ff6b6b';
+      ctx.fillStyle = '#ffffff';
       ctx.fillText(
-        (tMem / 1024).toFixed(1) + ' KB',
+        'KV: ' + (tMem / 1024).toFixed(1) + ' KB',
         xScale(data.lengths[lastIdx]) + 2,
         yScale(tMem) - 10
       );
-      ctx.fillStyle = '#51cf66';
       ctx.fillText(
-        (bMem / 1024).toFixed(1) + ' KB',
+        'BDH: ' + (bMem / 1024).toFixed(1) + ' KB',
         xScale(data.lengths[lastIdx]) + 2,
         yScale(bMem) - 10
       );

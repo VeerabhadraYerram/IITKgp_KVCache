@@ -1,6 +1,6 @@
 // surgery_hud.js
 // The Crown Jewel: 3-knob interactive sandbox (Density, Capacity, Overlap)
-// with live Recall–Interference curve and analytical E[overlap] ∝ p² overlay.
+// with live Recall–Interference curve in high-contrast Black & White theme.
 
 import { sweepDensityCurve, runRecallExperiment } from '../engine/memory_experiment.js';
 
@@ -20,9 +20,7 @@ export class SurgeryHUD {
       seed: 12345,
     };
 
-    // Cached curve data
     this.curveData = null;
-    // Current single experiment result
     this.currentResult = null;
 
     this._resizeHandler = () => this._resize();
@@ -111,7 +109,6 @@ export class SurgeryHUD {
       group.appendChild(sliderRow);
       this.controlsContainer.appendChild(group);
 
-      // Event listener
       input.addEventListener('input', () => {
         const val = knob.id === 'capacity' ? parseInt(input.value) : parseFloat(input.value);
         this.params[knob.id] = val;
@@ -121,7 +118,6 @@ export class SurgeryHUD {
       });
     }
 
-    // HUD metrics display
     const hudEl = document.createElement('div');
     hudEl.className = 'surgery-hud-metrics';
     hudEl.id = 'surgery-hud-metrics';
@@ -164,28 +160,25 @@ export class SurgeryHUD {
       return sum + (cs.overlaps.length > 0 ? cs.overlaps[0].overlapFraction : 0);
     }, 0) / r.crimeScenes.length;
 
-    const accuracyColor = r.overallAccuracy >= 0.8 ? '#51cf66' : r.overallAccuracy >= 0.5 ? '#ffd43b' : '#ff6b6b';
-    const interferenceColor = avgInterference < 0.2 ? '#51cf66' : avgInterference < 0.5 ? '#ffd43b' : '#ff6b6b';
-
     el.innerHTML = `
       <div class="hud-metric">
         <span class="hud-metric-label">Capacity Load</span>
-        <div class="hud-bar-track"><div class="hud-bar-fill" style="width:${load}%;background:${accuracyColor}"></div></div>
+        <div class="hud-bar-track"><div class="hud-bar-fill" style="width:${load}%;"></div></div>
         <span class="hud-metric-value">${load}%</span>
       </div>
       <div class="hud-metric">
         <span class="hud-metric-label">Avg Interference</span>
-        <div class="hud-bar-track"><div class="hud-bar-fill" style="width:${(avgInterference*100).toFixed(0)}%;background:${interferenceColor}"></div></div>
+        <div class="hud-bar-track"><div class="hud-bar-fill" style="width:${(avgInterference*100).toFixed(0)}%;"></div></div>
         <span class="hud-metric-value">${(avgInterference*100).toFixed(0)}%</span>
       </div>
       <div class="hud-metric">
         <span class="hud-metric-label">Recall Accuracy</span>
-        <div class="hud-bar-track"><div class="hud-bar-fill" style="width:${accuracyPct}%;background:${accuracyColor}"></div></div>
-        <span class="hud-metric-value" style="color:${accuracyColor}">${accuracyPct}%</span>
+        <div class="hud-bar-track"><div class="hud-bar-fill" style="width:${accuracyPct}%;"></div></div>
+        <span class="hud-metric-value">${accuracyPct}%</span>
       </div>
       <div class="hud-metric">
         <span class="hud-metric-label">Memory</span>
-        <span class="hud-metric-value" style="color:#74c0fc">${(r.memoryBytes / 1024).toFixed(1)} KB (constant in T)</span>
+        <span class="hud-metric-value">${(r.memoryBytes / 1024).toFixed(1)} KB (constant in T)</span>
       </div>
     `;
   }
@@ -199,15 +192,13 @@ export class SurgeryHUD {
     const plotH = height - pad.top - pad.bottom;
 
     ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = 'rgba(15, 15, 25, 0.6)';
-    ctx.beginPath();
-    ctx.roundRect(0, 0, width, height, 12);
-    ctx.fill();
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, width, height);
 
     const { densities, accuracies, analyticalOverlaps, interferences } = curveData;
 
     // Grid
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
       const y = pad.top + (i / 4) * plotH;
@@ -220,11 +211,9 @@ export class SurgeryHUD {
     const xScale = (p) => pad.left + (p / 1.0) * plotW;
     const yScale = (v) => pad.top + plotH - v * plotH;
 
-    // Recall accuracy curve (green)
-    ctx.strokeStyle = '#51cf66';
-    ctx.lineWidth = 2.5;
-    ctx.shadowColor = '#51cf66';
-    ctx.shadowBlur = 6;
+    // Recall accuracy curve (Solid White Line)
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
     ctx.beginPath();
     for (let i = 0; i < densities.length; i++) {
       const x = xScale(densities[i]);
@@ -232,11 +221,11 @@ export class SurgeryHUD {
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
     ctx.stroke();
-    ctx.shadowBlur = 0;
 
-    // Interference curve (red)
-    ctx.strokeStyle = '#ff6b6b';
+    // Interference curve (Dotted White Line)
+    ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 2;
+    ctx.setLineDash([3, 3]);
     ctx.beginPath();
     for (let i = 0; i < densities.length; i++) {
       const x = xScale(densities[i]);
@@ -244,11 +233,12 @@ export class SurgeryHUD {
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
     ctx.stroke();
+    ctx.setLineDash([]);
 
-    // Analytical p² overlap (dashed white)
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    // Analytical p² overlap (Long-dashed Line)
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
     ctx.lineWidth = 1.5;
-    ctx.setLineDash([6, 4]);
+    ctx.setLineDash([8, 4]);
     ctx.beginPath();
     for (let i = 0; i < densities.length; i++) {
       const x = xScale(densities[i]);
@@ -258,9 +248,9 @@ export class SurgeryHUD {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Current density marker (vertical line)
+    // Current density marker (Vertical Dash Line)
     const curX = xScale(this.params.density);
-    ctx.strokeStyle = 'rgba(255, 224, 102, 0.6)';
+    ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 1.5;
     ctx.setLineDash([4, 3]);
     ctx.beginPath();
@@ -271,23 +261,25 @@ export class SurgeryHUD {
 
     // Current density label
     ctx.font = 'bold 11px "Inter", system-ui, sans-serif';
-    ctx.fillStyle = '#ffe066';
+    ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
     ctx.fillText(`p = ${(this.params.density * 100).toFixed(0)}%`, curX, pad.top - 5);
 
     // BDH observed region (shaded band around 5%)
     const bdhLeft = xScale(0.03);
     const bdhRight = xScale(0.08);
-    ctx.fillStyle = 'rgba(116, 192, 252, 0.08)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
     ctx.fillRect(bdhLeft, pad.top, bdhRight - bdhLeft, plotH);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.strokeRect(bdhLeft, pad.top, bdhRight - bdhLeft, plotH);
     ctx.font = '10px "Inter", system-ui, sans-serif';
-    ctx.fillStyle = 'rgba(116, 192, 252, 0.6)';
+    ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
     ctx.fillText('Observed BDH (~5%)', (bdhLeft + bdhRight) / 2, pad.top + plotH - 6);
 
     // Axis labels
-    ctx.font = '13px "Inter", system-ui, sans-serif';
-    ctx.fillStyle = '#adb5bd';
+    ctx.font = '500 13px "Inter", system-ui, sans-serif';
+    ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
     ctx.fillText('Active Neuron Density (p)', pad.left + plotW / 2, height - 8);
     ctx.save();
@@ -298,7 +290,7 @@ export class SurgeryHUD {
 
     // Axis ticks
     ctx.font = '11px "Inter", system-ui, sans-serif';
-    ctx.fillStyle = '#868e96';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
     ctx.textAlign = 'center';
     for (let i = 0; i <= 5; i++) {
       const p = i * 0.2;
@@ -312,34 +304,46 @@ export class SurgeryHUD {
     // Legend
     ctx.font = '11px "Inter", system-ui, sans-serif';
     ctx.textAlign = 'left';
+    ctx.fillStyle = '#ffffff';
     const lx = pad.left + 10;
     let ly = pad.top + 14;
 
-    ctx.fillStyle = '#51cf66';
-    ctx.fillRect(lx, ly - 6, 12, 3);
-    ctx.fillText('Recall Accuracy', lx + 18, ly);
+    // Solid line legend
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(lx, ly - 5);
+    ctx.lineTo(lx + 12, ly - 5);
+    ctx.stroke();
+    ctx.fillText('Recall Accuracy [Solid]', lx + 18, ly);
     ly += 16;
-    ctx.fillStyle = '#ff6b6b';
-    ctx.fillRect(lx, ly - 6, 12, 3);
-    ctx.fillText('Interference', lx + 18, ly);
-    ly += 16;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.setLineDash([4, 3]);
+
+    // Dotted line legend
+    ctx.lineWidth = 2;
+    ctx.setLineDash([3, 3]);
     ctx.beginPath();
     ctx.moveTo(lx, ly - 5);
     ctx.lineTo(lx + 12, ly - 5);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillText('Analytical E[overlap] ∝ p²', lx + 18, ly);
+    ctx.fillText('Interference [Dotted]', lx + 18, ly);
+    ly += 16;
 
-    // 🔵 Badge
-    ctx.font = 'bold 11px "Inter", system-ui, sans-serif';
-    ctx.fillStyle = '#74c0fc';
+    // Dashed line legend
+    ctx.setLineDash([6, 3]);
+    ctx.beginPath();
+    ctx.moveTo(lx, ly - 5);
+    ctx.lineTo(lx + 12, ly - 5);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillText('Analytical E[overlap] ∝ p² [Dashed]', lx + 18, ly);
+
+    // Live empirical badge
+    ctx.font = 'bold 10px "Inter", system-ui, sans-serif';
+    ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'right';
-    ctx.fillText('🔵 LIVE EMPIRICAL', width - pad.right - 5, pad.top + 12);
+    ctx.fillText('LIVE EMPIRICAL', width - pad.right - 5, pad.top + 12);
   }
 
-  /** Dispatch event so other components can react to parameter changes */
   dispatchResultEvent() {
     if (this.currentResult) {
       window.dispatchEvent(new CustomEvent('surgery-result', {
