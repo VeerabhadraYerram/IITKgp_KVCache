@@ -2841,3 +2841,426 @@ body.dark-mode .cert-btn-primary {
 body.dark-mode .cert-btn-secondary {
   border-color: rgba(255,255,255,0.2);
 }
+
+/* ══════════════════════════════════════════════════════ */
+/* 📱 MOBILE NAVIGATION & TOPBAR (Visible <= 900px)        */
+/* ══════════════════════════════════════════════════════ */
+.mobile-topbar {
+  display: none;
+}
+@media (max-width: 900px) {
+  .mobile-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    z-index: 150;
+    box-sizing: border-box;
+  }
+  body.dark-mode .mobile-topbar {
+    background: rgba(9, 10, 15, 0.94);
+    border-bottom-color: rgba(255, 255, 255, 0.14);
+  }
+  .mobile-brand {
+    font-size: 0.92rem;
+    font-weight: 800;
+    text-decoration: none;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mobile-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mobile-nav-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.05);
+    font-size: 0.74rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+  }
+  body.dark-mode .mobile-nav-btn {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+  }
+  .mobile-nav-btn.tour-btn {
+    background: #10b981;
+    color: #000000;
+    border-color: #10b981;
+  }
+  body.dark-mode .mobile-nav-btn.tour-btn {
+    background: #10b981;
+    color: #000000;
+    border-color: #10b981;
+  }
+}
+
+/* ══════════════════════════════════════════════════════ */
+/* 🌙 COMPREHENSIVE DARK MODE CONTRAST & READABILITY FIX  */
+/* ══════════════════════════════════════════════════════ */
+body.dark-mode {
+  --bg-primary: #090a0f;
+  --bg-card: rgba(16, 18, 27, 0.92);
+  --bg-card-hover: rgba(26, 30, 46, 0.98);
+  --border-glass: rgba(255, 255, 255, 0.14);
+  --border-highlight: #ffffff;
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --text-primary: #ffffff;
+  --text-secondary: #e2e8f0;
+  --text-muted: #94a3b8;
+  background: #090a0f !important;
+  color: #ffffff !important;
+}
+
+/* ALL Headings in Dark Mode */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6,
+body.dark-mode .act-title,
+body.dark-mode .dilemma-title,
+body.dark-mode .card-name,
+body.dark-mode .calc-card-title,
+body.dark-mode .surgery-hud-title,
+body.dark-mode .crime-scene-title,
+body.dark-mode .pareto-title,
+body.dark-mode .quiz-title,
+body.dark-mode .decision-heading,
+body.dark-mode .spec-title,
+body.dark-mode .dual-spec-title,
+body.dark-mode .toy-model-title,
+body.dark-mode .arch-diagram-title,
+body.dark-mode .roofline-title,
+body.dark-mode .serving-sandbox-title,
+body.dark-mode .taxonomy-title,
+body.dark-mode .comparison-workspace-title,
+body.dark-mode .framing-title,
+body.dark-mode .author-table-title,
+body.dark-mode .stepper-title,
+body.dark-mode .step-heading,
+body.dark-mode .epilogue-title,
+body.dark-mode .references-title,
+body.dark-mode .prompt-playground-title,
+body.dark-mode .cloud-calc-title,
+body.dark-mode .fleet-card-title,
+body.dark-mode .details-summary,
+body.dark-mode .math-proof-summary,
+body.dark-mode .approach-card-title {
+  color: #ffffff !important;
+}
+
+/* ALL Body Copy, Paragraphs, Quotes in Dark Mode */
+body.dark-mode p,
+body.dark-mode .act-intro,
+body.dark-mode .scenario-prompt,
+body.dark-mode .simplification-label,
+body.dark-mode .summary-explanation,
+body.dark-mode .spec-desc,
+body.dark-mode .toy-model-body,
+body.dark-mode .quiz-q-text,
+body.dark-mode .quiz-q-status,
+body.dark-mode .response-quote,
+body.dark-mode .timeline-desc,
+body.dark-mode .table-cell-body,
+body.dark-mode .step-body,
+body.dark-mode .author-quote-text,
+body.dark-mode .arch-diagram-sub,
+body.dark-mode .dual-spec-sub,
+body.dark-mode .math-proof-body,
+body.dark-mode .math-proof-body p,
+body.dark-mode .math-proof-body li,
+body.dark-mode .tl-dr-text,
+body.dark-mode .tour-commentary-text,
+body.dark-mode .prompt-playground-desc,
+body.dark-mode .cloud-calc-desc,
+body.dark-mode .summary-line {
+  color: #e2e8f0 !important;
+}
+
+/* Specific Component Fixes in Dark Mode */
+body.dark-mode .decision-section {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+body.dark-mode .choice-btn {
+  background: rgba(255, 255, 255, 0.07) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+}
+body.dark-mode .choice-btn:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+}
+body.dark-mode .choice-btn.active {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+body.dark-mode .summary-box {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .dual-spec-card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-glass) !important;
+}
+body.dark-mode .spec-box {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+body.dark-mode .toy-model-card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-glass) !important;
+}
+body.dark-mode .math-formula-box {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: #38bdf8 !important;
+}
+
+body.dark-mode .quiz-section {
+  background: var(--bg-card) !important;
+  border-color: var(--border-glass) !important;
+}
+body.dark-mode .quiz-question-card {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+body.dark-mode .quiz-q-number {
+  color: #94a3b8 !important;
+}
+body.dark-mode .quiz-q-text {
+  color: #ffffff !important;
+}
+body.dark-mode .quiz-option-btn {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: #ffffff !important;
+}
+body.dark-mode .quiz-option-btn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: #ffffff !important;
+}
+body.dark-mode .quiz-option-btn.selected {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+body.dark-mode .quiz-option-letter {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+body.dark-mode .quiz-option-btn.selected .quiz-option-letter {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+}
+body.dark-mode .quiz-nav-btn {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+body.dark-mode .approach-card {
+  background: var(--bg-card) !important;
+  border-color: var(--border-glass) !important;
+}
+body.dark-mode .approach-detail-label { color: #e2e8f0 !important; }
+body.dark-mode .approach-card-desc { color: #94a3b8 !important; }
+body.dark-mode .approach-select-btn {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+body.dark-mode .approach-select-btn.active-a {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+body.dark-mode .approach-select-btn.active-b {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+  border-style: solid !important;
+}
+
+body.dark-mode .trait-val { color: #ffffff !important; }
+body.dark-mode .knob-label,
+body.dark-mode .knob-value,
+body.dark-mode .hud-metric-value,
+body.dark-mode .stat-metric-val,
+body.dark-mode .metric-card-val {
+  color: #ffffff !important;
+}
+
+body.dark-mode select {
+  background: #111420 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+body.dark-mode option {
+  background: #111420 !important;
+  color: #ffffff !important;
+}
+
+/* ══════════════════════════════════════════════════════ */
+/* 📱 MOBILE RESPONSIVENESS & OVERLAP PREVENTION (< 768px) */
+/* ══════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    position: relative;
+    padding-bottom: 80px;
+  }
+
+  .container {
+    padding: 0 14px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+
+  .act {
+    padding: 24px 0 !important;
+  }
+
+  /* All Grid Layouts convert to 1 Column */
+  .response-cards-grid,
+  .prompt-comparison-grid,
+  .cloud-fleet-grid,
+  .dual-spec-grid,
+  .surgery-hud-layout,
+  .serving-grid,
+  .step-tradeoff-grid,
+  .calc-layout,
+  .benchmark-grid,
+  .taxonomy-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .stat-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  /* Prompt Input Row: Stack input and button vertically */
+  .prompt-input-row {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .prompt-input-field {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .prompt-sim-btn {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Cloud ROI Inputs */
+  .cloud-inputs-row {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .roi-savings-banner {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  /* Canvases & 3D Viewports */
+  .microscope-viewport,
+  .kv3d-viewport-wrapper,
+  .kv-3d-viewport {
+    height: 250px !important;
+    max-width: 100% !important;
+    touch-action: pan-y !important;
+  }
+  canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Tables: Horizontal scroll wrapper with minimum width to prevent vertical cell crushing */
+  .arch-table-wrapper,
+  .matrix-table-wrapper,
+  #crime-scene-table-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    display: block !important;
+    margin-bottom: 12px !important;
+  }
+  .arch-table,
+  .matrix-table,
+  .crime-scene-table {
+    min-width: 580px !important;
+  }
+
+  /* Guided Tour HUD on mobile: Compact bottom banner */
+  #guided-tour-hud {
+    width: calc(100% - 20px) !important;
+    left: 10px !important;
+    right: 10px !important;
+    bottom: 10px !important;
+    transform: translateY(140%) !important;
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
+  }
+  #guided-tour-hud.active {
+    transform: translateY(0) !important;
+  }
+  .tour-commentary-text {
+    font-size: 0.76rem !important;
+    line-height: 1.35 !important;
+  }
+  .tour-controls-row {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .tour-timer-pill {
+    font-size: 0.65rem !important;
+  }
+
+  /* Hide background decorative SVGs on mobile to eliminate clutter and overflow */
+  .bg-decorations {
+    display: none !important;
+  }
+
+  /* General card padding reduction on phone */
+  .conversation-card, .response-card, .benchmark-card, .calc-card,
+  .roofline-card, .serving-card, .comparison-card, .toy-model-card,
+  .bdh-cq-card, .quiz-section, .prompt-playground-card, .cloud-fleet-calculator {
+    padding: 14px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}

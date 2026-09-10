@@ -1280,6 +1280,7 @@ function initScrollTrigger() {
 // ══════════════════════════════════════════════════════════════
 function initThemeToggle() {
   const toggleBtn = document.getElementById('theme-toggle');
+  const mobileToggleBtn = document.getElementById('mobile-theme-toggle');
   const themeIcon = document.getElementById('theme-icon');
   const themeLabel = document.getElementById('theme-label');
 
@@ -1293,11 +1294,13 @@ function initThemeToggle() {
       document.body.classList.add('dark-mode');
       if (themeIcon) themeIcon.textContent = '☀️';
       if (themeLabel) themeLabel.textContent = 'Light';
+      if (mobileToggleBtn) mobileToggleBtn.textContent = '☀️ Light';
       localStorage.setItem('theme', 'dark');
     } else {
       document.body.classList.remove('dark-mode');
       if (themeIcon) themeIcon.textContent = '🌙';
       if (themeLabel) themeLabel.textContent = 'Dark';
+      if (mobileToggleBtn) mobileToggleBtn.textContent = '🌙 Dark';
       localStorage.setItem('theme', 'light');
     }
     window.dispatchEvent(new CustomEvent('themechange', { detail: { dark } }));
@@ -1305,10 +1308,13 @@ function initThemeToggle() {
 
   applyTheme(isDark);
 
-  toggleBtn?.addEventListener('click', () => {
+  const toggleHandler = () => {
     const willBeDark = !document.body.classList.contains('dark-mode');
     applyTheme(willBeDark);
-  });
+  };
+
+  toggleBtn?.addEventListener('click', toggleHandler);
+  mobileToggleBtn?.addEventListener('click', toggleHandler);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1491,6 +1497,7 @@ function initGuidedTour() {
   const hud = document.getElementById('guided-tour-hud');
   const heroBtn = document.getElementById('hero-tour-btn');
   const navBtn = document.getElementById('nav-tour-btn');
+  const mobileTourBtn = document.getElementById('mobile-tour-btn');
   const closeBtn = document.getElementById('tour-close-btn');
   const prevBtn = document.getElementById('tour-prev-btn');
   const playPauseBtn = document.getElementById('tour-play-pause-btn');
@@ -1623,6 +1630,7 @@ function initGuidedTour() {
 
   heroBtn?.addEventListener('click', startTour);
   navBtn?.addEventListener('click', startTour);
+  mobileTourBtn?.addEventListener('click', startTour);
   closeBtn?.addEventListener('click', stopTour);
 
   prevBtn?.addEventListener('click', () => goToStep(currentStep - 1));
