@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>When Attention Becomes Memory — DataForge 2026</title>
+  <meta name="description" content="An interactive visual essay exploring the duality between Transformer KV-caches, fast-weight associative memory, and biological synaptic plasticity. Featuring Pathway's Dragon Hatchling (BDH) architecture.">
+
+  <link rel="stylesheet" href="style.css">
+  <!-- KaTeX for beautiful math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- HERO                                                        -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <h1 class="hero-hook">Can you break an AI's memory<br>without deleting a single parameter?</h1>
+      <p class="hero-subtitle">An interactive journey through KV-caches, fast weights, and synaptic plasticity — and what happens when memory fills up.</p>
+
+      <div class="hero-claim">
+        <strong>The Central Claim:</strong> Fixed-state associative memory can replace sequence-length-growing token storage, but its finite capacity creates an interference trade-off: sparse, non-negative representations reduce expected overlap between stored associations (\(\mathbb{E}[\text{overlap}] \propto p^2\)), while excessive compression or dense overlap causes retrieval failures.
+      </div>
+
+      <div class="hero-meta">
+        <span class="hero-meta-tag">DataForge 2026 · Pathway Track</span>
+        <span class="hero-meta-tag">Topic: Associative Memory & Fast Weights</span>
+        <span class="hero-meta-tag">BDH · BDH-CQ</span>
+      </div>
+
+      <div class="scroll-indicator">
+        <span>↓</span>
+        Start the journey
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- ACT I: The Memory Wall & The Re-Association Trick      -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section class="act" id="act-1">
+      <div class="act-header">
+        <div class="act-number">Act I</div>
+        <h2 class="act-title">The Memory Wall & The Re-Association Trick</h2>
+        <p class="act-description">
+          Standard Transformers retain context by caching every past token's key and value vectors.
+          As sequence length \(T\) grows, so does the cache — linearly.
+          But what if we could accumulate the same information into a fixed-size state?
+        </p>
+      </div>
+
+      <!-- Memory scaling comparison -->
+      <div class="glass-card">
+        <div class="equation-label">
+          <span>KV-Cache Memory vs Synaptic State Memory</span>
+          <span class="badge badge-empirical">🔵 Live Empirical</span>
+        </div>
+        <div class="canvas-container" id="memory-wall-container">
+          <canvas id="memory-wall-canvas"></canvas>
+        </div>
+        <p class="text-sm text-muted text-center mt-24">
+          KV-cache memory grows proportionally with sequence length \(T\).
+          Synaptic state memory remains constant regardless of how many tokens are processed.
+        </p>
+      </div>
+
+      <!-- The Re-Association Bracket Drag -->
+      <div class="bracket-drag-container" id="bracket-drag">
+        <div class="equation-label">
+          <span>The Re-Association Trick</span>
+          <span class="badge badge-established">🟢 Established · Katharopoulos et al., 2020</span>
+        </div>
+
+        <div class="bracket-equation" id="bracket-eq">
+          <span id="eq-before">
+            \(\displaystyle y_t = \sum_{\tau=1}^{t}\) <span class="paren" id="paren-open">(</span> \(q_t \, k_\tau^\top\) <span class="paren" id="paren-close">)</span> \(v_\tau\)
+          </span>
+          <span id="eq-after" style="display:none;">
+            \(\displaystyle y_t = q_t\) <span class="paren" style="color:var(--green)">(</span> \(\displaystyle\sum_{\tau=1}^{t} k_\tau^\top v_\tau\) <span class="paren" style="color:var(--green)">)</span> \(= q_t \, \mathbf{S}_t\)
+          </span>
+        </div>
+
+        <p class="bracket-instruction" id="bracket-instruction">
+          👆 Click the yellow brackets to re-associate the multiplication
+        </p>
+
+        <div id="bracket-state-label" class="bracket-state-label bracket-state-before">
+          Token-by-token pairwise comparison · O(T · d) memory
+        </div>
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>🔴 NOT CLAIMED:</strong> This is unnormalized / linear attention.
+        It is <strong>not</strong> algebraically identical to softmax attention.
+        The softmax normalizer couples queries and keys non-linearly, preventing this regrouping in the exact case.
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- ACT II: When Attention Becomes Synapses                 -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section class="act" id="act-2">
+      <div class="act-header">
+        <div class="act-number">Act II</div>
+        <h2 class="act-title">When Attention Becomes Synapses</h2>
+        <p class="act-description">
+          The accumulator \(\mathbf{S}_t\) updates by adding an outer product at each step.
+          This shares mathematical form with a rule proposed by Donald Hebb in 1949:
+          <em>"Neurons that fire together, wire together."</em>
+        </p>
+      </div>
+
+      <div class="equation-block">
+        <div class="equation-label">
+          <span>The Hebbian Correspondence</span>
+          <span class="badge badge-established">🟢 Established · Hebb 1949, Schmidhuber 1992, Kosowski et al. 2025</span>
+        </div>
+        <p style="font-size:1.15rem; margin: 16px 0;">
+          \(\mathbf{S}_{t+1} = \mathbf{S}_t + k_t^\top v_t \implies \Delta S_{ij} = k_{t,i} \cdot v_{t,j}\)
+        </p>
+        <p class="text-sm text-muted" style="margin-top: 12px;">
+          The outer-product update accumulating key-value pairs shares mathematical form with Hebbian synaptic plasticity:
+          \(\Delta W_{ij} \propto \text{pre}_i \times \text{post}_j\)
+        </p>
+      </div>
+
+      <!-- Live synaptic matrix -->
+      <div class="glass-card">
+        <div class="equation-label">
+          <span>Live Synaptic State Matrix</span>
+          <span class="badge badge-toy">🟡 Educational Toy · Micro-BDH (D=32, N=128)</span>
+        </div>
+        <div style="display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap;">
+          <button class="btn" id="btn-stream-token">▶ Stream Token</button>
+          <button class="btn" id="btn-reset-synapse">↺ Reset State</button>
+        </div>
+        <div class="canvas-container" id="synapse-container">
+          <canvas id="synapse-canvas"></canvas>
+        </div>
+        <p class="text-sm text-muted mt-24">
+          Watch synapses ignite as each token writes a Hebbian outer product \(k_t^\top v_t\) into the fixed state matrix \(\mathbf{S}\).
+        </p>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- ACT III: BREAK IT! The Memory Crime Scene               -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section class="act" id="act-3">
+      <div class="act-header">
+        <div class="act-number">Act III</div>
+        <h2 class="act-title">BREAK IT! 💥</h2>
+        <p class="act-description">
+          Can you break this memory without deleting a single parameter?
+          Store 8 dense associations, then try to retrieve them.
+          Watch what happens when representations overlap.
+        </p>
+      </div>
+
+      <div class="glass-card">
+        <div style="display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+          <button class="btn btn-danger" id="btn-break-memory">💥 Store 8 Dense Associations</button>
+          <button class="btn" id="btn-query-memory">🔍 Query: Alpha → ?</button>
+          <button class="btn" id="btn-crime-scene">🔎 Why Did It Forget?</button>
+        </div>
+
+        <!-- Truth Beside Estimate -->
+        <div class="crime-scene-result" id="crime-scene-result" style="display:none;">
+          <div class="truth-box">
+            <div class="truth-box-label">Ground Truth</div>
+            <div class="truth-box-value correct" id="truth-expected">—</div>
+          </div>
+          <div class="truth-box">
+            <div class="truth-box-label">Model Retrieved</div>
+            <div class="truth-box-value" id="truth-retrieved">—</div>
+          </div>
+        </div>
+
+        <!-- Crime Scene Inspector -->
+        <div class="crime-scene-container" id="crime-scene-inspector" style="display:none;">
+          <div class="crime-scene-title">⚠ Memory Crime Scene</div>
+          <p class="text-sm text-muted mb-16">
+            These stored keys share overlapping active neurons with the query, causing associative crosstalk:
+          </p>
+          <ul class="crime-overlap-list" id="crime-overlap-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- ACT IV: Memory Surgery (Crown Jewel)                    -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section class="act" id="act-4">
+      <div class="act-header">
+        <div class="act-number">Act IV</div>
+        <h2 class="act-title">Memory Surgery 🩺</h2>
+        <p class="act-description">
+          Now that you've broken the memory, can you fix it?
+          Manipulate three knobs and discover the <strong>Recall–Interference Curve</strong> — live.
+          <br><br>
+          <em>Sparse representations can reduce expected overlap between stored associations,
+          making associative crosstalk less likely. But sparsity is not magic:
+          too little activity can reduce representational capacity.</em>
+        </p>
+      </div>
+
+      <div class="glass-card glass-card-highlight">
+        <div id="surgery-controls"></div>
+      </div>
+
+      <div class="glass-card">
+        <div class="equation-label">
+          <span>Live Recall–Interference Curve</span>
+          <span class="badge badge-empirical">🔵 Live Empirical</span>
+        </div>
+        <div class="canvas-container canvas-container-tall" id="surgery-canvas-container">
+          <canvas id="surgery-canvas"></canvas>
+        </div>
+        <p class="text-sm text-muted text-center mt-24">
+          Dashed line: analytical prediction \(\mathbb{E}[\langle k_i, k_j \rangle] \propto p^2\).
+          Shaded region: observed BDH activity (~5%).
+          Curves generated live from your parameter settings.
+        </p>
+      </div>
+
+      <div class="callout callout-info">
+        <strong>🟡 Derivable Property:</strong> For random non-negative sparse vectors with activation probability \(p\),
+        the expected pairwise overlap scales as \(\mathbb{E}[\langle k_i, k_j \rangle] = D \cdot p^2\).
+        This is verified live against the empirical curve above.
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- ACT V: The Frontier & BDH / BDH-CQ Microscope          -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section class="act" id="act-5">
+      <div class="act-header">
+        <div class="act-number">Act V</div>
+        <h2 class="act-title">The Frontier: BDH & BDH-CQ</h2>
+        <p class="act-description">
+          You've just explored a simplified mechanism that appears inside a much larger research architecture.
+          Here's how Pathway's Dragon Hatchling (BDH) implements these ideas at scale — and what its
+          recurrent memory enables.
+        </p>
+      </div>
+
+      <!-- BDH Microscope: Real vs Micro -->
+      <div class="microscope-compare">
+        <div class="microscope-panel">
+          <div class="microscope-panel-title">
+            <span class="badge badge-established">🟢</span>
+            Real BDH (<code>bdh.py</code>)
+          </div>
+          <div class="microscope-code"><span class="cm"># Kosowski et al., 2025 (arXiv:2509.26507)</span>
+<span class="cm"># Baseline GPU-friendly formulation</span>
+
+x_latent <span class="op">=</span> x <span class="op">@</span> self.encoder     <span class="cm"># D→N projection</span>
+x_sparse <span class="op">=</span> <span class="fn">F.relu</span>(x_latent) <span class="cm"># Non-negative sparse</span>
+
+<span class="cm"># Linear attention with RoPE</span>
+QR <span class="op">=</span> <span class="fn">self.rope</span>(phases, x_sparse)
+scores <span class="op">=</span> (QR <span class="op">@</span> QR.mT).<span class="fn">tril</span>(diagonal<span class="op">=</span>-1)
+yKV <span class="op">=</span> scores <span class="op">@</span> V
+
+<span class="cm"># Gated sparse MLP</span>
+xy_sparse <span class="op">=</span> x_sparse <span class="op">*</span> y_sparse
+y <span class="op">=</span> xy_sparse <span class="op">@</span> self.decoder
+
+<span class="cm"># Observed: ~5% neurons active</span>
+<span class="cm"># Activity varies with predictability</span></div>
+          <p class="text-sm text-muted" style="margin-top:12px;">
+            N = 8192 neurons · RoPE positional encoding · Gated sparse MLP ·
+            Scales to GPT-2 level at 10M–1B parameters.
+          </p>
+        </div>
+
+        <div class="microscope-panel">
+          <div class="microscope-panel-title">
+            <span class="badge badge-toy">🟡</span>
+            Our Micro-BDH (Educational)
+          </div>
+          <div class="microscope-code"><span class="cm">// Transparent educational engine</span>
+<span class="cm">// Isolates the core principle</span>
+
+latent <span class="op">=</span> x <span class="op">@</span> encoder     <span class="cm">// D(32)→N(128)</span>
+sparse <span class="op">=</span> <span class="fn">topk_relu</span>(latent) <span class="cm">// Enforce density</span>
+
+<span class="cm">// Hebbian outer-product write</span>
+S <span class="op">+=</span> sparse<span class="op">ᵀ</span> <span class="op">*</span> value   <span class="cm">// ΔS = kᵀv</span>
+
+<span class="cm">// Readout</span>
+output <span class="op">=</span> query_sparse <span class="op">@</span> S
+
+<span class="cm">// Adjustable density: 1%–100%</span>
+<span class="cm">// D=32, N=128 for real-time use</span></div>
+          <p class="text-sm text-muted" style="margin-top:12px;">
+            Same mathematical principle. Simplified for transparency, speed, and
+            interactive exploration in the browser.
+          </p>
+        </div>
+      </div>
+
+      <!-- BDH-CQ Payoff -->
+      <h3 style="font-size:1.2rem; margin: 40px 0 16px; color: var(--text-primary);">
+        So what can this kind of memory actually enable?
+      </h3>
+
+      <p class="act-description mb-16">
+        BDH-CQ extends BDH's recurrent synaptic memory to enable <strong>latent reasoning</strong>:
+        instead of emitting hundreds of verbal Chain-of-Thought tokens, the model solves queries
+        through iterative computation in its internal latent state.
+      </p>
+
+      <div class="effort-tiers" id="effort-tiers">
+        <div class="effort-tier" data-tier="low">
+          <div class="effort-tier-label">Low Effort</div>
+          <div class="effort-tier-value">~21%</div>
+          <div class="effort-tier-unit">pass@2 on ARC-AGI-1</div>
+        </div>
+        <div class="effort-tier active" data-tier="medium">
+          <div class="effort-tier-label">Medium Effort</div>
+          <div class="effort-tier-value">~27%</div>
+          <div class="effort-tier-unit">pass@2 on ARC-AGI-1</div>
+        </div>
+        <div class="effort-tier" data-tier="high">
+          <div class="effort-tier-label">High Effort</div>
+          <div class="effort-tier-value">~30%</div>
+          <div class="effort-tier-unit">pass@2 on ARC-AGI-1</div>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <strong>🟣 Precomputed / Audited:</strong>
+        150M-parameter BDH-CQ configuration. Developer-computed inference cost: $0.0007/task ($3/H200-hr).
+        Score independently audited by Bielik/NYU co-authors on the public ARC-AGI-1 evaluation set.
+        Internal recurrence iteration counts and update dynamics remain proprietary.
+        <br><em>Source: Pathway, arXiv:2608.09888, August 2026.</em>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- FRONTIER: The Uncomfortable Trade-Off                    -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section class="frontier-section" id="frontier">
+      <div class="act-header">
+        <div class="act-number">The Frontier</div>
+        <h2 class="act-title">The Uncomfortable Trade-Off</h2>
+      </div>
+
+      <div class="frontier-equation">
+        Fixed State
+        <span class="arrow">→</span> Constant Memory w.r.t. T
+        <span class="arrow">→</span> Bounded Capacity
+        <span class="arrow">→</span> Compression
+        <span class="arrow">→</span> Interference
+        <br><br>
+        Growing KV-Cache
+        <span class="arrow">→</span> Perfect Recall
+        <span class="arrow">→</span> O(T · d) Memory
+        <span class="arrow">→</span> Bandwidth Bottleneck
+      </div>
+
+      <div class="callout callout-warning">
+        <strong>🔴 Honest Limitations:</strong>
+        <ul style="margin-top:8px; padding-left:20px; list-style: disc;">
+          <li>As sequence length \(T \gg N\), even sparse Hebbian memory saturates (capacity bound).</li>
+          <li>Linear recurrence without decay treats past tokens additively; precise order requires positional modulations like RoPE.</li>
+          <li>GPUs excel at dense matrix math; achieving real hardware speedups with sparse Hebbian updates may require specialized sparse kernels or neuromorphic substrates.</li>
+          <li>BDH-CQ results are developer-reported with independent score audit, but cost figures and architectural details are proprietary.</li>
+        </ul>
+      </div>
+
+      <p class="frontier-closing">
+        "You didn't learn that one memory mechanism is <em>better</em>.<br>
+        You learned what you trade away when you stop storing the past explicitly —<br>
+        and what becomes possible when you let memory <em>evolve</em>."
+      </p>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- SOURCES                                                  -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section class="sources-section" id="sources">
+      <h3 style="font-size:1rem; font-weight:700; margin-bottom:16px;">Primary Sources (2017–2026)</h3>
+      <ol class="source-list">
+        <li>[1] Kosowski, A. et al. (2025). <em>The Dragon Hatchling: The Missing Link between the Transformer and Models of the Brain.</em> <a href="https://arxiv.org/abs/2509.26507" target="_blank">arXiv:2509.26507</a></li>
+        <li>[2] Pathway Research (2026). <em>BDH-CQ: In-Context Learning with Recurrent Latent Reasoning.</em> <a href="https://arxiv.org/abs/2608.09888" target="_blank">arXiv:2608.09888</a></li>
+        <li>[3] Katharopoulos, A. et al. (2020). <em>Transformers are RNNs: Fast Autoregressive Transformers with Linear Attention.</em> ICML 2020.</li>
+        <li>[4] Schlag, I., Irie, K. & Schmidhuber, J. (2021). <em>Linear Transformers Are Secretly Fast Weight Programmers.</em> ICML 2021.</li>
+        <li>[5] Dao, T. et al. (2022). <em>FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness.</em> NeurIPS 2022.</li>
+        <li>[6] Gu, A. & Dao, T. (2023). <em>Mamba: Linear-Time Sequence Modeling with Selective State Spaces.</em> arXiv:2312.00752.</li>
+        <li>[7] Sun, Y. et al. (2023). <em>Retentive Network: A Successive Linear Attention Architecture.</em> arXiv:2307.08621.</li>
+        <li>[8] Vaswani, A. et al. (2017). <em>Attention Is All You Need.</em> NeurIPS 2017.</li>
+      </ol>
+      <p class="text-sm text-muted" style="margin-top:24px;">
+        Built for DataForge 2026 (Pathway Track) at IIT Kharagpur.
+        This interactive essay uses a clearly labeled educational Micro-BDH engine (🟡)
+        alongside citations from peer-reviewed primary literature (🟢).
+        All live empirical results (🔵) are computed dynamically in the browser.
+      </p>
+    </section>
+
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

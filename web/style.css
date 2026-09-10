@@ -1,0 +1,780 @@
+/* style.css — Publication-grade dark-mode glassmorphic design */
+/* DataForge 2026: "When Attention Becomes Memory" */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ─── Design Tokens ─── */
+:root {
+  --bg-primary: #0a0a14;
+  --bg-secondary: #10101f;
+  --bg-card: rgba(18, 18, 35, 0.7);
+  --bg-glass: rgba(25, 25, 50, 0.5);
+  --border-glass: rgba(255, 255, 255, 0.06);
+  --border-highlight: rgba(116, 192, 252, 0.25);
+
+  --text-primary: #e9ecef;
+  --text-secondary: #adb5bd;
+  --text-muted: #868e96;
+  --text-accent: #74c0fc;
+
+  --green: #51cf66;
+  --red: #ff6b6b;
+  --yellow: #ffd43b;
+  --blue: #74c0fc;
+  --purple: #b197fc;
+  --orange: #ff922b;
+
+  --badge-established: #51cf66;
+  --badge-toy: #ffd43b;
+  --badge-empirical: #74c0fc;
+  --badge-precomputed: #b197fc;
+  --badge-not-claimed: #ff6b6b;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  --transition-fast: 150ms ease;
+  --transition-med: 300ms ease;
+}
+
+/* ─── Reset & Base ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ─── Background Pattern ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(81, 207, 102, 0.03) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 90%, rgba(116, 192, 252, 0.03) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 50% 50%, rgba(177, 151, 252, 0.02) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Layout ─── */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Hero Section ─── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 60px 24px;
+}
+
+.hero-hook {
+  font-size: clamp(1.6rem, 4vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--green), var(--blue), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: var(--text-secondary);
+  max-width: 640px;
+  margin-bottom: 40px;
+  font-weight: 400;
+}
+
+.hero-claim {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 20px 28px;
+  max-width: 720px;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.hero-claim strong {
+  color: var(--text-accent);
+}
+
+.hero-meta {
+  margin-top: 32px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hero-meta-tag {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 100px;
+  background: rgba(116, 192, 252, 0.08);
+  color: var(--blue);
+  border: 1px solid rgba(116, 192, 252, 0.15);
+}
+
+/* ─── Scroll Indicator ─── */
+.scroll-indicator {
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+.scroll-indicator span { font-size: 1.4rem; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(6px); }
+}
+
+/* ─── Act Sections ─── */
+.act {
+  padding: 80px 0 60px;
+  border-top: 1px solid var(--border-glass);
+}
+
+.act-header {
+  margin-bottom: 40px;
+}
+
+.act-number {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.act-title {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.act-description {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 680px;
+  line-height: 1.7;
+}
+
+/* ─── Honesty Badges ─── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.badge-established { background: rgba(81, 207, 102, 0.1); color: var(--badge-established); border: 1px solid rgba(81, 207, 102, 0.2); }
+.badge-toy { background: rgba(255, 212, 59, 0.1); color: var(--badge-toy); border: 1px solid rgba(255, 212, 59, 0.2); }
+.badge-empirical { background: rgba(116, 192, 252, 0.1); color: var(--badge-empirical); border: 1px solid rgba(116, 192, 252, 0.2); }
+.badge-precomputed { background: rgba(177, 151, 252, 0.1); color: var(--badge-precomputed); border: 1px solid rgba(177, 151, 252, 0.2); }
+.badge-not-claimed { background: rgba(255, 107, 107, 0.1); color: var(--badge-not-claimed); border: 1px solid rgba(255, 107, 107, 0.2); }
+
+/* ─── Glass Cards ─── */
+.glass-card {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  margin-bottom: 24px;
+}
+
+.glass-card-highlight {
+  border-color: var(--border-highlight);
+  box-shadow: 0 0 30px rgba(116, 192, 252, 0.04);
+}
+
+/* ─── Canvas Containers ─── */
+.canvas-container {
+  width: 100%;
+  height: 300px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin: 16px 0;
+}
+
+.canvas-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.canvas-container-tall { height: 360px; }
+
+/* ─── Interactive Bracket Drag ─── */
+.bracket-drag-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 32px 24px;
+  text-align: center;
+  margin: 24px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.bracket-equation {
+  font-family: var(--font-mono);
+  font-size: clamp(0.85rem, 2vw, 1.1rem);
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  line-height: 2;
+  user-select: none;
+}
+
+.bracket-equation .paren {
+  color: var(--yellow);
+  font-weight: 700;
+  font-size: 1.3em;
+  cursor: grab;
+  transition: color var(--transition-fast), text-shadow var(--transition-fast);
+}
+
+.bracket-equation .paren:hover {
+  text-shadow: 0 0 12px rgba(255, 212, 59, 0.6);
+}
+
+.bracket-equation .paren.dragging {
+  cursor: grabbing;
+  color: var(--green);
+  text-shadow: 0 0 16px rgba(81, 207, 102, 0.6);
+}
+
+.bracket-instruction {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 12px;
+}
+
+.bracket-state-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 100px;
+  display: inline-block;
+  margin-top: 16px;
+  transition: all var(--transition-med);
+}
+
+.bracket-state-before {
+  background: rgba(255, 107, 107, 0.1);
+  color: var(--red);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+}
+
+.bracket-state-after {
+  background: rgba(81, 207, 102, 0.1);
+  color: var(--green);
+  border: 1px solid rgba(81, 207, 102, 0.2);
+}
+
+/* ─── Crime Scene ─── */
+.crime-scene-container {
+  background: rgba(255, 107, 107, 0.03);
+  border: 1px solid rgba(255, 107, 107, 0.15);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin: 24px 0;
+}
+
+.crime-scene-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--red);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.crime-scene-result {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.truth-box {
+  background: rgba(81, 207, 102, 0.06);
+  border: 1px solid rgba(81, 207, 102, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+}
+
+.truth-box-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.truth-box-value {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.truth-box-value.correct { color: var(--green); }
+.truth-box-value.incorrect { color: var(--red); }
+
+.crime-overlap-list {
+  list-style: none;
+}
+
+.crime-overlap-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-glass);
+  font-size: 0.9rem;
+}
+
+.crime-overlap-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.crime-overlap-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--red), var(--orange));
+  transition: width var(--transition-med);
+}
+
+/* ─── Surgery Controls ─── */
+.surgery-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 20px 0;
+}
+
+.knob-group {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+}
+
+.knob-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.knob-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.knob-value {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-accent);
+}
+
+.knob-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.knob-range-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  min-width: 60px;
+}
+.knob-range-label:last-child { text-align: right; }
+
+.knob-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.knob-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--blue);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: grab;
+  box-shadow: 0 0 8px rgba(116, 192, 252, 0.3);
+  transition: box-shadow var(--transition-fast);
+}
+
+.knob-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 16px rgba(116, 192, 252, 0.5);
+}
+
+.knob-slider::-webkit-slider-thumb:active { cursor: grabbing; }
+
+.knob-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--blue);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: grab;
+}
+
+/* ─── Surgery HUD Metrics ─── */
+.surgery-hud-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.hud-metric {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hud-metric-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  min-width: 110px;
+}
+
+.hud-bar-track {
+  flex: 1;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.hud-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width var(--transition-med);
+}
+
+.hud-metric-value {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-width: 90px;
+  text-align: right;
+}
+
+/* ─── BDH Microscope ─── */
+.microscope-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+@media (max-width: 640px) {
+  .microscope-compare { grid-template-columns: 1fr; }
+}
+
+.microscope-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+
+.microscope-panel-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.microscope-code {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.microscope-code .kw { color: var(--purple); }
+.microscope-code .fn { color: var(--blue); }
+.microscope-code .cm { color: var(--text-muted); }
+.microscope-code .st { color: var(--green); }
+.microscope-code .op { color: var(--yellow); }
+
+/* ─── BDH-CQ Effort Tiers ─── */
+.effort-tiers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 24px 0;
+}
+
+@media (max-width: 640px) {
+  .effort-tiers { grid-template-columns: 1fr; }
+}
+
+.effort-tier {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-med);
+}
+
+.effort-tier:hover, .effort-tier.active {
+  border-color: var(--border-highlight);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.effort-tier.active { border-color: var(--blue); }
+
+.effort-tier-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.effort-tier-value {
+  font-family: var(--font-mono);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.effort-tier-unit {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* ─── Callout Boxes ─── */
+.callout {
+  border-radius: var(--radius-md);
+  padding: 18px 22px;
+  margin: 20px 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.callout-warning {
+  background: rgba(255, 107, 107, 0.06);
+  border: 1px solid rgba(255, 107, 107, 0.15);
+  color: var(--text-secondary);
+}
+
+.callout-info {
+  background: rgba(116, 192, 252, 0.06);
+  border: 1px solid rgba(116, 192, 252, 0.15);
+  color: var(--text-secondary);
+}
+
+.callout-success {
+  background: rgba(81, 207, 102, 0.06);
+  border: 1px solid rgba(81, 207, 102, 0.15);
+  color: var(--text-secondary);
+}
+
+.callout strong { color: var(--text-primary); }
+
+/* ─── Equation Blocks ─── */
+.equation-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  margin: 20px 0;
+  text-align: center;
+  overflow-x: auto;
+}
+
+.equation-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ─── Buttons ─── */
+.btn {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 10px 20px;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  background: var(--bg-glass);
+  color: var(--text-primary);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn:hover {
+  border-color: var(--border-highlight);
+  background: rgba(116, 192, 252, 0.08);
+}
+
+.btn-danger {
+  border-color: rgba(255, 107, 107, 0.3);
+  color: var(--red);
+}
+.btn-danger:hover {
+  background: rgba(255, 107, 107, 0.1);
+  border-color: var(--red);
+}
+
+.btn-success {
+  border-color: rgba(81, 207, 102, 0.3);
+  color: var(--green);
+}
+
+/* ─── Footer / Frontier ─── */
+.frontier-section {
+  padding: 60px 0 80px;
+  border-top: 1px solid var(--border-glass);
+}
+
+.frontier-equation {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 2.2;
+  margin: 32px 0;
+}
+
+.frontier-equation .arrow {
+  color: var(--text-muted);
+}
+
+.frontier-closing {
+  text-align: center;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 40px auto 0;
+  line-height: 1.8;
+}
+
+/* ─── Sources Footer ─── */
+.sources-section {
+  padding: 40px 0 80px;
+  border-top: 1px solid var(--border-glass);
+}
+
+.source-list {
+  list-style: none;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 2;
+}
+
+.source-list a {
+  color: var(--text-accent);
+  text-decoration: none;
+}
+.source-list a:hover { text-decoration: underline; }
+
+/* ─── Utility ─── */
+.mt-24 { margin-top: 24px; }
+.mb-16 { margin-bottom: 16px; }
+.text-center { text-align: center; }
+.text-mono { font-family: var(--font-mono); }
+.text-muted { color: var(--text-muted); }
+.text-sm { font-size: 0.85rem; }
+.flex-center { display: flex; justify-content: center; align-items: center; }
+
+/* ─── Responsive ─── */
+@media (max-width: 640px) {
+  .container { padding: 0 16px; }
+  .act { padding: 48px 0 36px; }
+  .glass-card { padding: 16px; }
+  .canvas-container { height: 240px; }
+  .canvas-container-tall { height: 280px; }
+  .crime-scene-result { grid-template-columns: 1fr; }
+  .hero-claim { padding: 16px 20px; }
+}
