@@ -978,9 +978,354 @@
 
     </section>
     <!-- END CHAPTER 4 -->
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- CHAPTER 5: ALTERNATE MEMORY APPROACHES, COMPARED HONESTLY    -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <section class="act" id="chapter-5">
+      <div class="act-header">
+        <div class="act-number">Chapter 5</div>
+        <h2 class="act-title">Alternate Memory Approaches, Compared Honestly</h2>
+        <p class="act-description">
+          Faced with the quadratic compute of naive recomputation (Chapter 2) and the memory-bandwidth wall of unbounded KV caches (Chapters 3 &amp; 4), the machine learning community has proposed diverse memory architectures. But memory reduction never comes for free: each approach trades away explicit token-addressability, recall precision, or softmax sharpness. Here, we compare these mechanisms under a common normalized analytical scale.
+        </p>
+      </div>
+
+      <!-- Scientific Honesty Scoping Banner -->
+      <div class="scientific-honesty-box" style="margin-bottom: 20px;">
+        <span class="honesty-box-title">Normalized Analytical Comparison Notice</span>
+        <div class="honesty-box-item">
+          Except where explicitly stated, these numbers are normalized analytical estimates that place different memory mechanisms on a common 32-layer, FP16 comparison scale (<em>L=32, d<sub>model</sub>=4096, d<sub>head</sub>=128, s=2 bytes</em>). They are not measurements of the original published model implementations, which differ in layer count, precision, and architectural hyperparameters.
+        </div>
+        <div class="honesty-box-item">
+          These curves describe state-memory scaling, not model quality, latency, throughput, or recall accuracy. Two methods with identical memory growth can have radically different retrieval behavior.
+        </div>
+      </div>
+
+      <!-- State Semantics Taxonomy Banner -->
+      <div class="taxonomy-card">
+        <h3 class="taxonomy-title">Taxonomy of State Semantics: What Kind of Memory?</h3>
+        <p class="taxonomy-desc">
+          Before comparing numbers, we must distinguish what information physically survives inside each state representation:
+        </p>
+        <div class="taxonomy-grid">
+          <div class="taxonomy-item">
+            <span class="taxonomy-num">01 · Explicit Token</span>
+            <span class="taxonomy-item-name">Token-Addressable Buffers</span>
+            <span class="taxonomy-item-sub">Standard KV, StreamingLLM, H2O: stores explicit activations per position.</span>
+          </div>
+          <div class="taxonomy-item">
+            <span class="taxonomy-num">02 · Compressed Token</span>
+            <span class="taxonomy-item-name">Token-Addressable Latents</span>
+            <span class="taxonomy-item-sub">DeepSeek MLA: low-rank compressed vectors still indexed per token position.</span>
+          </div>
+          <div class="taxonomy-item">
+            <span class="taxonomy-num">03 · Recurrent Associative</span>
+            <span class="taxonomy-item-name">Matrix Fast Weights</span>
+            <span class="taxonomy-item-sub">Linear Attention: folds outer products into a fixed-size associative matrix.</span>
+          </div>
+          <div class="taxonomy-item">
+            <span class="taxonomy-num">04 · Dynamical Recurrent</span>
+            <span class="taxonomy-item-name">Continuous State Vectors</span>
+            <span class="taxonomy-item-sub">Mamba / SSM: continuous-time hidden state evolving via selective recurrence.</span>
+          </div>
+          <div class="taxonomy-item">
+            <span class="taxonomy-num">05 · Learned Graph</span>
+            <span class="taxonomy-item-name">Dynamical Synaptic Graph</span>
+            <span class="taxonomy-item-sub">Dragon Hatchling (BDH): Hebbian edge-reweighting on a fixed graph topology.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6-Approach Interactive Card Deck -->
+      <div class="approaches-deck" id="approaches-deck">
+        <!-- Card 1: Standard KV -->
+        <div class="approach-card selected-a" id="card-standard_kv" data-approach="standard_kv">
+          <div class="approach-card-header">
+            <div class="approach-card-title-group">
+              <h4 class="approach-card-title">Standard KV-Cache</h4>
+              <span class="approach-card-category">Explicit Token Memory</span>
+            </div>
+            <span class="approach-badge linear">O(T) Linear</span>
+          </div>
+          <div class="approach-formula-box">
+            M<sub>KV</sub>(T) = 2 · L · n<sub>KV</sub> · d<sub>head</sub> · s · T = 131,072 · T bytes
+          </div>
+          <div class="approach-card-details">
+            <div class="approach-detail-item">
+              <span class="approach-detail-label">Information Retained:</span>
+              <span>Full, uncompressed past Key &amp; Value activation projections for every token.</span>
+            </div>
+            <div class="approach-detail-item">
+              <span class="approach-detail-label">Real Limitation:</span>
+              <span>Unbounded linear growth in cache state memory; acute memory-bandwidth saturation during decode (Chapter 4).</span>
+            </div>
+          </div>
+          <div class="approach-card-footer">
+            <span class="control-help">Vaswani 2017 · Pope 2023</span>
+            <div class="approach-btn-group">
+              <button class="approach-select-btn active-a" data-action="set-a" data-id="standard_kv">Approach A</button>
+              <button class="approach-select-btn" data-action="set-b" data-id="standard_kv">Approach B</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Eviction / Attention Sinks -->
+        <div class="approach-card" id="card-streaming_llm" data-approach="streaming_llm">
+          <div class="approach-card-header">
+            <div class="approach-card-title-group">
+              <h4 class="approach-card-title">Attention Sinks &amp; Eviction</h4>
+              <span class="approach-card-category">Explicit Token Memory (Windowed)</span>
+            </div>
+            <span class="approach-badge constant">O(1) Fixed Window</span>
+          </div>
+          <div class="approach-formula-box">
+            M<sub>Streaming</sub>(T) = 131,072 · min(T, 1028) bytes [W<sub>sink</sub>=4, W<sub>win</sub>=1024]
+          </div>
+          <div class="approach-card-details">
+            <div class="approach-detail-item">
+              <span class="approach-detail-label">Information Retained:</span>
+              <span>Initial sink tokens + recent sliding window. Intermediate tokens evicted. (H2O uses dynamic heavy-hitter scoring).</span>
+            </div>
+            <div class="approach-detail-item">
+              <span class="approach-detail-label">Real Limitation:</span>
+              <span>Once a token's KV state is evicted, this cache mechanism no longer has direct access to that token's stored K/V representation. Exact recovery is unavailable unless preserved elsewhere.</span>
+            </div>
+          </div>
+          <div class="approach-card-footer">
+            <span class="control-help">Xiao 2023 (StreamingLLM) · Zhang 2023 (H2O)</span>
+            <div class="approach-btn-group">
+              <button class="approach-select-btn" data-action="set-a" data-id="streaming_llm">Approach A</button>
+              <button class="approach-select-btn" data-action="set-b" data-id="streaming_llm">Approach B</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: DeepSeek MLA -->
+        <div class="approach-card" id="card-deepseek_mla" data-approach="deepseek_mla">
+          <div class="approach-card-header">
+            <div class="approach-card-title-group">
+              <h4 class="approach-card-title">Low-Rank Compression (MLA)</h4>
+              <span class="approach-card-category">Compressed Token Memory</span>
+            </div>
+            <span class="approach-badge linear">O(T) Compressed</span>
+          </div>
+          <div class="approach-formula-box">
+            M<sub>MLA</sub>(T) = L · (d<sub>c</sub> + d<sub>R</sub>) · s · T = 36,864 · T bytes [L=32 normalized]
+          </div>
+          <div class="approach-card-details">
+            <div class="approach-detail-item">
+              <span class="approach-detail-label">Information Retained:</span>
+              <span>512D compressed KV latent (c<sub>t</sub><sup>KV</sup>) + 64D decoupled RoPE key (k<sub>t</sub><sup>R</sup>). 576 elements/token/layer.</span>
+            </div>
+            <div class="approach-detail-item">
+              <span class="approach-detail-label">Real Limitation:</span>
+              <span>Reduces footprint per token by 71.875% vs standard KV, but does NOT make memory constant in T. Unbounded linear growth remains at long contexts.</span>
+            </div>
+          </div>
+          <div class="approach-card-footer">
+            <span class="control-help">DeepSeek-AI 2024 (DeepSeek-V2)</span>
+            <div class="approach-btn-group">
+              <button class="approach-select-btn" data-action="set-a" data-id="deepseek_mla">Approach A</button>
+              <button class="approach-select-btn" data-action="set-b" data-id="deepseek_mla">Approach B</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: Linear Attention -->
+        <div class="approach-card" id="card-linear_attention" data-approach="linear_attention">
+          <div class="approach-card-header">
+            <div class="approach-card-title-group">
+              <h4 class="approach-card-title">Linear Attention (Fast Weights)</h4>
+              <span class="approach-card-category">Recurrent Associative State</span>
+            </div>
+            <span class="approach-badge constant">O(1) Matrix Memory</span>
+          </div>
+          <div class="approach-formula-box">
+            M<sub>Linear</sub> = L · n<sub>head</sub> · r · d<sub>v</sub> · s = 33,554,432 bytes [r=d<sub>v</sub>=128]
+          </div>
+          <div class="approach-card-details">
+            <div class="approach-detail-item">
+              <span class="approach-detail-label">Information Retained:</span>
+              <span>Associative matrix accumulating outer products: S<sub>t</sub> = S<sub>t-1</sub> + φ(k<sub>t</sub>) v<sub>t</sub><sup>T</sup>.</span>
+            </div>
+            <div class="approach-detail-item">
+              <span class="approach-detail-label">Real Limitation:</span>
+              <span>Replaces exact softmax attention with a kernelized/linearized mechanism, changing retrieval behavior and introducing capacity/interference trade-offs in its finite recurrent state.</span>
+            </div>
+          </div>
+          <div class="approach-card-footer">
+            <span class="control-help">Katharopoulos 2020 · Schlag 2021</span>
+            <div class="approach-btn-group">
+              <button class="approach-select-btn" data-action="set-a" data-id="linear_attention">Approach A</button>
+              <button class="approach-select-btn" data-action="set-b" data-id="linear_attention">Approach B</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5: Mamba SSM -->
+        <div class="approach-card selected-b" id="card-mamba_ssm" data-approach="mamba_ssm">
+          <div class="approach-card-header">
+            <div class="approach-card-title-group">
+              <h4 class="approach-card-title">State-Space Models (Mamba)</h4>
+              <span class="approach-card-category">Dynamical Recurrent State</span>
+            </div>
+            <span class="approach-badge constant">O(1) Vector State</span>
+          </div>
+          <div class="approach-formula-box">
+            M<sub>SSM</sub> = L · d<sub>model</sub> · d<sub>state</sub> · s = 4,194,304 bytes [d<sub>state</sub>=16, state-only]
+          </div>
+          <div class="approach-card-details">
+            <div class="approach-detail-item">
+              <span class="approach-detail-label">Information Retained:</span>
+              <span>Continuous-time hidden state evolving via input-dependent selective discretization: h<sub>t</sub> = Ā<sub>t</sub> h<sub>t-1</sub> + B̄<sub>t</sub> x<sub>t</sub>.</span>
+            </div>
+            <div class="approach-detail-item">
+              <span class="approach-detail-label">Real Limitation:</span>
+              <span>Fixed-size recurrent state can make exact long-range retrieval and associative recall more difficult than explicit token-addressable memory; performance depends strongly on architecture, training, and task.</span>
+            </div>
+          </div>
+          <div class="approach-card-footer">
+            <span class="control-help">Gu &amp; Dao 2023 (Mamba)</span>
+            <div class="approach-btn-group">
+              <button class="approach-select-btn" data-action="set-a" data-id="mamba_ssm">Approach A</button>
+              <button class="approach-select-btn active-b" data-action="set-b" data-id="mamba_ssm">Approach B</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6: BDH Graph -->
+        <div class="approach-card" id="card-bdh_graph" data-approach="bdh_graph">
+          <div class="approach-card-header">
+            <div class="approach-card-title-group">
+              <h4 class="approach-card-title">Dragon Hatchling (BDH)</h4>
+              <span class="approach-card-category">Learned Graph Memory</span>
+            </div>
+            <span class="approach-badge constant">O(1) Graph State</span>
+          </div>
+          <div class="approach-formula-box">
+            Fixed graph state; sequence-length-independent state footprint [See Chapter 6]
+          </div>
+          <div class="approach-card-details">
+            <div class="approach-detail-item">
+              <span class="approach-detail-label">Information Retained:</span>
+              <span>Synaptic edge connection weights and dynamic activations on a learned bipartite network graph.</span>
+            </div>
+            <div class="approach-detail-item">
+              <span class="approach-detail-label">Chapter 6 Teaser:</span>
+              <span>Trades explicit token buffers and recurrent vectors for a dynamical graph memory structure. Full treatment in Chapter 6.</span>
+            </div>
+          </div>
+          <div class="approach-card-footer">
+            <span class="control-help">Teaser for Chapter 6</span>
+            <div class="approach-btn-group">
+              <button class="approach-select-btn" data-action="set-a" data-id="bdh_graph">Approach A</button>
+              <button class="approach-select-btn" data-action="set-b" data-id="bdh_graph">Approach B</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side-by-Side Comparison Workspace -->
+      <div class="comparison-workspace">
+        <div class="comparison-workspace-header">
+          <h3 class="comparison-workspace-title">Side-by-Side Architectural Comparison</h3>
+          <div class="scale-toggle-group">
+            <button class="scale-btn active" id="btn-scale-log" data-scale="log">Log Scale (Default)</button>
+            <button class="scale-btn" id="btn-scale-linear" data-scale="linear">Linear Scale</button>
+          </div>
+        </div>
+
+        <!-- 2D Canvas Wrapper -->
+        <div class="memory-canvas-wrapper">
+          <canvas id="memory-comparison-canvas"></canvas>
+        </div>
+
+        <!-- Scrubber & Exact Readout Strip -->
+        <div class="scrubber-strip">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span>Inspecting at Context Length:</span>
+            <span class="scrubber-t-badge" id="scrubber-t-val">65,536 tokens</span>
+            <span class="control-help">(Hover or drag across chart to scrub T)</span>
+          </div>
+          <div class="scrubber-val-group">
+            <span class="scrubber-val-pill" id="scrubber-val-a" style="color: #000000;">A: --</span>
+            <span class="scrubber-val-pill" id="scrubber-val-b" style="color: #4b5563;">B: --</span>
+          </div>
+        </div>
+
+        <!-- Comparison Matrix Table -->
+        <div class="comparison-table-wrapper">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th style="width: 22%;">Dimension</th>
+                <th class="col-a" id="table-head-a" style="width: 39%;">Approach A: Standard KV</th>
+                <th class="col-b" id="table-head-b" style="width: 39%;">Approach B: Mamba SSM</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="comparison-dim-name">State Category</td>
+                <td id="td-category-a">Explicit Token Memory</td>
+                <td id="td-category-b">Dynamical Recurrent State</td>
+              </tr>
+              <tr>
+                <td class="comparison-dim-name">Memory Complexity</td>
+                <td id="td-complexity-a">O(T) linear with respect to sequence length T</td>
+                <td id="td-complexity-b">O(1) with respect to sequence length T</td>
+              </tr>
+              <tr>
+                <td class="comparison-dim-name">Normalized Memory @ 128K</td>
+                <td id="td-mem128-a">17.18 GB decimal (16.00 GiB binary)</td>
+                <td id="td-mem128-b">4.19 MB decimal (4.00 MiB binary)</td>
+              </tr>
+              <tr>
+                <td class="comparison-dim-name">Token Addressability</td>
+                <td id="td-address-a">Yes (all positions)</td>
+                <td id="td-address-b">No (folded into continuous state)</td>
+              </tr>
+              <tr>
+                <td class="comparison-dim-name">Information Retained</td>
+                <td id="td-info-a">Full uncompressed past K and V activation projections.</td>
+                <td id="td-info-b">Continuous-time hidden state evolving via input-dependent selection.</td>
+              </tr>
+              <tr>
+                <td class="comparison-dim-name">Key Trade-off / Failure Mode</td>
+                <td id="td-limit-a">Unbounded linear growth and memory-bandwidth saturation during decode.</td>
+                <td id="td-limit-b">Fixed-size recurrent state can make exact long-range retrieval more difficult.</td>
+              </tr>
+              <tr>
+                <td class="comparison-dim-name">Citation &amp; Provenance</td>
+                <td id="td-cite-a">Vaswani et al. 2017 · Pope et al. 2023</td>
+                <td id="td-cite-b">Gu &amp; Dao 2023 (Mamba)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Final Scientific Framing Card -->
+      <div class="framing-card">
+        <h4 class="framing-title">The Fundamental Bargain of Attention vs. State</h4>
+        <p class="framing-text">
+          The KV cache solves a very specific problem: preserve token-addressable information so future queries can directly retrieve it. Every alternative changes that bargain. Eviction keeps only selected tokens. MLA compresses token information. Linear attention folds history into an associative state. SSMs compress history into a dynamical state. BDH explores a learned graph as memory. The interesting question is therefore not whether memory can be made smaller—it can—but what information is lost, compressed, or transformed when we do so.
+        </p>
+      </div>
+
+      <!-- Bridge Sentence to Chapter 6 -->
+      <div class="bridge-card">
+        <p class="bridge-text">
+          Chapter 6 asks whether memory can be neither a growing token buffer nor a conventional recurrent vector, but a dynamically modified graph.
+        </p>
+      </div>
+
+    </section>
+    <!-- END CHAPTER 5 -->
   </main>
 
   <script type="module" src="app.js"></script>
 </body>
 </html>
+
 

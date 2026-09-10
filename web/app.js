@@ -1,8 +1,9 @@
-// app.js — Chapters 1, 2, 3, & 4 Controller
+// app.js — Chapters 1, 2, 3, 4, & 5 Controller
 // Chapter 1: Typewriter hero + Dilemma widget
 // Chapter 2: Live TypedArray Benchmark + 2D Runtime Canvas + 3D Attention Microscope
 // Chapter 3: Architecture-Aware VRAM Sandbox + 3D Structural KV Cache Tensor Visualizer
 // Chapter 4: Prefill vs. Decode Analytical Roofline + Serving Concurrency Sandbox
+// Chapter 5: Alternate Memory Approaches Side-by-Side Comparison
 
 import { MicroTransformerEngine } from './engine/micro_transformer.js';
 import { BenchmarkCanvas } from './visualizers/benchmark_canvas.js';
@@ -10,6 +11,7 @@ import { AttentionMicroscope3D } from './visualizers/benchmark_3d.js';
 import { calculateKVCacheMemory, MODEL_PRESETS, GPU_SPECS, PRECISIONS } from './engine/gpu_calculator.js';
 import { KV3DVisualizer } from './visualizers/kv_3d_visualizer.js';
 import { BandwidthCanvas } from './visualizers/bandwidth_canvas.js';
+import { MemoryComparisonCanvas, APPROACHES } from './visualizers/memory_comparison_canvas.js';
 
 // ─── Chapter 1: Typewriter Animation ───────────────────────────
 function initTypewriter() {
@@ -520,6 +522,159 @@ function initChapter4() {
   updateServingSandbox();
 }
 
+// ─── Chapter 5: Alternate Memory Approaches Controller ──────────
+function initChapter5() {
+  const canvasEl = document.getElementById('memory-comparison-canvas');
+  if (!canvasEl) return;
+
+  const compCanvas = new MemoryComparisonCanvas('memory-comparison-canvas');
+
+  let activeIdA = 'standard_kv';
+  let activeIdB = 'mamba_ssm';
+
+  const btnScaleLog = document.getElementById('btn-scale-log');
+  const btnScaleLinear = document.getElementById('btn-scale-linear');
+
+  const scrubberTVal = document.getElementById('scrubber-t-val');
+  const scrubberValA = document.getElementById('scrubber-val-a');
+  const scrubberValB = document.getElementById('scrubber-val-b');
+
+  // Table element bindings
+  const tableHeadA = document.getElementById('table-head-a');
+  const tableHeadB = document.getElementById('table-head-b');
+  const tdCategoryA = document.getElementById('td-category-a');
+  const tdCategoryB = document.getElementById('td-category-b');
+  const tdComplexityA = document.getElementById('td-complexity-a');
+  const tdComplexityB = document.getElementById('td-complexity-b');
+  const tdMem128A = document.getElementById('td-mem128-a');
+  const tdMem128B = document.getElementById('td-mem128-b');
+  const tdAddressA = document.getElementById('td-address-a');
+  const tdAddressB = document.getElementById('td-address-b');
+  const tdInfoA = document.getElementById('td-info-a');
+  const tdInfoB = document.getElementById('td-info-b');
+  const tdLimitA = document.getElementById('td-limit-a');
+  const tdLimitB = document.getElementById('td-limit-b');
+  const tdCiteA = document.getElementById('td-cite-a');
+  const tdCiteB = document.getElementById('td-cite-b');
+
+  function formatMemoryExact(bytes) {
+    if (bytes >= 1e9) {
+      const gbDec = (bytes / 1e9).toFixed(2);
+      const gibBin = (bytes / (1024 * 1024 * 1024)).toFixed(2);
+      return `${gbDec} GB decimal (${gibBin} GiB binary)`;
+    } else {
+      const mbDec = (bytes / 1e6).toFixed(2);
+      const mibBin = (bytes / (1024 * 1024)).toFixed(2);
+      return `${mbDec} MB decimal (${mibBin} MiB binary)`;
+    }
+  }
+
+  function updateScrubberDisplay(t) {
+    if (scrubberTVal) scrubberTVal.textContent = `${t.toLocaleString()} tokens`;
+    const appA = APPROACHES[activeIdA];
+    const appB = APPROACHES[activeIdB];
+    if (appA && scrubberValA) {
+      const bytesA = appA.normalizedBytes(t);
+      scrubberValA.textContent = `A (${appA.shortName}): ${formatMemoryExact(bytesA)}`;
+    }
+    if (appB && scrubberValB) {
+      const bytesB = appB.normalizedBytes(t);
+      scrubberValB.textContent = `B (${appB.shortName}): ${formatMemoryExact(bytesB)}`;
+    }
+  }
+
+  function updateComparisonView() {
+    const appA = APPROACHES[activeIdA];
+    const appB = APPROACHES[activeIdB];
+    if (!appA || !appB) return;
+
+    // Update canvas
+    compCanvas.setApproaches(activeIdA, activeIdB);
+
+    // Update table headers
+    if (tableHeadA) tableHeadA.textContent = `Approach A: ${appA.name}`;
+    if (tableHeadB) tableHeadB.textContent = `Approach B: ${appB.name}`;
+
+    // Update table rows
+    if (tdCategoryA) tdCategoryA.textContent = appA.stateCategory;
+    if (tdCategoryB) tdCategoryB.textContent = appB.stateCategory;
+
+    if (tdComplexityA) tdComplexityA.textContent = appA.complexityStr;
+    if (tdComplexityB) tdComplexityB.textContent = appB.complexityStr;
+
+    if (tdMem128A) tdMem128A.textContent = formatMemoryExact(appA.normalizedBytes(131072));
+    if (tdMem128B) tdMem128B.textContent = formatMemoryExact(appB.normalizedBytes(131072));
+
+    if (tdAddressA) tdAddressA.textContent = appA.tokenAddressable;
+    if (tdAddressB) tdAddressB.textContent = appB.tokenAddressable;
+
+    if (tdInfoA) tdInfoA.textContent = appA.informationRetained;
+    if (tdInfoB) tdInfoB.textContent = appB.informationRetained;
+
+    if (tdLimitA) tdLimitA.textContent = appA.limitations;
+    if (tdLimitB) tdLimitB.textContent = appB.limitations;
+
+    if (tdCiteA) tdCiteA.textContent = appA.citation;
+    if (tdCiteB) tdCiteB.textContent = appB.citation;
+
+    // Update cards visual state
+    document.querySelectorAll('.approach-card').forEach(card => {
+      const id = card.dataset.approach;
+      card.classList.toggle('selected-a', id === activeIdA);
+      card.classList.toggle('selected-b', id === activeIdB);
+    });
+
+    document.querySelectorAll('.approach-select-btn').forEach(btn => {
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+      if (action === 'set-a') {
+        btn.classList.toggle('active-a', id === activeIdA);
+      } else if (action === 'set-b') {
+        btn.classList.toggle('active-b', id === activeIdB);
+      }
+    });
+
+    updateScrubberDisplay(compCanvas.activeT);
+  }
+
+  // Card select button event listeners
+  document.querySelectorAll('.approach-select-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+      if (action === 'set-a') {
+        activeIdA = id;
+      } else if (action === 'set-b') {
+        activeIdB = id;
+      }
+      updateComparisonView();
+    });
+  });
+
+  // Scale toggle event listeners
+  if (btnScaleLog && btnScaleLinear) {
+    btnScaleLog.addEventListener('click', () => {
+      btnScaleLog.classList.add('active');
+      btnScaleLinear.classList.remove('active');
+      compCanvas.setScaleType('log');
+    });
+
+    btnScaleLinear.addEventListener('click', () => {
+      btnScaleLinear.classList.add('active');
+      btnScaleLog.classList.remove('active');
+      compCanvas.setScaleType('linear');
+    });
+  }
+
+  // Scrubber hover callback
+  compCanvas.onHoverT = (t) => {
+    updateScrubberDisplay(t);
+  };
+
+  updateComparisonView();
+}
+
 // ─── Main Initialization ───────────────────────────────────────
 function init() {
   initTypewriter();
@@ -527,6 +682,7 @@ function init() {
   initChapter2();
   initChapter3();
   initChapter4();
+  initChapter5();
 }
 
 if (document.readyState === 'loading') {
@@ -534,4 +690,5 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+
 

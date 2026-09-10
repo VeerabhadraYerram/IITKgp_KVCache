@@ -2046,3 +2046,390 @@ body::before {
   color: #4b5563;
   line-height: 1.5;
 }
+
+/* ════════════════════════════════════════════════════════════ */
+/* CHAPTER 5: ALTERNATE MEMORY APPROACHES, COMPARED HONESTLY    */
+/* ════════════════════════════════════════════════════════════ */
+
+/* Taxonomy of State Semantics Banner */
+.taxonomy-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.taxonomy-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 8px 0;
+}
+
+.taxonomy-desc {
+  font-size: 0.85rem;
+  color: #4b5563;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+}
+
+.taxonomy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.taxonomy-item {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.taxonomy-num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.taxonomy-item-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #000000;
+}
+
+.taxonomy-item-sub {
+  font-size: 0.74rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+/* Approaches 6-Card Deck */
+.approaches-deck {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+.approach-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.approach-card:hover {
+  border-color: #000000;
+}
+
+.approach-card.selected-a {
+  border: 2px solid #000000;
+  background: #ffffff;
+}
+
+.approach-card.selected-b {
+  border: 2px dashed #000000;
+  background: #fafafa;
+}
+
+.approach-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.approach-card-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.approach-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #000000;
+  margin: 0;
+}
+
+.approach-card-category {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.approach-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.approach-badge.linear {
+  background: #000000;
+  color: #ffffff;
+}
+
+.approach-badge.constant {
+  background: #f3f4f6;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+
+.approach-formula-box {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: #111827;
+  line-height: 1.4;
+}
+
+.approach-card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.approach-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.approach-detail-label {
+  font-weight: 700;
+  color: #000000;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.approach-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: auto;
+  gap: 8px;
+}
+
+.approach-btn-group {
+  display: flex;
+  gap: 6px;
+}
+
+.approach-select-btn {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #000000;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.approach-select-btn:hover {
+  background: #f3f4f6;
+}
+
+.approach-select-btn.active-a {
+  background: #000000;
+  color: #ffffff;
+}
+
+.approach-select-btn.active-b {
+  background: #374151;
+  color: #ffffff;
+  border-style: dashed;
+}
+
+/* Comparison Workspace */
+.comparison-workspace {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.comparison-workspace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.comparison-workspace-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #000000;
+  margin: 0;
+}
+
+.scale-toggle-group {
+  display: flex;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.scale-btn {
+  background: #ffffff;
+  color: #000000;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.scale-btn.active {
+  background: #000000;
+  color: #ffffff;
+}
+
+.memory-canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #ffffff;
+  margin-bottom: 20px;
+}
+
+#memory-comparison-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Scrubber / T Inspector Strip */
+.scrubber-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 10px 16px;
+  margin-bottom: 24px;
+  font-size: 0.8rem;
+}
+
+.scrubber-t-badge {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #000000;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  padding: 3px 8px;
+  border-radius: 3px;
+}
+
+.scrubber-val-group {
+  display: flex;
+  gap: 16px;
+}
+
+.scrubber-val-pill {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* Comparison Matrix Table */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  text-align: left;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+.comparison-table th {
+  background: #f9fafb;
+  font-weight: 700;
+  color: #111827;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.comparison-table th.col-a {
+  border-top: 3px solid #000000;
+}
+
+.comparison-table th.col-b {
+  border-top: 3px dashed #000000;
+}
+
+.comparison-dim-name {
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+}
+
+/* Final Scientific Framing Box */
+.framing-card {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.framing-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 8px 0;
+}
+
+.framing-text {
+  font-size: 0.88rem;
+  color: #374151;
+  line-height: 1.65;
+  margin: 0;
+}
+
