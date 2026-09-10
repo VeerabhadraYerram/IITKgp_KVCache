@@ -30,17 +30,18 @@ export class KV3DVisualizer {
     const width = this.container.clientWidth || 600;
     const height = this.container.clientHeight || 450;
 
-    // 1. Scene
+    // 1. Scene (transparent, no box)
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0xffffff);
+    this.scene.background = null;
 
     // 2. Camera centered directly on the scene origin (0, 0, 0)
     this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
     this.camera.position.set(24, 16, 26);
     this.camera.lookAt(0, 0, 0);
 
-    // 3. Renderer
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    // 3. Renderer with transparent alpha channel
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    this.renderer.setClearColor(0x000000, 0);
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.domElement.style.display = 'block';

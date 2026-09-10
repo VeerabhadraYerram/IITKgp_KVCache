@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>What does an AI mean by "remembering"?</title>
-  <meta name="description" content="An interactive explainer on AI memory: verbatim recording versus compressed state.">
+  <meta name="description" content="An interactive visual essay on AI memory: verbatim recording versus compressed state.">
 
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
   <link rel="stylesheet" href="style.css">
@@ -20,10 +20,9 @@
 <body>
 
   <!-- ════════════════════════════════════════════════════════════ -->
-  <!-- BACKGROUND GEOMETRIC ELEMENTS                               -->
+  <!-- BACKGROUND GEOMETRIC ELEMENTS (Fixed Technical Wallpaper)    -->
   <!-- ════════════════════════════════════════════════════════════ -->
   <div class="bg-decorations" aria-hidden="true">
-    <!-- Top Left: Concentric circles & orbital axes -->
     <svg class="bg-shape shape-top-left" viewBox="0 0 300 300">
       <circle cx="150" cy="150" r="140" stroke="#000000" stroke-width="1.5" stroke-dasharray="6,6" fill="none" opacity="0.12"/>
       <circle cx="150" cy="150" r="100" stroke="#000000" stroke-width="1.5" fill="none" opacity="0.16"/>
@@ -33,7 +32,6 @@
       <line x1="150" y1="0" x2="150" y2="300" stroke="#000000" stroke-width="1" stroke-dasharray="3,3" opacity="0.12"/>
     </svg>
 
-    <!-- Top Right: Isometric 3D Wireframe Cube -->
     <svg class="bg-shape shape-top-right" viewBox="0 0 240 240">
       <polygon points="120,30 210,80 120,130 30,80" stroke="#000000" stroke-width="1.5" fill="rgba(0,0,0,0.02)" opacity="0.18"/>
       <polygon points="30,80 120,130 120,220 30,170" stroke="#000000" stroke-width="1.5" fill="rgba(0,0,0,0.04)" opacity="0.18"/>
@@ -41,14 +39,12 @@
       <line x1="120" y1="30" x2="120" y2="130" stroke="#000000" stroke-width="1" stroke-dasharray="4,4" opacity="0.2"/>
     </svg>
 
-    <!-- Mid Left: Technical Crosshair Grid -->
     <svg class="bg-shape shape-mid-left" viewBox="0 0 200 200">
       <path d="M20,100 L180,100 M100,20 L100,180" stroke="#000000" stroke-width="1.5" stroke-dasharray="8,4" opacity="0.15"/>
       <rect x="70" y="70" width="60" height="60" stroke="#000000" stroke-width="1.5" fill="none" opacity="0.2"/>
       <rect x="85" y="85" width="30" height="30" stroke="#000000" stroke-width="1.5" fill="rgba(0,0,0,0.05)" opacity="0.25"/>
     </svg>
 
-    <!-- Mid Right: Diagonal Hatch Block -->
     <svg class="bg-shape shape-mid-right" viewBox="0 0 260 260">
       <defs>
         <pattern id="hatch" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
@@ -59,7 +55,6 @@
       <circle cx="200" cy="60" r="16" stroke="#000000" stroke-width="2" fill="none" opacity="0.3"/>
     </svg>
 
-    <!-- Bottom Left: Floating Matrix Vector Brackets -->
     <svg class="bg-shape shape-bottom-left" viewBox="0 0 220 220">
       <path d="M40,20 L20,20 L20,200 L40,200" stroke="#000000" stroke-width="2.5" fill="none" opacity="0.2"/>
       <path d="M180,20 L200,20 L200,200 L180,200" stroke="#000000" stroke-width="2.5" fill="none" opacity="0.2"/>
@@ -68,7 +63,6 @@
       <line x1="50" y1="160" x2="170" y2="160" stroke="#000000" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.15"/>
     </svg>
 
-    <!-- Bottom Right: Geometric Polygon / Node Network -->
     <svg class="bg-shape shape-bottom-right" viewBox="0 0 280 280">
       <polygon points="140,20 250,90 210,230 70,230 30,90" stroke="#000000" stroke-width="1.5" stroke-dasharray="5,5" fill="rgba(0,0,0,0.02)" opacity="0.18"/>
       <line x1="140" y1="20" x2="210" y2="230" stroke="#000000" stroke-width="1" opacity="0.12"/>
@@ -83,7 +77,7 @@
   </div>
 
   <!-- ════════════════════════════════════════════════════════════ -->
-  <!-- FIRST PAGE: ONLY THE QUESTION (TYPED-IN ANIMATION)          -->
+  <!-- HERO: THE CENTRAL QUESTION                                  -->
   <!-- ════════════════════════════════════════════════════════════ -->
   <section class="hero" id="hero">
     <div class="hero-center">
@@ -101,16 +95,15 @@
   <!-- ════════════════════════════════════════════════════════════ -->
   <main class="container" id="chapter-1">
     <section class="act">
-      
       <div class="act-header">
         <div class="act-number">Chapter 1</div>
         <h2 class="act-title">The Two Paths of Memory</h2>
         <p class="act-description">
-          Consider an enterprise conversation that spans 50 turns. A crucial detail is discussed at the very start, and queried at the end:
+          A 50-turn conversation. Turn 3 sets a precise financial limit; Turn 50 asks for it back. How should an AI remember?
         </p>
       </div>
 
-      <!-- Fictional 50-Turn Conversation Scenario -->
+      <!-- 50-Turn Conversation Scenario -->
       <div class="conversation-card">
         <div class="turn-box turn-early">
           <div class="turn-label">Turn 3 · Client Proposal</div>
@@ -152,11 +145,11 @@
             <div class="response-card-footer">
               <div class="trait-line">
                 <span class="trait-label">Recall Style:</span>
-                <span class="trait-val">100% Literal / Exact</span>
+                <span class="trait-val">100% Exact</span>
               </div>
               <div class="trait-line">
-                <span class="trait-label">Memory Footprint:</span>
-                <span class="trait-val">Keeps every past word</span>
+                <span class="trait-label">Memory:</span>
+                <span class="trait-val">Stores all past tokens</span>
               </div>
             </div>
           </div>
@@ -175,29 +168,27 @@
             <div class="response-card-footer">
               <div class="trait-line">
                 <span class="trait-label">Recall Style:</span>
-                <span class="trait-val">Semantic Gist / Meaning</span>
+                <span class="trait-val">Semantic Gist</span>
               </div>
               <div class="trait-line">
-                <span class="trait-label">Memory Footprint:</span>
+                <span class="trait-label">Memory:</span>
                 <span class="trait-val">Fixed-size internal state</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Mandatory Honesty Label -->
         <p class="simplification-label">
-          Teaching simplification — not a live computation.
+          Teaching simplification — illustrates exact retrieval vs. semantic compression.
         </p>
 
-        <!-- Forced-Choice Decision Scenarios -->
+        <!-- Decision Scenarios -->
         <div class="decision-section">
           <h4 class="decision-heading">Which strategy would you deploy?</h4>
 
-          <!-- Question 1: Legal Audit -->
           <div class="scenario-group" id="group-legal">
             <p class="scenario-prompt">
-              <strong>Scenario 1:</strong> Legal Contract Audit & Compliance
+              <strong>Scenario 1:</strong> Legal Contract Audit &amp; Compliance
             </p>
             <div class="scenario-buttons">
               <button class="choice-btn" data-scenario="legal" data-choice="verbatim">Deploy Verbatim Store</button>
@@ -205,7 +196,6 @@
             </div>
           </div>
 
-          <!-- Question 2: Real-Time Chat -->
           <div class="scenario-group" id="group-chat">
             <p class="scenario-prompt">
               <strong>Scenario 2:</strong> Real-Time Voice Chat Assistant
@@ -216,24 +206,19 @@
             </div>
           </div>
 
-          <!-- Dynamic Live Summary Line -->
           <div class="summary-box" id="summary-box" style="display: none;">
             <div class="summary-line" id="summary-line-text"></div>
             <p class="summary-explanation" id="summary-explanation-text"></p>
           </div>
         </div>
-
       </div>
 
-      <!-- Closing Bridge Sentence to Chapter 2 -->
       <div class="bridge-card">
         <p class="bridge-text">
-          To see why this tradeoff exists at all, we need to look at what a Transformer is actually storing.
+          Why does this tradeoff exist? To understand, we must inspect what a Transformer computes and caches during generation.
         </p>
       </div>
-
     </section>
-    <!-- END CHAPTER 1 -->
 
     <!-- ════════════════════════════════════════════════════════════ -->
     <!-- CHAPTER 2: NAIVE RECOMPUTE VS. THE CACHE                    -->
@@ -243,7 +228,7 @@
         <div class="act-number">Chapter 2</div>
         <h2 class="act-title">Naive Recompute vs. The Cache</h2>
         <p class="act-description">
-          During autoregressive generation, predicting each new token requires attending over all previous tokens in the sequence. Without caching, the model repeatedly recomputes the Key and Value projections for every historical token at every single generation step. KV caching stores these projections after their first computation, eliminating repeated projection work while attention continues to operate over the growing context.
+          Autoregressive generation predicts one token at a time. Without caching, the model recalculates Key and Value projections for all past tokens at every step (O(N²D²) work). KV caching stores these projections once, cutting projection work to O(ND²).
         </p>
       </div>
 
@@ -258,7 +243,7 @@
           </div>
           <div class="control-meta">
             <span class="meta-tag">D = 32 (Hidden Dimension)</span>
-            <span class="meta-tag">TypedArray Float64</span>
+            <span class="meta-tag">Float64 TypedArray</span>
           </div>
           <button id="btn-run-benchmark" class="tech-button primary">
             ▶ Run Live Browser Benchmark
@@ -266,110 +251,102 @@
         </div>
       </div>
 
-      <!-- Quantitative Tier: Measured Runtime Metrics & 2D Canvas -->
-      <div class="section-sub-header">
-        <h3 class="sub-title">1. Quantitative Runtime Measurement</h3>
-        <p class="sub-desc">Actual wall-clock execution time measured in your browser via <code>performance.now()</code>.</p>
-      </div>
-
+      <!-- Measured Runtime Metrics -->
       <div class="metrics-grid">
         <div class="metric-box">
-          <span class="metric-label">No Cache — Total Runtime</span>
+          <span class="metric-label">No Cache — Runtime</span>
           <div class="metric-value" id="metric-nocache-ms">-- ms</div>
-          <span class="metric-sub">Recomputing historical K/V projections</span>
+          <span class="metric-sub">Recomputing past K/V projections</span>
         </div>
         <div class="metric-box">
-          <span class="metric-label">KV Cache — Total Runtime</span>
+          <span class="metric-label">KV Cache — Runtime</span>
           <div class="metric-value" id="metric-cached-ms">-- ms</div>
           <span class="metric-sub">Single-pass K/V projection reuse</span>
         </div>
         <div class="metric-box highlight">
           <span class="metric-label">Measured Speedup</span>
           <div class="metric-value" id="metric-speedup-x">-- ×</div>
-          <span class="metric-sub">Measured wall-clock latency ratio</span>
+          <span class="metric-sub">Wall-clock latency ratio</span>
         </div>
       </div>
 
-      <!-- 2D Canvas Container -->
+      <!-- Latency Canvas -->
       <div class="canvas-card">
         <div class="canvas-header">
-          <span class="canvas-title">Measured Cumulative Latency (ms) vs. Sequence Step</span>
-          <span class="canvas-badge">Real performance.now()</span>
+          <span class="canvas-title">Cumulative Latency (ms) vs. Generation Step</span>
+          <span class="canvas-badge">Measured performance.now()</span>
         </div>
         <div class="canvas-wrapper">
           <canvas id="benchmark-canvas" height="340"></canvas>
         </div>
         <div class="canvas-caption">
-          <strong>No Cache:</strong> cumulative K/V projection work grows quadratically with sequence length (<span class="math-code">O(N²D²)</span>) because previous projections are repeatedly recomputed. <strong>With KV Cache:</strong> cumulative K/V projection work grows linearly (<span class="math-code">O(ND²)</span>) because each K/V projection is computed once, while attention interaction work continues to grow with context length (<span class="math-code">O(N²D)</span>).
+          <strong>No Cache:</strong> Work scales quadratically (<span class="math-code">O(N²D²)</span>). <strong>With KV Cache:</strong> Projections scale linearly (<span class="math-code">O(ND²)</span>); attention matrix interactions scale as <span class="math-code">O(N²D)</span>.
         </div>
       </div>
 
-      <!-- Theoretical Tier: Analytical FLOP Accounting -->
-      <div class="section-sub-header">
-        <h3 class="sub-title">2. Analytical FLOP Accounting for Included Operations</h3>
-        <p class="sub-desc">Theoretical operation counts for the linear projections and attention interactions in this benchmark.</p>
-      </div>
-
+      <!-- Analytical FLOP Accounting -->
       <div class="table-card">
-        <table class="tech-table">
-          <thead>
-            <tr>
-              <th>Operation Stage</th>
-              <th>Formula (Step t)</th>
-              <th>Cumulative Work (N tokens)</th>
-              <th>Complexity</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Naive K/V Projection</strong> (No Cache)</td>
-              <td><span class="math-code">4 · t · D²</span></td>
-              <td><span class="math-code">2N(N + 1)D²</span> = <span id="flop-naive-proj">--</span> FLOPs</td>
-              <td><span class="complexity-badge bad">O(N²D²)</span></td>
-            </tr>
-            <tr>
-              <td><strong>Cached K/V Projection</strong> (KV Cache)</td>
-              <td><span class="math-code">4 · D²</span></td>
-              <td><span class="math-code">4ND²</span> = <span id="flop-cached-proj">--</span> FLOPs</td>
-              <td><span class="complexity-badge good">O(ND²)</span></td>
-            </tr>
-            <tr>
-              <td><strong>Attention Interaction</strong> (QKᵀ + AV)</td>
-              <td><span class="math-code">4 · t · D</span></td>
-              <td><span class="math-code">2N(N + 1)D</span> = <span id="flop-attn">--</span> FLOPs</td>
-              <td><span class="complexity-badge neutral">O(N²D)</span></td>
-            </tr>
-            <tr class="table-total-row">
-              <td><strong>Naive Benchmark Total</strong></td>
-              <td><span class="math-code">4tD² + 4tD</span></td>
-              <td><span class="math-code">2N(N + 1)D² + 2N(N + 1)D</span> = <span id="flop-naive-total">--</span> FLOPs</td>
-              <td><span class="complexity-badge bad">O(N²D² + N²D)</span></td>
-            </tr>
-            <tr class="table-total-row">
-              <td><strong>Cached Benchmark Total</strong></td>
-              <td><span class="math-code">4D² + 4tD</span></td>
-              <td><span class="math-code">4ND² + 2N(N + 1)D</span> = <span id="flop-cached-total">--</span> FLOPs</td>
-              <td><span class="complexity-badge good">O(ND² + N²D)</span></td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-scroll-wrapper">
+          <table class="tech-table">
+            <thead>
+              <tr>
+                <th>Operation Stage</th>
+                <th>Step t Formula</th>
+                <th>Cumulative Work (N tokens)</th>
+                <th>Complexity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Naive K/V Projection</strong> (No Cache)</td>
+                <td><span class="math-code">4 · t · D²</span></td>
+                <td><span class="math-code">2N(N + 1)D²</span> = <span id="flop-naive-proj">--</span> FLOPs</td>
+                <td><span class="complexity-badge bad">O(N²D²)</span></td>
+              </tr>
+              <tr>
+                <td><strong>Cached K/V Projection</strong> (KV Cache)</td>
+                <td><span class="math-code">4 · D²</span></td>
+                <td><span class="math-code">4ND²</span> = <span id="flop-cached-proj">--</span> FLOPs</td>
+                <td><span class="complexity-badge good">O(ND²)</span></td>
+              </tr>
+              <tr>
+                <td><strong>Attention Interaction</strong> (QKᵀ + AV)</td>
+                <td><span class="math-code">4 · t · D</span></td>
+                <td><span class="math-code">2N(N + 1)D</span> = <span id="flop-attn">--</span> FLOPs</td>
+                <td><span class="complexity-badge neutral">O(N²D)</span></td>
+              </tr>
+              <tr class="table-total-row">
+                <td><strong>Naive Total</strong></td>
+                <td><span class="math-code">4tD² + 4tD</span></td>
+                <td><span class="math-code">2N(N + 1)(D² + D)</span> = <span id="flop-naive-total">--</span> FLOPs</td>
+                <td><span class="complexity-badge bad">O(N²D²)</span></td>
+              </tr>
+              <tr class="table-total-row">
+                <td><strong>Cached Total</strong></td>
+                <td><span class="math-code">4D² + 4tD</span></td>
+                <td><span class="math-code">4ND² + 2N(N + 1)D</span> = <span id="flop-cached-total">--</span> FLOPs</td>
+                <td><span class="complexity-badge good">O(ND² + N²D)</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <div class="table-footnote">
-          <em>Scope Note:</em> Analytical FLOP accounting for the included operations (W<sub>K</sub>, W<sub>V</sub> linear projections, score dot products, and value weighting). Intentionally omits Q projection (2ND² common to both), output projection W<sub>O</sub>, non-linear softmax exponentiations, causal masking, layer normalization, and MLP blocks. Analytical FLOPs describe theoretical operation counts and are distinct from browser wall-clock runtime.
+          <em>Scope:</em> Accounts for W<sub>K</sub>, W<sub>V</sub> projections and attention score/value operations.
         </div>
       </div>
 
-      <!-- Mechanistic Tier: 3D Attention Microscope -->
+      <!-- 3D Attention Microscope (Floating directly on screen) -->
       <div class="section-sub-header">
-        <h3 class="sub-title">3. 3D Attention Microscope</h3>
-        <p class="sub-desc">Conceptual & mechanistic inspection of high-dimensional attention states (D=32) projected deterministically into 3D space.</p>
+        <h3 class="sub-title">3D Attention Microscope</h3>
+        <p class="sub-desc">Mechanistic inspection of high-dimensional attention states (D=32) projected deterministically into 3D space.</p>
       </div>
 
       <div class="microscope-card">
-        <!-- 3D Toolbar -->
+        <!-- Floating 3D Toolbar -->
         <div class="microscope-toolbar">
           <div class="toolbar-group">
             <label for="slider-timestep" class="toolbar-label">
-              Generation Step (t): <span id="disp-timestep" class="control-num">80</span> / <span id="disp-timestep-max">80</span>
+              Step (t): <span id="disp-timestep" class="control-num">80</span> / <span id="disp-timestep-max">80</span>
             </label>
             <input type="range" id="slider-timestep" min="1" max="80" value="80" class="tech-slider mini">
           </div>
@@ -384,30 +361,30 @@
           </button>
         </div>
 
-        <!-- Live Status Badges -->
+        <!-- Floating Status Badges -->
         <div class="status-badges-row">
           <div class="status-pill">
             <span class="pill-label">Cached Tokens:</span>
             <span class="pill-val" id="pill-cached-tokens">80</span>
           </div>
           <div class="status-pill">
-            <span class="pill-label">Stored K/V Vectors:</span>
+            <span class="pill-label">Stored Vectors:</span>
             <span class="pill-val" id="pill-stored-vectors">160</span>
           </div>
           <div class="status-pill highlight" id="pill-mode-status">
-            <span class="pill-label">Projection Status:</span>
+            <span class="pill-label">Status:</span>
             <span class="pill-val" id="pill-proj-breakdown">Historical K/V reused: 79 · New: 1</span>
           </div>
         </div>
 
-        <!-- 3D Viewport & Inspector Side-by-Side -->
+        <!-- 3D Viewport & Inspector Side-by-Side (Floating Seamlessly) -->
         <div class="microscope-viewport-wrapper">
           <div id="microscope-3d-container" class="microscope-viewport"></div>
 
-          <!-- Mechanistic Chain Inspector Card -->
+          <!-- Floating Token Inspector HUD -->
           <div class="inspector-card">
             <div class="inspector-header">
-              <span class="inspector-title">Mechanistic Token Inspector</span>
+              <span class="inspector-title">Token Inspector</span>
               <span class="inspector-tag" id="inspect-token-tag">Token k₈₀</span>
             </div>
 
@@ -415,7 +392,7 @@
               <div class="chain-step">
                 <span class="chain-step-num">1</span>
                 <div class="chain-step-content">
-                  <span class="chain-name">Raw Dot Product Similarity</span>
+                  <span class="chain-name">Dot Product</span>
                   <span class="chain-math">q<sub>t</sub> · k<sub>i</sub></span>
                   <span class="chain-value" id="inspect-dot">--</span>
                 </div>
@@ -425,7 +402,7 @@
                 <span class="chain-step-num">2</span>
                 <div class="chain-step-content">
                   <span class="chain-name">Scaled Logit</span>
-                  <span class="chain-math">S<sub>i</sub><sup>(t)</sup> = (q<sub>t</sub> · k<sub>i</sub>) / √D</span>
+                  <span class="chain-math">(q<sub>t</sub> · k<sub>i</sub>) / √D</span>
                   <span class="chain-value" id="inspect-logit">--</span>
                 </div>
               </div>
@@ -433,8 +410,8 @@
               <div class="chain-step">
                 <span class="chain-step-num">3</span>
                 <div class="chain-step-content">
-                  <span class="chain-name">Normalized Attention Weight</span>
-                  <span class="chain-math">α<sub>i</sub><sup>(t)</sup> = softmax(S<sup>(t)</sup>)<sub>i</sub></span>
+                  <span class="chain-name">Attention Weight</span>
+                  <span class="chain-math">α<sub>i</sub><sup>(t)</sup> = softmax(S)<sub>i</sub></span>
                   <span class="chain-value highlight" id="inspect-weight">--</span>
                 </div>
               </div>
@@ -442,8 +419,8 @@
               <div class="chain-step">
                 <span class="chain-step-num">4</span>
                 <div class="chain-step-content">
-                  <span class="chain-name">Value Vector Contribution</span>
-                  <span class="chain-math">α<sub>i</sub><sup>(t)</sup> · v<sub>i</sub>  (in ℝ³²)</span>
+                  <span class="chain-name">Value Contribution</span>
+                  <span class="chain-math">α<sub>i</sub><sup>(t)</sup> · v<sub>i</sub></span>
                   <span class="chain-value" id="inspect-val-contrib">Calculated live</span>
                 </div>
               </div>
@@ -452,57 +429,37 @@
                 <span class="chain-step-num">5</span>
                 <div class="chain-step-content">
                   <span class="chain-name">Attention Output</span>
-                  <span class="chain-math">o<sub>t</sub> = ∑ α<sub>i</sub><sup>(t)</sup> v<sub>i</sub>  (in ℝ³²)</span>
-                  <span class="chain-value" id="inspect-output-vec">Projected in 3D (dodecahedron)</span>
+                  <span class="chain-math">o<sub>t</sub> = ∑ α<sub>i</sub><sup>(t)</sup> v<sub>i</sub></span>
+                  <span class="chain-value" id="inspect-output-vec">Projected output (dodecahedron)</span>
                 </div>
               </div>
             </div>
 
             <div class="inspector-footer">
-              <span class="flow-hint">Query → similarity → score → softmax → attention weight → value contribution</span>
+              <span class="flow-hint">Query → Similarity → Logit → Softmax → Value weighting</span>
             </div>
           </div>
         </div>
 
-        <!-- Scientific Honesty Legend -->
         <div class="honesty-legend">
-          <div class="legend-item">
-            <strong>Actual computation:</strong> D = 32 vectors and matrix operations (Float64Array)
-          </div>
-          <div class="legend-item">
-            <strong>3D display:</strong> Deterministic projection of actual 32D vectors (P ∈ ℝ<sup>32×3</sup>). The 3D scene is a deterministic projection of the actual D=32 vectors; it is not the original attention space and does not claim to preserve all 32-dimensional geometric relationships.
-          </div>
-          <div class="legend-item">
-            <strong>Attention links:</strong> Line opacity & width computed directly from actual attention weights α<sub>i</sub><sup>(t)</sup>
-          </div>
-          <div class="legend-item">
-            <strong>Runtime:</strong> Measured separately using <code>performance.now()</code>
-          </div>
+          <div class="legend-item"><strong>3D Scene:</strong> Deterministic projection of actual 32D attention vectors (P ∈ ℝ<sup>32×3</sup>).</div>
+          <div class="legend-item"><strong>Attention Links:</strong> Line opacity &amp; width scale directly with attention weight α<sub>i</sub>.</div>
         </div>
       </div>
 
-      <!-- Persistent Scientific Annotation -->
-      <div class="persistent-annotation">
-        <strong>Scientific Distinction:</strong> KV caching removes repeated K/V projection work. Attention still interacts with the growing context.
-      </div>
-
-      <!-- Vaswani et al. 2017 Citation Badge -->
       <div class="attribution-card">
-        <div class="attribution-badge">● Established · Vaswani et al. 2017 (Attention formulation)</div>
+        <div class="attribution-badge">● Vaswani et al. 2017 · Multi-Head Attention Formulation</div>
         <p class="attribution-text">
-          Vaswani et al. (2017) introduced the multi-head attention formulation: <span class="math-code">Attention(Q, K, V) = softmax(QKᵀ / √d)V</span>. KV-caching emerged as a standard inference optimization in subsequent autoregressive sequence serving systems.
+          <span class="math-code">Attention(Q, K, V) = softmax(QKᵀ / √d)V</span>. KV caching eliminates redundant recomputation of past key and value vectors.
         </p>
       </div>
 
-      <!-- Bridge Sentence to Chapter 3 -->
       <div class="bridge-card">
         <p class="bridge-text">
-          Caching saves compute — but everything you cache has to live somewhere. Let's see how much room it takes.
+          Caching saves compute—but every token you cache demands memory. Let's see how fast it expands.
         </p>
       </div>
-
     </section>
-    <!-- END CHAPTER 2 -->
 
     <!-- ════════════════════════════════════════════════════════════ -->
     <!-- CHAPTER 3: THE COST: WHAT YOU'RE ACTUALLY STORING           -->
@@ -512,21 +469,19 @@
         <div class="act-number">Chapter 3</div>
         <h2 class="act-title">The Cost: What You're Actually Storing</h2>
         <p class="act-description">
-          Every token passed into an autoregressive model leaves behind Key and Value activations that must be retained in GPU memory. As sequence length and batch size scale, this cache expands until it rivals or dwarfs the parameter count of the model itself.
+          Every token retains Key and Value activations in GPU memory. As context length and batch size scale, KV cache footprint rapidly rivals model parameter weights.
         </p>
       </div>
 
-      <!-- Conceptual Progression: MHA -> GQA -> MLA -->
+      <!-- Architectural Evolution -->
       <div class="architecture-progression-card">
-        <h3 class="progression-title">Architectural Evolution: Reducing the KV Footprint</h3>
-        <p class="progression-desc">Different attention architectures mitigate the memory cost of KV storage in fundamentally different ways:</p>
-        
+        <h3 class="progression-title">Architectural Evolution: Reducing KV Footprint</h3>
         <div class="progression-grid">
           <div class="progression-col">
             <div class="progression-badge mha">MHA · Multi-Head Attention</div>
             <div class="progression-math">n<sub>KV</sub> = n<sub>Q</sub></div>
             <p class="progression-text">
-              Every query head has an independent key and value head. High expressiveness, but maximum memory footprint (e.g. GPT-3 175B with 96 KV heads).
+              Independent K/V head per query head. Maximum memory footprint (e.g. GPT-3 175B with 96 KV heads).
             </p>
           </div>
 
@@ -534,7 +489,7 @@
             <div class="progression-badge gqa">GQA · Grouped-Query Attention</div>
             <div class="progression-math">n<sub>KV</sub> &lt; n<sub>Q</sub></div>
             <p class="progression-text">
-              Multiple query heads share each key-value head (e.g. Llama-3-8B with 32 Q heads sharing 8 KV heads). Cuts KV cache size by the grouping ratio (4:1 or 8:1).
+              Multiple query heads share each KV head (e.g. Llama-3 with 32 Q heads sharing 8 KV heads). Cuts cache size 4× to 8×.
             </p>
           </div>
 
@@ -542,47 +497,40 @@
             <div class="progression-badge mla">MLA · Multi-Head Latent Attention</div>
             <div class="progression-math">c<sub>t</sub><sup>KV</sup> ∈ ℝ⁵¹² + k<sub>t</sub><sup>R</sup> ∈ ℝ⁶⁴</div>
             <p class="progression-text">
-              Replaces per-head K/V tensors with a low-rank compressed latent vector plus decoupled RoPE key (576 elements total per layer). Dramatically compresses cache without losing multi-head capacity.
+              Compresses KV into a shared 512D latent vector + 64D decoupled RoPE key (576 elements total per layer).
             </p>
           </div>
         </div>
       </div>
 
-      <!-- Architecture-Aware Capacity Formula Card -->
+      <!-- Governing Formulas -->
       <div class="formula-card">
-        <h3 class="formula-title">Governing KV Cache Capacity Formulas</h3>
-        
+        <h3 class="formula-title">Governing KV Cache Formulas</h3>
         <div class="formula-split-grid">
           <div class="formula-box">
             <div class="formula-box-header">
-              <span class="formula-arch-tag">Conventional MHA / GQA (Llama-3, GPT-3)</span>
+              <span class="formula-arch-tag">Conventional MHA / GQA</span>
               <span class="formula-cite-badge">Pope et al. 2023</span>
             </div>
             <div class="formula-math-display">
               VRAM<sub>KV</sub> = 2 × L × n<sub>KV</sub> × d<sub>head</sub> × T × B × s
             </div>
             <p class="formula-expl">
-              The factor of <strong>2</strong> accounts for separate Key and Value tensors. <strong>L</strong> is decoder layers, <strong>n<sub>KV</sub></strong> is KV head count, <strong>d<sub>head</sub></strong> is head dimension, <strong>T</strong> is context length, <strong>B</strong> is batch size, and <strong>s</strong> is bytes per element.
+              Factor of <strong>2</strong> accounts for separate Key and Value tensors.
             </p>
-            <div class="formula-footnote">
-              Attributed to <em>Pope et al. 2023 (Efficiently Scaling Transformer Inference on TPU v4)</em>.
-            </div>
           </div>
 
           <div class="formula-box">
             <div class="formula-box-header">
-              <span class="formula-arch-tag">DeepSeek-V2 MLA (Low-Rank Latent Cache)</span>
+              <span class="formula-arch-tag">DeepSeek-V2 MLA</span>
               <span class="formula-cite-badge">DeepSeek-AI 2024</span>
             </div>
             <div class="formula-math-display">
               VRAM<sub>MLA</sub> = L × (d<sub>c</sub> + d<sub>r</sub>) × T × B × s
             </div>
             <p class="formula-expl">
-              Compresses Keys and Values into a single shared latent vector <strong>d<sub>c</sub> = 512</strong> plus decoupled RoPE key <strong>d<sub>r</sub> = 64</strong> (total <strong>576 elements</strong> per token per layer). <strong>No factor of 2</strong> is applied.
+              Low-rank latent <strong>d<sub>c</sub> = 512</strong> + RoPE <strong>d<sub>r</sub> = 64</strong> (576 elements/layer). No factor of 2.
             </p>
-            <div class="formula-footnote">
-              Attributed to <em>DeepSeek-AI 2024 (DeepSeek-V2 Technical Report)</em>.
-            </div>
           </div>
         </div>
       </div>
@@ -591,23 +539,21 @@
       <div class="sandbox-container">
         <div class="sandbox-header">
           <h3 class="sandbox-title">Interactive VRAM Sandbox</h3>
-          <span class="sandbox-unit-note">Memory calculations shown in GiB (1 GiB = 2³⁰ bytes)</span>
+          <span class="sandbox-unit-note">GiB (1 GiB = 2³⁰ bytes)</span>
         </div>
 
         <div class="sandbox-controls-grid">
-          <!-- Control: Model Preset -->
           <div class="sandbox-control-item">
             <label for="select-model-preset" class="sandbox-label">Model Architecture Preset</label>
             <select id="select-model-preset" class="tech-select">
               <option value="llama-3-8b" selected>Llama-3-8B — GQA: 8 KV heads, 32 layers</option>
               <option value="llama-3-70b">Llama-3-70B — GQA: 8 KV heads, 80 layers</option>
               <option value="gpt3-175b">GPT-3 (175B) — MHA: 96 KV heads, 96 layers</option>
-              <option value="deepseek-v2">DeepSeek-V2 — MLA: 512D KV latent + 64D decoupled RoPE key, 60 layers</option>
+              <option value="deepseek-v2">DeepSeek-V2 — MLA: 512D latent + 64D RoPE, 60 layers</option>
             </select>
             <span class="control-help" id="preset-help-text">GQA (8 KV heads, 4:1 ratio) · 14.96 GiB weights</span>
           </div>
 
-          <!-- Control: Sequence Length T -->
           <div class="sandbox-control-item">
             <div class="slider-label-row">
               <label for="slider-context-len" class="sandbox-label">Context Length (T)</label>
@@ -615,15 +561,10 @@
             </div>
             <input type="range" id="slider-context-len" min="0" max="8" step="1" value="4" class="tech-slider">
             <div class="slider-ticks">
-              <span>512</span>
-              <span>2k</span>
-              <span>8k</span>
-              <span>32k</span>
-              <span>128k</span>
+              <span>512</span><span>2k</span><span>8k</span><span>32k</span><span>128k</span>
             </div>
           </div>
 
-          <!-- Control: Batch Size B -->
           <div class="sandbox-control-item">
             <div class="slider-label-row">
               <label for="slider-batch-size" class="sandbox-label">Batch Size (B)</label>
@@ -631,40 +572,34 @@
             </div>
             <input type="range" id="slider-batch-size" min="1" max="64" step="1" value="1" class="tech-slider">
             <div class="slider-ticks">
-              <span>1</span>
-              <span>16</span>
-              <span>32</span>
-              <span>48</span>
-              <span>64</span>
+              <span>1</span><span>16</span><span>32</span><span>48</span><span>64</span>
             </div>
           </div>
 
-          <!-- Control: Precision & GPU -->
           <div class="sandbox-control-item">
-            <label class="sandbox-label">Numeric Precision (bytes/element)</label>
+            <label class="sandbox-label">Precision</label>
             <div class="precision-btn-group">
               <button class="prec-btn active" data-prec="fp16">FP16 (2 B)</button>
               <button class="prec-btn" data-prec="fp8">FP8 (1 B)</button>
               <button class="prec-btn" data-prec="int4">INT4 (0.5 B)</button>
             </div>
 
-            <label for="select-gpu-target" class="sandbox-label" style="margin-top: 12px;">Target GPU Ceiling</label>
+            <label for="select-gpu-target" class="sandbox-label" style="margin-top: 10px;">Target GPU</label>
             <select id="select-gpu-target" class="tech-select">
               <option value="rtx-4090">NVIDIA RTX 4090 (24 GB)</option>
               <option value="a100-80gb" selected>NVIDIA A100 (80 GB)</option>
-              <option value="8x-h100">8× H100 — 640 GB aggregate HBM</option>
+              <option value="8x-h100">8× H100 — 640 GB aggregate</option>
             </select>
           </div>
         </div>
 
-        <!-- Live VRAM Allocation Bar & Breakdown -->
+        <!-- VRAM Allocation Bar -->
         <div class="vram-allocation-section">
           <div class="allocation-bar-header">
             <span class="alloc-title">Estimated VRAM Allocation</span>
             <span class="alloc-total" id="alloc-total-text">-- GiB / -- GiB</span>
           </div>
 
-          <!-- Visual Horizontal Allocation Bar -->
           <div class="vram-bar-track">
             <div class="vram-bar-segment weights" id="vram-bar-weights" style="width: 20%;">
               <span class="bar-seg-label">Weights</span>
@@ -673,31 +608,23 @@
               <span class="bar-seg-label">KV Cache</span>
             </div>
             <div class="vram-bar-segment overflow" id="vram-bar-overflow" style="display: none;">
-              <span class="bar-seg-label">Over Ceiling</span>
+              <span class="bar-seg-label">Exceeded</span>
             </div>
           </div>
 
-          <!-- Capacity Exceeded Warning Box -->
           <div class="capacity-warning-card" id="capacity-warning-card" style="display: none;">
-            <div class="warning-title">⚠ Capacity exceeded in simplified model</div>
-            <p class="warning-desc">
-              Simplified capacity estimate (model weights + KV cache only) exceeds the selected GPU memory ceiling. Actual inference memory additionally requires activations, temporary workspaces, communication buffers, and CUDA runtime allocations.
-            </p>
+            <div class="warning-title">⚠ Memory Exceeds Target GPU Ceiling</div>
           </div>
 
-          <!-- Multi-GPU Aggregate Note Box -->
           <div class="aggregate-note-card" id="aggregate-note-card" style="display: none;">
-            <p class="aggregate-text">
-              <strong>Aggregate Memory Notice:</strong> This is aggregate memory across eight GPUs, not a single contiguous 640 GB memory pool. Actual usable capacity depends on the tensor/pipeline parallelism sharding strategy.
-            </p>
+            <p class="aggregate-text">Aggregate memory across 8 GPUs; requires tensor/pipeline parallel sharding.</p>
           </div>
 
-          <!-- Exact Breakdown Cards -->
           <div class="vram-breakdown-grid">
             <div class="breakdown-card">
               <span class="breakdown-label">Model Weights</span>
               <div class="breakdown-val" id="val-weights-gib">-- GiB</div>
-              <span class="breakdown-sub" id="val-weights-sub">FP16 baseline</span>
+              <span class="breakdown-sub" id="val-weights-sub">FP16</span>
             </div>
             <div class="breakdown-card">
               <span class="breakdown-label">KV Cache Footprint</span>
@@ -705,9 +632,9 @@
               <span class="breakdown-sub" id="val-kv-sub">-- bytes/token</span>
             </div>
             <div class="breakdown-card highlight">
-              <span class="breakdown-label">Total Estimated VRAM</span>
+              <span class="breakdown-label">Total VRAM</span>
               <div class="breakdown-val" id="val-total-gib">-- GiB</div>
-              <span class="breakdown-sub" id="val-total-sub">--% of GPU ceiling</span>
+              <span class="breakdown-sub" id="val-total-sub">--% GPU</span>
             </div>
             <div class="breakdown-card">
               <span class="breakdown-label">Formula Evaluated</span>
@@ -715,54 +642,48 @@
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- 3D Structural KV Cache Visualizer -->
-        <div class="kv3d-section">
-          <div class="kv3d-header">
-            <div class="kv3d-title-group">
-              <h4 class="kv3d-title">Structural Tensor Dimensions of the KV Cache</h4>
-              <span class="kv3d-subtitle">Layers (L) × Attention Channels/Heads (n<sub>KV</sub>) × Context Tokens (T)</span>
-            </div>
-            <button id="btn-kv3d-reset" class="tech-button mini">⟲ Reset Camera</button>
+      <!-- 3D Structural KV Cache Visualizer (Floating Seamlessly on Screen) -->
+      <div class="kv3d-section">
+        <div class="kv3d-header">
+          <div class="kv3d-title-group">
+            <h4 class="kv3d-title">3D Structural Tensor Dimensions</h4>
+            <span class="kv3d-subtitle">Layers (L) × KV Channels (n<sub>KV</sub>) × Tokens (T)</span>
           </div>
+          <button id="btn-kv3d-reset" class="tech-button mini">⟲ Reset Camera</button>
+        </div>
 
-          <div class="kv3d-viewport-wrapper">
-            <div id="kv-3d-container" class="kv-3d-viewport"></div>
-            
-            <!-- Axis Legend Overlay -->
-            <div class="axis-legend-overlay">
-              <div class="axis-item">
-                <span class="axis-indicator z-axis"></span>
-                <span class="axis-text"><strong>Z-Axis:</strong> Context Sequence Length (T)</span>
-              </div>
-              <div class="axis-item">
-                <span class="axis-indicator y-axis"></span>
-                <span class="axis-text"><strong>Y-Axis:</strong> Transformer Layers (L)</span>
-              </div>
-              <div class="axis-item">
-                <span class="axis-indicator x-axis"></span>
-                <span class="axis-text"><strong>X-Axis:</strong> KV Representation Channels / Heads</span>
-              </div>
+        <div class="kv3d-viewport-wrapper">
+          <div id="kv-3d-container" class="kv-3d-viewport"></div>
+          
+          <div class="axis-legend-overlay">
+            <div class="axis-item">
+              <span class="axis-indicator z-axis"></span>
+              <span class="axis-text"><strong>Z:</strong> Context Length (T)</span>
             </div>
-          </div>
-
-          <!-- Scientific Honesty Caption -->
-          <div class="kv3d-honesty-caption">
-            "The 3D geometry visualizes the tensor structure of the cached representation. The VRAM calculation additionally accounts for representation width, batch size, and bytes per element. It is not a literal physical map of GPU memory addresses."
+            <div class="axis-item">
+              <span class="axis-indicator y-axis"></span>
+              <span class="axis-text"><strong>Y:</strong> Decoder Layers (L)</span>
+            </div>
+            <div class="axis-item">
+              <span class="axis-indicator x-axis"></span>
+              <span class="axis-text"><strong>X:</strong> KV Heads / Latents</span>
+            </div>
           </div>
         </div>
 
+        <div class="kv3d-honesty-caption">
+          Visualizes the structural tensor (L × n<sub>KV</sub> × T). VRAM accounts for head width, batch size, and precision.
+        </div>
       </div>
 
-      <!-- Bridge Sentence to Chapter 4 -->
       <div class="bridge-card">
         <p class="bridge-text">
-          This growing buffer isn't just a storage problem — it changes how fast the GPU can actually run.
+          This growing buffer isn't just a storage problem—it fundamentally alters how fast the GPU can generate tokens.
         </p>
       </div>
-
     </section>
-    <!-- END CHAPTER 3 -->
 
     <!-- ════════════════════════════════════════════════════════════ -->
     <!-- CHAPTER 4: LIMITATIONS IN PRODUCTION: PREFILL VS. DECODE   -->
@@ -772,55 +693,37 @@
         <div class="act-number">Chapter 4</div>
         <h2 class="act-title">Limitations in Production: Prefill vs. Decode</h2>
         <p class="act-description">
-          A common misconception is that the KV cache is merely a capacity concern — an issue of having enough gigabytes on the GPU. In real production serving systems, the physical mechanics of KV cache retrieval dictate throughput and execution latency, bifurcating transformer inference into two radically different operating regimes.
+          Inference splits into two opposite hardware regimes: parallel compute-bound prefill vs. memory-bandwidth-bound decode.
         </p>
       </div>
 
       <!-- Two Phases Comparison Grid -->
       <div class="phases-grid">
-        <!-- Prefill Phase Card -->
         <div class="phase-card prefill">
           <div class="phase-header">
             <h3 class="phase-title">Phase 1: Prefill</h3>
             <span class="phase-badge compute">Compute-Bound</span>
           </div>
           <div class="phase-math-tag">Matrix-Matrix (GEMM) · Highly Parallel</div>
-          <p class="phase-desc">
-            Processing the full input prompt at once. The model computes Key and Value projections for all prompt tokens in parallel across thousands of tensor cores.
-          </p>
+          <p class="phase-desc">Processes the entire prompt simultaneously across thousands of GPU Tensor Cores.</p>
           <ul class="phase-features-list">
-            <li class="phase-feature-item">
-              <strong>Execution:</strong> Ingests all <em>T<sub>prompt</sub></em> tokens simultaneously in a single forward pass.
-            </li>
-            <li class="phase-feature-item">
-              <strong>Arithmetic Intensity:</strong> High (<em>I<sub>prefill</sub></em> &gt;&gt; 150 FLOP/byte). High compute-to-memory ratio keeps GPU tensor cores saturated.
-            </li>
-            <li class="phase-feature-item">
-              <strong>Hardware State:</strong> Tensor cores run near peak; memory bus is not the primary bottleneck.
-            </li>
+            <li class="phase-feature-item"><strong>Execution:</strong> All tokens in a single forward pass.</li>
+            <li class="phase-feature-item"><strong>Intensity:</strong> High (I &gt;&gt; 150 FLOP/byte).</li>
+            <li class="phase-feature-item"><strong>Bottleneck:</strong> Compute execution units; memory bus is not saturated.</li>
           </ul>
         </div>
 
-        <!-- Decode Phase Card -->
         <div class="phase-card decode">
           <div class="phase-header">
             <h3 class="phase-title">Phase 2: Decode</h3>
-            <span class="phase-badge bandwidth">Memory-Bandwidth-Bound</span>
+            <span class="phase-badge bandwidth">Memory-Bound</span>
           </div>
-          <div class="phase-math-tag">Matrix-Vector (GEMV) · Strictly Sequential</div>
-          <p class="phase-desc">
-            Generating one token at a time using the accumulated cache. For small batches, major layers behave approximately like matrix-vector operations; larger batches become matrix-matrix-like across the batch.
-          </p>
+          <div class="phase-math-tag">Matrix-Vector (GEMV) · Sequential</div>
+          <p class="phase-desc">Generates 1 token at a time, streaming the entire accumulated KV cache from HBM for each step.</p>
           <ul class="phase-features-list">
-            <li class="phase-feature-item">
-              <strong>Execution:</strong> Autoregressive loop generating 1 token per step per sequence.
-            </li>
-            <li class="phase-feature-item">
-              <strong>Arithmetic Intensity:</strong> Very low (<em>I<sub>decode</sub></em> ≈ 0.99 – 4 FLOP/byte). Each step must stream the entire KV cache from HBM just to generate a single token.
-            </li>
-            <li class="phase-feature-item">
-              <strong>Hardware State:</strong> Tensor cores sit idle most of the cycle, waiting on memory transfers from High Bandwidth Memory (HBM).
-            </li>
+            <li class="phase-feature-item"><strong>Execution:</strong> Autoregressive loop, 1 token per sequence.</li>
+            <li class="phase-feature-item"><strong>Intensity:</strong> Extremely low (I ≈ 0.99 – 4 FLOP/byte).</li>
+            <li class="phase-feature-item"><strong>Bottleneck:</strong> Memory bandwidth; Tensor Cores wait for HBM data transfers.</li>
           </ul>
         </div>
       </div>
@@ -829,11 +732,11 @@
       <div class="roofline-card">
         <div class="roofline-header">
           <div class="roofline-title-group">
-            <h3 class="roofline-title">Analytical Roofline Model: Hardware Bottlenecks</h3>
-            <span class="roofline-subtitle">Attainable Performance P = min(P<sub>peak</sub>, I × B<sub>mem</sub>) · Williams, Waterman, Patterson (2009)</span>
+            <h3 class="roofline-title">Roofline Model: Hardware Ceilings</h3>
+            <span class="roofline-subtitle">P = min(P<sub>peak</sub>, I × B<sub>mem</sub>)</span>
           </div>
           <div class="hardware-spec-badge">
-            A100 80GB SXM · 312 TFLOPS Dense FP16 · 2,039 GB/s HBM2e
+            NVIDIA A100 80GB SXM · 312 TFLOPS Dense FP16 · 2,039 GB/s HBM2e
           </div>
         </div>
 
@@ -841,43 +744,33 @@
           <canvas id="bandwidth-canvas"></canvas>
         </div>
 
-        <!-- Attribution & Citation Badge -->
-        <div class="attribution-card" style="margin-top: 14px; margin-bottom: 0;">
-          <div class="attribution-badge">● Foundational Methodology · Williams et al. 2009 (Roofline Model)</div>
-          <p class="attribution-text">
-            Williams, Waterman, and Patterson (2009) introduced the Roofline model to relate floating-point performance to memory bandwidth and arithmetic intensity. The knee point (<em>I* = P<sub>peak</sub> / B<sub>mem</sub> ≈ 153.0 FLOP/byte</em> on the A100) demarcates memory-bandwidth-bound from compute-bound execution.
-          </p>
+        <div class="attribution-card" style="margin-top: 12px; margin-bottom: 0;">
+          <div class="attribution-badge">● Williams, Waterman, Patterson (2009) · Roofline Model</div>
+          <p class="attribution-text">Knee point at <em>I* = P<sub>peak</sub> / B<sub>mem</sub> ≈ 153.0 FLOP/byte</em> separates memory-bandwidth from compute bounds.</p>
         </div>
       </div>
 
-      <!-- Interactive Concurrency & Bandwidth Degradation Sandbox -->
+      <!-- Serving Sandbox -->
       <div class="serving-sandbox-card">
         <div class="serving-sandbox-header">
-          <h3 class="serving-sandbox-title">Interactive Serving Sandbox: Memory Bandwidth Competition</h3>
+          <h3 class="serving-sandbox-title">Interactive Serving Sandbox: Memory Bandwidth Saturation</h3>
           <p class="serving-sandbox-desc">
-            Explore how concurrent requests (batch size <em>B</em>) and context length (<em>T</em>) alter memory traffic per decode step, moving the decode operating point along the roofline and revealing the KV-bandwidth ceiling.
+            Adjust concurrent requests and context length to observe how decode memory traffic limits throughput.
           </p>
         </div>
 
-        <!-- Controls Grid -->
         <div class="serving-controls-grid">
-          <!-- Control: Batch Size B -->
           <div class="serving-control-item">
             <div class="slider-label-row">
-              <label for="slider-serving-batch" class="sandbox-label">Concurrent Requests / Batch Size (B)</label>
+              <label for="slider-serving-batch" class="sandbox-label">Concurrent Requests / Batch (B)</label>
               <span class="slider-val-badge" id="badge-serving-batch">1 request</span>
             </div>
             <input type="range" id="slider-serving-batch" min="1" max="128" step="1" value="1" class="tech-slider">
             <div class="slider-ticks">
-              <span>1</span>
-              <span>32</span>
-              <span>64</span>
-              <span>96</span>
-              <span>128</span>
+              <span>1</span><span>32</span><span>64</span><span>96</span><span>128</span>
             </div>
           </div>
 
-          <!-- Control: Context Length T -->
           <div class="serving-control-item">
             <div class="slider-label-row">
               <label for="slider-serving-context" class="sandbox-label">Average Context Length (T)</label>
@@ -885,99 +778,65 @@
             </div>
             <input type="range" id="slider-serving-context" min="512" max="32768" step="512" value="1024" class="tech-slider">
             <div class="slider-ticks">
-              <span>512</span>
-              <span>4k</span>
-              <span>8k</span>
-              <span>16k</span>
-              <span>32k</span>
+              <span>512</span><span>4k</span><span>8k</span><span>16k</span><span>32k</span>
             </div>
           </div>
         </div>
 
-        <!-- Dynamic Real-Time Metrics Grid -->
         <div class="serving-metrics-grid">
           <div class="metric-card">
-            <span class="metric-card-label">Idealized Memory Traffic (M<sub>step</sub>)</span>
+            <span class="metric-card-label">Memory Traffic / Step</span>
             <div class="metric-card-val" id="val-serving-mem-traffic">-- GB</div>
-            <span class="metric-card-sub" id="sub-serving-mem-traffic">Weights + KV Cache per step</span>
+            <span class="metric-card-sub" id="sub-serving-mem-traffic">Weights + KV Cache</span>
           </div>
 
           <div class="metric-card">
-            <span class="metric-card-label">Decode Arithmetic Intensity (I)</span>
+            <span class="metric-card-label">Arithmetic Intensity</span>
             <div class="metric-card-val" id="val-serving-ai">-- FLOP/B</div>
             <span class="metric-card-sub" id="sub-serving-ai">FLOPs / Bytes transferred</span>
           </div>
 
           <div class="metric-card">
-            <span class="metric-card-label">Attained Compute (P<sub>decode</sub>)</span>
+            <span class="metric-card-label">Attained Compute</span>
             <div class="metric-card-val" id="val-serving-perf">-- TFLOPS</div>
-            <span class="metric-card-sub" id="sub-serving-perf">--% of 312 TFLOPS peak</span>
+            <span class="metric-card-sub" id="sub-serving-perf">--% of 312 peak</span>
           </div>
 
           <div class="metric-card">
-            <span class="metric-card-label">Simplified Batch Step Latency</span>
+            <span class="metric-card-label">Step Latency</span>
             <div class="metric-card-val" id="val-serving-latency">-- ms</div>
-            <span class="metric-card-sub">Time to generate 1 token/stream</span>
+            <span class="metric-card-sub">Time per token</span>
           </div>
 
           <div class="metric-card">
-            <span class="metric-card-label">Per-Request Token Rate</span>
+            <span class="metric-card-label">Per-Stream Rate</span>
             <div class="metric-card-val" id="val-serving-user-rate">-- tok/s</div>
-            <span class="metric-card-sub">R<sub>user</sub> = 1 / t<sub>step</sub></span>
+            <span class="metric-card-sub">1 / t<sub>step</sub></span>
           </div>
 
           <div class="metric-card primary">
-            <span class="metric-card-label">Aggregate System Throughput</span>
+            <span class="metric-card-label">Aggregate Throughput</span>
             <div class="metric-card-val" id="val-serving-agg-rate">-- tok/s</div>
-            <span class="metric-card-sub" id="sub-serving-agg-rate">R<sub>aggregate</sub> = B / t<sub>step</sub></span>
+            <span class="metric-card-sub" id="sub-serving-agg-rate">B / t<sub>step</sub></span>
           </div>
         </div>
-
-        <!-- Nuance Note on Batch Scaling -->
-        <p class="phase-desc" style="font-size: 0.82rem; margin-top: 12px; color: #4b5563;">
-          <strong>Batching Dynamic:</strong> Increasing batch size increases work and contention per decode step, while allowing more requests to share weight reads and GPU computation. Aggregate throughput can improve substantially before approaching a bandwidth/compute limit; individual-request latency depends on the serving and batching strategy.
-        </p>
       </div>
 
-      <!-- Systems Engineering Consequence: Disaggregation & PagedAttention -->
+      <!-- Systems Consequence -->
       <div class="systems-card">
-        <h4 class="systems-card-title">Systems Engineering Consequence: Prefill/Decode Disaggregation & PagedAttention</h4>
+        <h4 class="systems-card-title">Systems Solutions: PagedAttention &amp; Disaggregation</h4>
         <p class="systems-card-text">
-          Because prefill and decode exhibit fundamentally opposite hardware bottlenecks — compute-bound matrix-matrix multiplication versus memory-bandwidth-bound streaming of the growing KV cache — co-scheduling them on the same GPU creates severe resource interference. Bursty prefill passes monopolize tensor cores, while decode steps stall waiting for memory bandwidth. To resolve this, modern production inference architectures physically separate the two phases:
-        </p>
-        <p class="systems-card-text" style="margin-top: 10px;">
-          <strong>vLLM (Kwon et al. 2023, PagedAttention):</strong> Introduces virtual memory paging for KV caches, eliminating fragmentation and near-doubling effective capacity without changing the underlying bandwidth requirements.
-          <br><br>
-          <strong>DistServe (Zhong et al. 2024):</strong> Formally disaggregates prefill and decode onto physically separate GPU pools or dedicated scheduling phases. By separating compute-heavy prompt ingestion from latency-critical token generation, DistServe eliminates "prefill interference" and head-of-line blocking, allowing each phase to be provisioned and optimized for its own hardware bottleneck.
+          <strong>vLLM (Kwon et al. 2023):</strong> PagedAttention eliminates internal memory fragmentation using virtual memory paging.<br>
+          <strong>DistServe (Zhong et al. 2024):</strong> Physically disaggregates compute-bound prefill from bandwidth-bound decode onto separate GPU clusters.
         </p>
       </div>
 
-      <!-- Scientific Honesty Persistent Box -->
-      <div class="scientific-honesty-box">
-        <span class="honesty-box-title">Scientific Honesty & Methodology Notes</span>
-        <div class="honesty-box-item">
-          <strong>Roofline model:</strong> Analytical upper-bound model (Williams et al. 2009), not a direct measurement of A100 kernel performance. Actual measured performance can be lower due to kernel launch overhead, tensor core efficiency, cache hierarchy, synchronization, and communication.
-        </div>
-        <div class="honesty-box-item">
-          <strong>Memory traffic:</strong> Idealized analytical estimate of effective weight read plus KV cache streaming (<em>M<sub>step</sub> = 2P + B · k<sub>token</sub> · T</em>); actual HBM traffic depends on kernel implementation and cache hierarchy.
-        </div>
-        <div class="honesty-box-item">
-          <strong>Dense vs. Sparse compute:</strong> NVIDIA lists 624 TFLOPS FP16 for the A100 80GB SXM with structured sparsity; this chapter's roofline uses the 312 TFLOPS dense FP16 figure.
-        </div>
-        <div class="honesty-box-item">
-          <strong>Per-request token rate:</strong> Simplified analytical approximation under synchronized batch-step assumptions; production asynchronous continuous-batching engines exhibit request-level latency variance.
-        </div>
-      </div>
-
-      <!-- Bridge Sentence to Chapter 5 -->
       <div class="bridge-card">
         <p class="bridge-text">
-          Given these costs, researchers have tried several ways to avoid ever growing this cache in the first place.
+          Given these physical costs, how do alternative architectures avoid linear KV memory growth?
         </p>
       </div>
-
     </section>
-    <!-- END CHAPTER 4 -->
 
     <!-- ════════════════════════════════════════════════════════════ -->
     <!-- CHAPTER 5: ALTERNATE MEMORY APPROACHES, COMPARED HONESTLY    -->
@@ -987,59 +846,45 @@
         <div class="act-number">Chapter 5</div>
         <h2 class="act-title">Alternate Memory Approaches, Compared Honestly</h2>
         <p class="act-description">
-          Faced with the quadratic compute of naive recomputation (Chapter 2) and the memory-bandwidth wall of unbounded KV caches (Chapters 3 &amp; 4), the machine learning community has proposed diverse memory architectures. But memory reduction never comes for free: each approach trades away explicit token-addressability, recall precision, or softmax sharpness. Here, we compare these mechanisms under a common normalized analytical scale.
+          Normalized comparison under a 32-layer, FP16 scale (L=32, d<sub>model</sub>=4096). Reducing memory footprint always trades off addressability, recall, or precision.
         </p>
       </div>
 
-      <!-- Scientific Honesty Scoping Banner -->
-      <div class="scientific-honesty-box" style="margin-bottom: 20px;">
-        <span class="honesty-box-title">Normalized Analytical Comparison Notice</span>
-        <div class="honesty-box-item">
-          Except where explicitly stated, these numbers are normalized analytical estimates that place different memory mechanisms on a common 32-layer, FP16 comparison scale (<em>L=32, d<sub>model</sub>=4096, d<sub>head</sub>=128, s=2 bytes</em>). They are not measurements of the original published model implementations, which differ in layer count, precision, and architectural hyperparameters.
-        </div>
-        <div class="honesty-box-item">
-          These curves describe state-memory scaling, not model quality, latency, throughput, or recall accuracy. Two methods with identical memory growth can have radically different retrieval behavior.
-        </div>
-      </div>
-
-      <!-- State Semantics Taxonomy Banner -->
+      <!-- Taxonomy of State Semantics -->
       <div class="taxonomy-card">
-        <h3 class="taxonomy-title">Taxonomy of State Semantics: What Kind of Memory?</h3>
-        <p class="taxonomy-desc">
-          Before comparing numbers, we must distinguish what information physically survives inside each state representation:
-        </p>
+        <h3 class="taxonomy-title">Taxonomy of State Semantics</h3>
         <div class="taxonomy-grid">
           <div class="taxonomy-item">
             <span class="taxonomy-num">01 · Explicit Token</span>
-            <span class="taxonomy-item-name">Token-Addressable Buffers</span>
-            <span class="taxonomy-item-sub">Standard KV, StreamingLLM, H2O: stores explicit activations per position.</span>
+            <span class="taxonomy-item-name">Addressable Buffers</span>
+            <span class="taxonomy-item-sub">Standard KV, StreamingLLM: retains explicit activations.</span>
           </div>
           <div class="taxonomy-item">
             <span class="taxonomy-num">02 · Compressed Token</span>
-            <span class="taxonomy-item-name">Token-Addressable Latents</span>
-            <span class="taxonomy-item-sub">DeepSeek MLA: low-rank compressed vectors still indexed per token position.</span>
+            <span class="taxonomy-item-name">Addressable Latents</span>
+            <span class="taxonomy-item-sub">DeepSeek MLA: low-rank vectors indexed per token.</span>
           </div>
           <div class="taxonomy-item">
-            <span class="taxonomy-num">03 · Recurrent Associative</span>
+            <span class="taxonomy-num">03 · Associative</span>
             <span class="taxonomy-item-name">Matrix Fast Weights</span>
-            <span class="taxonomy-item-sub">Linear Attention: folds outer products into a fixed-size associative matrix.</span>
+            <span class="taxonomy-item-sub">Linear Attention: folds outer products into a fixed matrix.</span>
           </div>
           <div class="taxonomy-item">
-            <span class="taxonomy-num">04 · Dynamical Recurrent</span>
-            <span class="taxonomy-item-name">Continuous State Vectors</span>
-            <span class="taxonomy-item-sub">Mamba / SSM: continuous-time hidden state evolving via selective recurrence.</span>
+            <span class="taxonomy-num">04 · Dynamical</span>
+            <span class="taxonomy-item-name">Recurrent State</span>
+            <span class="taxonomy-item-sub">Mamba SSM: continuous hidden state evolving selectively.</span>
           </div>
           <div class="taxonomy-item">
             <span class="taxonomy-num">05 · Learned Graph</span>
-            <span class="taxonomy-item-name">Dynamical Synaptic Graph</span>
-            <span class="taxonomy-item-sub">Dragon Hatchling (BDH): Hebbian edge-reweighting on a fixed graph topology.</span>
+            <span class="taxonomy-item-name">Synaptic Plasticity</span>
+            <span class="taxonomy-item-sub">Dragon Hatchling (BDH): Hebbian reweighting on fixed topology.</span>
           </div>
         </div>
       </div>
 
-      <!-- 6-Approach Interactive Card Deck -->
+      <!-- 6-Approach Interactive Deck -->
       <div class="approaches-deck" id="approaches-deck">
-        <!-- Card 1: Standard KV -->
+        <!-- 1: Standard KV -->
         <div class="approach-card selected-a" id="card-standard_kv" data-approach="standard_kv">
           <div class="approach-card-header">
             <div class="approach-card-title-group">
@@ -1049,20 +894,14 @@
             <span class="approach-badge linear">O(T) Linear</span>
           </div>
           <div class="approach-formula-box">
-            M<sub>KV</sub>(T) = 2 · L · n<sub>KV</sub> · d<sub>head</sub> · s · T = 131,072 · T bytes
+            M<sub>KV</sub>(T) = 2 · L · n<sub>KV</sub> · d<sub>head</sub> · s · T = 131,072 · T B
           </div>
           <div class="approach-card-details">
-            <div class="approach-detail-item">
-              <span class="approach-detail-label">Information Retained:</span>
-              <span>Full, uncompressed past Key &amp; Value activation projections for every token.</span>
-            </div>
-            <div class="approach-detail-item">
-              <span class="approach-detail-label">Real Limitation:</span>
-              <span>Unbounded linear growth in cache state memory; acute memory-bandwidth saturation during decode (Chapter 4).</span>
-            </div>
+            <div class="approach-detail-item"><strong>Retained:</strong> Full uncompressed Key and Value projections.</div>
+            <div class="approach-detail-item"><strong>Limitation:</strong> Linear memory growth; decode memory-bandwidth bound.</div>
           </div>
           <div class="approach-card-footer">
-            <span class="control-help">Vaswani 2017 · Pope 2023</span>
+            <span class="control-help">Vaswani 2017</span>
             <div class="approach-btn-group">
               <button class="approach-select-btn active-a" data-action="set-a" data-id="standard_kv">Approach A</button>
               <button class="approach-select-btn" data-action="set-b" data-id="standard_kv">Approach B</button>
@@ -1070,30 +909,24 @@
           </div>
         </div>
 
-        <!-- Card 2: Eviction / Attention Sinks -->
+        <!-- 2: StreamingLLM -->
         <div class="approach-card" id="card-streaming_llm" data-approach="streaming_llm">
           <div class="approach-card-header">
             <div class="approach-card-title-group">
-              <h4 class="approach-card-title">Attention Sinks &amp; Eviction</h4>
-              <span class="approach-card-category">Explicit Token Memory (Windowed)</span>
+              <h4 class="approach-card-title">Attention Sinks</h4>
+              <span class="approach-card-category">Windowed Token Memory</span>
             </div>
-            <span class="approach-badge constant">O(1) Fixed Window</span>
+            <span class="approach-badge constant">O(1) Window</span>
           </div>
           <div class="approach-formula-box">
-            M<sub>Streaming</sub>(T) = 131,072 · min(T, 1028) bytes [W<sub>sink</sub>=4, W<sub>win</sub>=1024]
+            M(T) = 131,072 · min(T, 1028) B [W<sub>sink</sub>=4, W<sub>win</sub>=1024]
           </div>
           <div class="approach-card-details">
-            <div class="approach-detail-item">
-              <span class="approach-detail-label">Information Retained:</span>
-              <span>Initial sink tokens + recent sliding window. Intermediate tokens evicted. (H2O uses dynamic heavy-hitter scoring).</span>
-            </div>
-            <div class="approach-detail-item">
-              <span class="approach-detail-label">Real Limitation:</span>
-              <span>Once a token's KV state is evicted, this cache mechanism no longer has direct access to that token's stored K/V representation. Exact recovery is unavailable unless preserved elsewhere.</span>
-            </div>
+            <div class="approach-detail-item"><strong>Retained:</strong> Initial sink tokens + sliding recent window.</div>
+            <div class="approach-detail-item"><strong>Limitation:</strong> Zero exact recall for evicted intermediate tokens.</div>
           </div>
           <div class="approach-card-footer">
-            <span class="control-help">Xiao 2023 (StreamingLLM) · Zhang 2023 (H2O)</span>
+            <span class="control-help">Xiao 2023 (StreamingLLM)</span>
             <div class="approach-btn-group">
               <button class="approach-select-btn" data-action="set-a" data-id="streaming_llm">Approach A</button>
               <button class="approach-select-btn" data-action="set-b" data-id="streaming_llm">Approach B</button>
@@ -1101,30 +934,24 @@
           </div>
         </div>
 
-        <!-- Card 3: DeepSeek MLA -->
+        <!-- 3: DeepSeek MLA -->
         <div class="approach-card" id="card-deepseek_mla" data-approach="deepseek_mla">
           <div class="approach-card-header">
             <div class="approach-card-title-group">
-              <h4 class="approach-card-title">Low-Rank Compression (MLA)</h4>
+              <h4 class="approach-card-title">Low-Rank MLA</h4>
               <span class="approach-card-category">Compressed Token Memory</span>
             </div>
             <span class="approach-badge linear">O(T) Compressed</span>
           </div>
           <div class="approach-formula-box">
-            M<sub>MLA</sub>(T) = L · (d<sub>c</sub> + d<sub>R</sub>) · s · T = 36,864 · T bytes [L=32 normalized]
+            M<sub>MLA</sub>(T) = L · (d<sub>c</sub> + d<sub>R</sub>) · s · T = 36,864 · T B
           </div>
           <div class="approach-card-details">
-            <div class="approach-detail-item">
-              <span class="approach-detail-label">Information Retained:</span>
-              <span>512D compressed KV latent (c<sub>t</sub><sup>KV</sup>) + 64D decoupled RoPE key (k<sub>t</sub><sup>R</sup>). 576 elements/token/layer.</span>
-            </div>
-            <div class="approach-detail-item">
-              <span class="approach-detail-label">Real Limitation:</span>
-              <span>Reduces footprint per token by 71.875% vs standard KV, but does NOT make memory constant in T. Unbounded linear growth remains at long contexts.</span>
-            </div>
+            <div class="approach-detail-item"><strong>Retained:</strong> 512D latent + 64D decoupled RoPE key.</div>
+            <div class="approach-detail-item"><strong>Limitation:</strong> 71.9% smaller footprint, but remains O(T) linear.</div>
           </div>
           <div class="approach-card-footer">
-            <span class="control-help">DeepSeek-AI 2024 (DeepSeek-V2)</span>
+            <span class="control-help">DeepSeek-AI 2024</span>
             <div class="approach-btn-group">
               <button class="approach-select-btn" data-action="set-a" data-id="deepseek_mla">Approach A</button>
               <button class="approach-select-btn" data-action="set-b" data-id="deepseek_mla">Approach B</button>
@@ -1132,30 +959,24 @@
           </div>
         </div>
 
-        <!-- Card 4: Linear Attention -->
+        <!-- 4: Linear Attention -->
         <div class="approach-card" id="card-linear_attention" data-approach="linear_attention">
           <div class="approach-card-header">
             <div class="approach-card-title-group">
-              <h4 class="approach-card-title">Linear Attention (Fast Weights)</h4>
-              <span class="approach-card-category">Recurrent Associative State</span>
+              <h4 class="approach-card-title">Linear Attention</h4>
+              <span class="approach-card-category">Associative Matrix</span>
             </div>
-            <span class="approach-badge constant">O(1) Matrix Memory</span>
+            <span class="approach-badge constant">O(1) Matrix</span>
           </div>
           <div class="approach-formula-box">
-            M<sub>Linear</sub> = L · n<sub>head</sub> · r · d<sub>v</sub> · s = 33,554,432 bytes [r=d<sub>v</sub>=128]
+            M<sub>Linear</sub> = L · n<sub>head</sub> · r · d<sub>v</sub> · s = 33.55 MB
           </div>
           <div class="approach-card-details">
-            <div class="approach-detail-item">
-              <span class="approach-detail-label">Information Retained:</span>
-              <span>Associative matrix accumulating outer products: S<sub>t</sub> = S<sub>t-1</sub> + φ(k<sub>t</sub>) v<sub>t</sub><sup>T</sup>.</span>
-            </div>
-            <div class="approach-detail-item">
-              <span class="approach-detail-label">Real Limitation:</span>
-              <span>Replaces exact softmax attention with a kernelized/linearized mechanism, changing retrieval behavior and introducing capacity/interference trade-offs in its finite recurrent state.</span>
-            </div>
+            <div class="approach-detail-item"><strong>Retained:</strong> Associative matrix accumulating outer products.</div>
+            <div class="approach-detail-item"><strong>Limitation:</strong> Lacks exact softmax focus; finite state capacity.</div>
           </div>
           <div class="approach-card-footer">
-            <span class="control-help">Katharopoulos 2020 · Schlag 2021</span>
+            <span class="control-help">Katharopoulos 2020</span>
             <div class="approach-btn-group">
               <button class="approach-select-btn" data-action="set-a" data-id="linear_attention">Approach A</button>
               <button class="approach-select-btn" data-action="set-b" data-id="linear_attention">Approach B</button>
@@ -1163,30 +984,24 @@
           </div>
         </div>
 
-        <!-- Card 5: Mamba SSM -->
+        <!-- 5: Mamba SSM -->
         <div class="approach-card selected-b" id="card-mamba_ssm" data-approach="mamba_ssm">
           <div class="approach-card-header">
             <div class="approach-card-title-group">
-              <h4 class="approach-card-title">State-Space Models (Mamba)</h4>
-              <span class="approach-card-category">Dynamical Recurrent State</span>
+              <h4 class="approach-card-title">Mamba (SSM)</h4>
+              <span class="approach-card-category">Dynamical State</span>
             </div>
-            <span class="approach-badge constant">O(1) Vector State</span>
+            <span class="approach-badge constant">O(1) Vector</span>
           </div>
           <div class="approach-formula-box">
-            M<sub>SSM</sub> = L · d<sub>model</sub> · d<sub>state</sub> · s = 4,194,304 bytes [d<sub>state</sub>=16, state-only]
+            M<sub>SSM</sub> = L · d<sub>model</sub> · d<sub>state</sub> · s = 4.19 MB
           </div>
           <div class="approach-card-details">
-            <div class="approach-detail-item">
-              <span class="approach-detail-label">Information Retained:</span>
-              <span>Continuous-time hidden state evolving via input-dependent selective discretization: h<sub>t</sub> = Ā<sub>t</sub> h<sub>t-1</sub> + B̄<sub>t</sub> x<sub>t</sub>.</span>
-            </div>
-            <div class="approach-detail-item">
-              <span class="approach-detail-label">Real Limitation:</span>
-              <span>Fixed-size recurrent state can make exact long-range retrieval and associative recall more difficult than explicit token-addressable memory; performance depends strongly on architecture, training, and task.</span>
-            </div>
+            <div class="approach-detail-item"><strong>Retained:</strong> Continuous-time hidden state evolving selectively.</div>
+            <div class="approach-detail-item"><strong>Limitation:</strong> Fixed state complicates exact long-range recall.</div>
           </div>
           <div class="approach-card-footer">
-            <span class="control-help">Gu &amp; Dao 2023 (Mamba)</span>
+            <span class="control-help">Gu &amp; Dao 2023</span>
             <div class="approach-btn-group">
               <button class="approach-select-btn" data-action="set-a" data-id="mamba_ssm">Approach A</button>
               <button class="approach-select-btn active-b" data-action="set-b" data-id="mamba_ssm">Approach B</button>
@@ -1194,30 +1009,24 @@
           </div>
         </div>
 
-        <!-- Card 6: BDH Graph -->
+        <!-- 6: BDH Graph -->
         <div class="approach-card" id="card-bdh_graph" data-approach="bdh_graph">
           <div class="approach-card-header">
             <div class="approach-card-title-group">
-              <h4 class="approach-card-title">Dragon Hatchling (BDH)</h4>
-              <span class="approach-card-category">Learned Graph Memory</span>
+              <h4 class="approach-card-title">Dragon Hatchling</h4>
+              <span class="approach-card-category">Synaptic Plasticity</span>
             </div>
-            <span class="approach-badge constant">O(1) Graph State</span>
+            <span class="approach-badge constant">O(1) Graph</span>
           </div>
           <div class="approach-formula-box">
-            Fixed graph state; sequence-length-independent state footprint [See Chapter 6]
+            Fixed synaptic state; length-independent footprint [Ch. 6]
           </div>
           <div class="approach-card-details">
-            <div class="approach-detail-item">
-              <span class="approach-detail-label">Information Retained:</span>
-              <span>Synaptic edge connection weights and dynamic activations on a learned bipartite network graph.</span>
-            </div>
-            <div class="approach-detail-item">
-              <span class="approach-detail-label">Chapter 6 Teaser:</span>
-              <span>Trades explicit token buffers and recurrent vectors for a dynamical graph memory structure. Full treatment in Chapter 6.</span>
-            </div>
+            <div class="approach-detail-item"><strong>Retained:</strong> Synaptic edge connections in a learned bipartite network.</div>
+            <div class="approach-detail-item"><strong>Limitation:</strong> Finite capacity; concepts share synaptic pathways.</div>
           </div>
           <div class="approach-card-footer">
-            <span class="control-help">Teaser for Chapter 6</span>
+            <span class="control-help">Kosowski et al. 2025</span>
             <div class="approach-btn-group">
               <button class="approach-select-btn" data-action="set-a" data-id="bdh_graph">Approach A</button>
               <button class="approach-select-btn" data-action="set-b" data-id="bdh_graph">Approach B</button>
@@ -1231,22 +1040,19 @@
         <div class="comparison-workspace-header">
           <h3 class="comparison-workspace-title">Side-by-Side Architectural Comparison</h3>
           <div class="scale-toggle-group">
-            <button class="scale-btn active" id="btn-scale-log" data-scale="log">Log Scale (Default)</button>
+            <button class="scale-btn active" id="btn-scale-log" data-scale="log">Log Scale</button>
             <button class="scale-btn" id="btn-scale-linear" data-scale="linear">Linear Scale</button>
           </div>
         </div>
 
-        <!-- 2D Canvas Wrapper -->
         <div class="memory-canvas-wrapper">
           <canvas id="memory-comparison-canvas"></canvas>
         </div>
 
-        <!-- Scrubber & Exact Readout Strip -->
         <div class="scrubber-strip">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span>Inspecting at Context Length:</span>
+            <span>Context Length:</span>
             <span class="scrubber-t-badge" id="scrubber-t-val">65,536 tokens</span>
-            <span class="control-help">(Hover or drag across chart to scrub T)</span>
           </div>
           <div class="scrubber-val-group">
             <span class="scrubber-val-pill" id="scrubber-val-a" style="color: #000000;">A: --</span>
@@ -1254,7 +1060,6 @@
           </div>
         </div>
 
-        <!-- Comparison Matrix Table -->
         <div class="comparison-table-wrapper">
           <table class="comparison-table">
             <thead>
@@ -1272,56 +1077,45 @@
               </tr>
               <tr>
                 <td class="comparison-dim-name">Memory Complexity</td>
-                <td id="td-complexity-a">O(T) linear with respect to sequence length T</td>
-                <td id="td-complexity-b">O(1) with respect to sequence length T</td>
+                <td id="td-complexity-a">O(T) linear in T</td>
+                <td id="td-complexity-b">O(1) constant in T</td>
               </tr>
               <tr>
-                <td class="comparison-dim-name">Normalized Memory @ 128K</td>
-                <td id="td-mem128-a">17.18 GB decimal (16.00 GiB binary)</td>
-                <td id="td-mem128-b">4.19 MB decimal (4.00 MiB binary)</td>
+                <td class="comparison-dim-name">Memory @ 128K</td>
+                <td id="td-mem128-a">17.18 GB decimal (16.00 GiB)</td>
+                <td id="td-mem128-b">4.19 MB decimal (4.00 MiB)</td>
               </tr>
               <tr>
-                <td class="comparison-dim-name">Token Addressability</td>
+                <td class="comparison-dim-name">Addressability</td>
                 <td id="td-address-a">Yes (all positions)</td>
-                <td id="td-address-b">No (folded into continuous state)</td>
+                <td id="td-address-b">No (folded into recurrent state)</td>
               </tr>
               <tr>
                 <td class="comparison-dim-name">Information Retained</td>
-                <td id="td-info-a">Full uncompressed past K and V activation projections.</td>
-                <td id="td-info-b">Continuous-time hidden state evolving via input-dependent selection.</td>
+                <td id="td-info-a">Full uncompressed past K/V projections.</td>
+                <td id="td-info-b">Continuous hidden state updated selectively.</td>
               </tr>
               <tr>
-                <td class="comparison-dim-name">Key Trade-off / Failure Mode</td>
-                <td id="td-limit-a">Unbounded linear growth and memory-bandwidth saturation during decode.</td>
-                <td id="td-limit-b">Fixed-size recurrent state can make exact long-range retrieval more difficult.</td>
+                <td class="comparison-dim-name">Key Limitation</td>
+                <td id="td-limit-a">Unbounded linear growth and decode memory bottleneck.</td>
+                <td id="td-limit-b">Fixed state complicates exact long-range retrieval.</td>
               </tr>
               <tr>
-                <td class="comparison-dim-name">Citation &amp; Provenance</td>
-                <td id="td-cite-a">Vaswani et al. 2017 · Pope et al. 2023</td>
-                <td id="td-cite-b">Gu &amp; Dao 2023 (Mamba)</td>
+                <td class="comparison-dim-name">Citation</td>
+                <td id="td-cite-a">Vaswani et al. 2017</td>
+                <td id="td-cite-b">Gu &amp; Dao 2023</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- Final Scientific Framing Card -->
-      <div class="framing-card">
-        <h4 class="framing-title">The Fundamental Bargain of Attention vs. State</h4>
-        <p class="framing-text">
-          The KV cache solves a very specific problem: preserve token-addressable information so future queries can directly retrieve it. Every alternative changes that bargain. Eviction keeps only selected tokens. MLA compresses token information. Linear attention folds history into an associative state. SSMs compress history into a dynamical state. BDH explores a learned graph as memory. The interesting question is therefore not whether memory can be made smaller—it can—but what information is lost, compressed, or transformed when we do so.
-        </p>
-      </div>
-
-      <!-- Bridge Sentence to Chapter 6 -->
       <div class="bridge-card">
         <p class="bridge-text">
-          Chapter 6 asks whether memory can be neither a growing token buffer nor a conventional recurrent vector, but an integrated architecture of synaptic plasticity.
+          Can memory be neither a growing token buffer nor a conventional vector, but an integrated architecture of synaptic plasticity?
         </p>
       </div>
-
     </section>
-    <!-- END CHAPTER 5 -->
 
     <!-- ════════════════════════════════════════════════════════════ -->
     <!-- CHAPTER 6: BDH AS AN INTEGRATED REDESIGN, NOT A TWEAK        -->
@@ -1331,165 +1125,135 @@
         <div class="act-number">Chapter 6</div>
         <h2 class="act-title">BDH as an Integrated Redesign, Not a Tweak</h2>
         <p class="act-description">
-          The Dragon Hatchling (BDH, arXiv:2509.26507) is often described as an attention alternative. But as its authors emphasize, BDH is an integrated architectural redesign rather than an isolated heuristic tweak. It does not make memory disappear—it changes what memory means: replacing explicit token-addressable storage with an evolving internal synaptic state that trades exact historical retrieval for constant-memory recurrence subject to finite capacity and interference.
+          The Dragon Hatchling (arXiv:2509.26507) replaces explicit token buffers with an evolving internal synaptic state, trading exact historical recall for constant memory (O(1) in T).
         </p>
       </div>
 
       <!-- Evidentiary Framework Legend -->
       <div class="evidence-legend-bar">
-        <span class="evidence-legend-title">Evidentiary Framework:</span>
+        <span class="evidence-legend-title">Evidence Framework:</span>
         <div class="evidence-legend-items">
-          <div class="evidence-legend-item">
-            <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span> Directly stated or mathematically specified in arXiv:2509.26507 / arXiv:2608.09888
-          </div>
-          <div class="evidence-legend-item">
-            <span class="evidence-badge badge-derived">[DERIVED]</span> Direct mathematical consequence of the architecture
-          </div>
-          <div class="evidence-legend-item">
-            <span class="evidence-badge badge-interpretation">[INTERPRETATION]</span> Pedagogical analogy or educational toy model
-          </div>
+          <div class="evidence-legend-item"><span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span> Author paper / code</div>
+          <div class="evidence-legend-item"><span class="evidence-badge badge-derived">[DERIVED]</span> Mathematical consequence</div>
+          <div class="evidence-legend-item"><span class="evidence-badge badge-interpretation">[INTERPRETATION]</span> Pedagogical model</div>
         </div>
       </div>
 
-      <!-- Primary-Source Author Clarification Quote Card -->
+      <!-- Primary-Source Author Clarification Quote -->
       <div class="quote-card">
         <div class="quote-header">
-          <span class="quote-source-label">Primary-Source Author Statement · Hugging Face Paper Discussion</span>
+          <span class="quote-source-label">Author Clarification · Hugging Face Paper Discussion</span>
           <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span>
         </div>
         <div class="quote-body">
-          &ldquo;@xz259 There are about 5 main differences, which should not be tried in isolation - or they will indeed not work (and cannot work in isolation, as explained in the theory part of the paper). See also table in comments below.&rdquo;<br><br>
-          &ldquo;From the authors: For readers looking for a synthetic (less rigorous) comparison to the Transformer, here is a summary table of differences.&rdquo;
+          &ldquo;There are about 5 main differences, which should not be tried in isolation - or they will indeed not work (and cannot work in isolation, as explained in the theory part of the paper).&rdquo;
         </div>
         <div class="quote-footer">
-          <span>Adrian Kosowski (<code>dxtrous</code>), Chief Scientific Officer at Pathway · Reply on Oct 7, 2025</span>
-          <a href="https://huggingface.co/papers/2509.26507" target="_blank" rel="noopener noreferrer" class="quote-link">View Discussion Thread on Hugging Face ↗</a>
+          <span>Adrian Kosowski (CSO at Pathway) · Oct 7, 2025</span>
+          <a href="https://huggingface.co/papers/2509.26507" target="_blank" rel="noopener noreferrer" class="quote-link">Hugging Face Discussion ↗</a>
         </div>
       </div>
 
-      <!-- Restructured 6-Difference Comparison Table -->
+      <!-- Comparison Table -->
       <div class="author-table-card">
         <div class="author-table-header">
-          <h3 class="author-table-title">Author-provided architectural summary — interpretation expanded for teaching</h3>
-          <p class="author-table-sub">
-            Grounded in primary-source author statements (arXiv:2509.26507). Each row identifies the architectural distinction alongside its evidentiary provenance.
-          </p>
+          <h3 class="author-table-title">Architectural Distinctions: BDH vs. Standard Transformer</h3>
+          <p class="author-table-sub">Primary source: Kosowski et al. (arXiv:2509.26507).</p>
         </div>
         <div class="author-table-wrapper">
           <table class="author-table">
             <thead>
               <tr>
                 <th style="width: 20%;">Dimension</th>
-                <th style="width: 38%;">BDH (Baby Dragon Hatchling)</th>
+                <th style="width: 38%;">BDH (Dragon Hatchling)</th>
                 <th style="width: 30%;">Standard Transformer</th>
                 <th style="width: 12%;">Status</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td class="dim-col">Attention / State Mechanism</td>
+                <td class="dim-col">Attention / State</td>
                 <td class="bdh-col">
-                  <span class="table-cell-lead">Recurrent associative / linear-attention state</span>
-                  <span class="table-cell-desc">Replaces explicit softmax attention over stored token keys/values with an associative recurrent state updated from the current activations.</span>
+                  <span class="table-cell-lead">Recurrent associative state</span>
+                  <span class="table-cell-desc">Associative recurrent state updated from current activations.</span>
                 </td>
                 <td class="tf-col">
-                  <span class="table-cell-lead">Softmax attention with token-addressable K/V state</span>
-                  <span class="table-cell-desc">Standard attention <em>A<sub>t</sub> = softmax(Q<sub>t</sub> K<sub>1:t</sub>ᵀ)V<sub>1:t</sub></em> requires access to the sequence's token-level K/V states.</span>
+                  <span class="table-cell-lead">Softmax attention over tokens</span>
+                  <span class="table-cell-desc">A<sub>t</sub> = softmax(Q<sub>t</sub> K<sub>1:t</sub>ᵀ) V<sub>1:t</sub> over stored tokens.</span>
                 </td>
-                <td class="status-col">
-                  <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span>
-                  <div style="font-size: 0.72rem; color: #6b7280; margin-top: 3px;">Architecture</div>
-                </td>
+                <td class="status-col"><span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span></td>
               </tr>
               <tr>
                 <td class="dim-col">Representation</td>
                 <td class="bdh-col">
-                  <span class="table-cell-lead">High-dimensional sparse positive activations</span>
-                  <span class="table-cell-desc">BDH uses a high-dimensional neuron/activation space with sparse positive activations; exact dimensions depend on the configuration (e.g., <em>N=4096</em> or <em>8192</em> in reported configurations).</span>
+                  <span class="table-cell-lead">High-dimensional sparse positive</span>
+                  <span class="table-cell-desc">Neuron activations a<sub>t</sub> ≥ 0 in high dimension N.</span>
                 </td>
                 <td class="tf-col">
                   <span class="table-cell-lead">Dense continuous activations</span>
-                  <span class="table-cell-desc">Continuous floating-point vectors in moderate dimension (&sim; 10² per head).</span>
+                  <span class="table-cell-desc">Continuous dense vectors in moderate dimension.</span>
                 </td>
-                <td class="status-col">
-                  <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span>
-                  <div style="font-size: 0.72rem; color: #6b7280; margin-top: 3px;">Architecture</div>
-                </td>
+                <td class="status-col"><span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span></td>
               </tr>
               <tr>
-                <td class="dim-col">Key-Query Interaction</td>
+                <td class="dim-col">Key-Query Match</td>
                 <td class="bdh-col">
-                  <span class="table-cell-lead">Sparse-overlap / hash-like interpretation</span>
-                  <span class="table-cell-desc">Conceptual analogy, not an explicit LSH index: high-dimensional sparse representations enable associative matching through sparse overlap.</span>
+                  <span class="table-cell-lead">Sparse-overlap interpretation</span>
+                  <span class="table-cell-desc">Associative retrieval via overlapping sparse support.</span>
                 </td>
                 <td class="tf-col">
-                  <span class="table-cell-lead">Similarity-based attention interpretation</span>
-                  <span class="table-cell-desc">Scaled dot-product similarity followed by softmax normalization over candidate tokens.</span>
+                  <span class="table-cell-lead">Dot-product similarity</span>
+                  <span class="table-cell-desc">Scaled dot products normalized by softmax.</span>
                 </td>
-                <td class="status-col">
-                  <span class="evidence-badge badge-interpretation">[INTERPRETATION]</span>
-                  <div style="font-size: 0.72rem; color: #6b7280; margin-top: 3px;">Conceptual Analogy</div>
-                </td>
+                <td class="status-col"><span class="evidence-badge badge-interpretation">[INTERPRETATION]</span></td>
               </tr>
               <tr>
-                <td class="dim-col">Sequence-State Scaling</td>
+                <td class="dim-col">State Scaling</td>
                 <td class="bdh-col">
-                  <span class="table-cell-lead">Fixed-size recurrent state with respect to T</span>
-                  <span class="table-cell-desc">Physical memory scaling is O(1) with respect to sequence length <em>T</em>; state size does not grow with context.</span>
+                  <span class="table-cell-lead">Fixed O(1) state w.r.t. T</span>
+                  <span class="table-cell-desc">State footprint does not grow with context.</span>
                 </td>
                 <td class="tf-col">
-                  <span class="table-cell-lead">KV state grows with T</span>
-                  <span class="table-cell-desc">Physical memory scaling is O(T), requiring one persistent KV cache entry per token position in VRAM.</span>
+                  <span class="table-cell-lead">Linear O(T) growth</span>
+                  <span class="table-cell-desc">Allocates one persistent KV entry per token.</span>
                 </td>
-                <td class="status-col">
-                  <span class="evidence-badge badge-derived">[DERIVED]</span>
-                  <div style="font-size: 0.72rem; color: #6b7280; margin-top: 3px;">Math Consequence</div>
-                </td>
+                <td class="status-col"><span class="evidence-badge badge-derived">[DERIVED]</span></td>
               </tr>
               <tr>
                 <td class="dim-col">Memory Mechanism</td>
                 <td class="bdh-col">
-                  <span class="table-cell-lead">Hebbian synaptic plasticity</span>
-                  <span class="table-cell-desc">Fixed-size neuron network with dynamically changing synaptic state: working memory is written into evolving synaptic connections.</span>
+                  <span class="table-cell-lead">Synaptic plasticity</span>
+                  <span class="table-cell-desc">Working memory is written into evolving synaptic connections S<sub>t</sub>.</span>
                 </td>
                 <td class="tf-col">
-                  <span class="table-cell-lead">Explicit KV cache</span>
-                  <span class="table-cell-desc">Externalized token memory buffer stored verbatim in GPU HBM.</span>
+                  <span class="table-cell-lead">Explicit KV cache buffer</span>
+                  <span class="table-cell-desc">External token log stored verbatim in VRAM.</span>
                 </td>
-                <td class="status-col">
-                  <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span>
-                  <div style="font-size: 0.72rem; color: #6b7280; margin-top: 3px;">Architecture</div>
-                </td>
+                <td class="status-col"><span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span></td>
               </tr>
               <tr>
                 <td class="dim-col">State Capacity</td>
                 <td class="bdh-col">
-                  <span class="table-cell-lead">Finite capacity determined by network/synaptic state</span>
-                  <span class="table-cell-desc">Sequence-length-independent recurrent state; effective context is limited by the information capacity of the learned state. BDH removes the requirement to allocate one persistent KV entry per token, but it does not create infinite information capacity.</span>
+                  <span class="table-cell-lead">Finite network capacity</span>
+                  <span class="table-cell-desc">Context capacity bounded by synaptic state and interference.</span>
                 </td>
                 <td class="tf-col">
-                  <span class="table-cell-lead">Explicit token storage capacity</span>
-                  <span class="table-cell-desc">Stores explicit token activations up to physical GPU memory limits.</span>
+                  <span class="table-cell-lead">Explicit token storage</span>
+                  <span class="table-cell-desc">Limited strictly by physical GPU VRAM.</span>
                 </td>
-                <td class="status-col">
-                  <span class="evidence-badge badge-derived">[DERIVED]</span>
-                  <div style="font-size: 0.72rem; color: #6b7280; margin-top: 3px;">Architectural Trade-off</div>
-                </td>
+                <td class="status-col"><span class="evidence-badge badge-derived">[DERIVED]</span></td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div style="padding: 10px 16px; background: #fafafa; border-top: 1px solid #e5e7eb; font-size: 0.75rem; color: #6b7280; font-family: var(--font-mono);">
-          Note: Key-query matching descriptions are mechanistic interpretations, not literal implementations of LSH or ANN data structures.
-        </div>
       </div>
 
-      <!-- Interactive "What Changes?" Sequence Stepper -->
+      <!-- Interactive Stepper -->
       <div class="stepper-container">
         <div class="stepper-header">
           <div class="stepper-title-group">
-            <h3 class="stepper-title">Interactive Progression: What Changes Between Attention and State?</h3>
-            <p class="stepper-subtitle">Step through the architectural transition from explicit token-addressable buffers to an evolving synaptic state.</p>
+            <h3 class="stepper-title">Progression: What Changes Between Attention and State?</h3>
+            <p class="stepper-subtitle">Transitioning from token buffers to evolving synaptic state.</p>
           </div>
           <div class="stepper-nav" id="stepper-nav">
             <button class="step-pill-btn active" data-step="0">01 · Transformer</button>
@@ -1499,121 +1263,85 @@
           </div>
         </div>
 
-        <div class="step-card" id="stepper-content">
-          <!-- Populated dynamically by app.js initChapter6() -->
-        </div>
+        <div class="step-card" id="stepper-content"></div>
 
         <div class="stepper-controls">
-          <button class="stepper-nav-btn" id="btn-step-prev" disabled>&larr; Previous Step</button>
+          <button class="stepper-nav-btn" id="btn-step-prev" disabled>&larr; Previous</button>
           <span style="font-family: var(--font-mono); font-size: 0.78rem; color: #6b7280;" id="stepper-step-indicator">Step 1 of 4</span>
-          <button class="stepper-nav-btn" id="btn-step-next">Next Step &rarr;</button>
+          <button class="stepper-nav-btn" id="btn-step-next">Next &rarr;</button>
         </div>
       </div>
 
-      <!-- Static Architecture Schematic Diagram -->
+      <!-- Architecture Schematic -->
       <div class="arch-diagram-card">
         <div class="arch-diagram-header">
-          <h3 class="arch-diagram-title">Architectural Schematic: Transformer Pipeline vs. BDH Pipeline</h3>
-          <p class="arch-diagram-sub">Contrasting the token-addressable KV buffer with an evolving inference-time synaptic state.</p>
+          <h3 class="arch-diagram-title">Schematic: Transformer Pipeline vs. BDH Pipeline</h3>
+          <p class="arch-diagram-sub">Token-addressable buffer vs. inference-time synaptic state.</p>
         </div>
         <div class="arch-diagram-wrapper">
           <svg class="arch-diagram-svg" viewBox="0 0 860 380" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Background panels -->
             <rect x="10" y="10" width="410" height="350" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
             <rect x="440" y="10" width="410" height="350" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
 
-            <!-- Panel Headers -->
             <text x="30" y="38" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="700" fill="#000000">STANDARD TRANSFORMER</text>
             <text x="30" y="54" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7280">Softmax Attention · Token-Addressable Memory</text>
 
             <text x="460" y="38" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="700" fill="#000000">BABY DRAGON HATCHLING (BDH)</text>
-            <text x="460" y="54" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7280">Hebbian Synaptic Plasticity · Evolving Recurrent State</text>
+            <text x="460" y="54" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7280">Hebbian Synaptic Plasticity · Evolving State</text>
 
-            <!-- LEFT SIDE: TRANSFORMER -->
-            <!-- Input Token -->
+            <!-- LEFT: Transformer -->
             <rect x="135" y="70" width="160" height="36" rx="4" fill="#f9fafb" stroke="#000000" stroke-width="1.2"/>
             <text x="215" y="93" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#000000" text-anchor="middle">Input Token x_t</text>
-
-            <!-- Down Arrow -->
             <line x1="215" y1="106" x2="215" y2="126" stroke="#000000" stroke-width="1.5"/>
             <polygon points="215,131 211,123 219,123" fill="#000000"/>
 
-            <!-- Q, K, V Projections -->
             <rect x="65" y="132" width="300" height="38" rx="4" fill="#f9fafb" stroke="#000000" stroke-width="1.2"/>
             <text x="215" y="156" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#000000" text-anchor="middle">Dense Projections: W_Q, W_K, W_V</text>
-
-            <!-- Down Arrow -->
             <line x1="215" y1="170" x2="215" y2="190" stroke="#000000" stroke-width="1.5"/>
             <polygon points="215,195 211,187 219,187" fill="#000000"/>
 
-            <!-- KV Buffer (Linear Scaling) -->
             <rect x="40" y="196" width="350" height="52" rx="4" fill="#fafafa" stroke="#000000" stroke-width="1.5" stroke-dasharray="4,3"/>
             <text x="215" y="218" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="700" fill="#111827" text-anchor="middle">Token-Addressable KV State Buffer</text>
-            <text x="215" y="236" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="middle">Stores K_{1:t}, V_{1:t} · Grows linearly O(T) with context</text>
-
-            <!-- Down Arrow -->
+            <text x="215" y="236" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="middle">Stores K_{1:t}, V_{1:t} · Linear O(T) Growth</text>
             <line x1="215" y1="248" x2="215" y2="268" stroke="#000000" stroke-width="1.5"/>
             <polygon points="215,273 211,265 219,265" fill="#000000"/>
 
-            <!-- Softmax Attention -->
             <rect x="65" y="274" width="300" height="38" rx="4" fill="#f9fafb" stroke="#000000" stroke-width="1.2"/>
             <text x="215" y="297" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#000000" text-anchor="middle">A_t = softmax(Q_t K_{1:t}ᵀ / √d) V_{1:t}</text>
-
-            <!-- Down Arrow -->
             <line x1="215" y1="312" x2="215" y2="326" stroke="#000000" stroke-width="1.5"/>
             <polygon points="215,331 211,323 219,323" fill="#000000"/>
-
             <text x="215" y="347" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7280" text-anchor="middle">Output Token &amp; Dense FFN</text>
 
-            <!-- RIGHT SIDE: BDH -->
-            <!-- Input Token -->
+            <!-- RIGHT: BDH -->
             <rect x="565" y="70" width="160" height="36" rx="4" fill="#f9fafb" stroke="#000000" stroke-width="1.2"/>
             <text x="645" y="93" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#000000" text-anchor="middle">Input Token x_t</text>
-
-            <!-- Down Arrow -->
             <line x1="645" y1="106" x2="645" y2="126" stroke="#000000" stroke-width="1.5"/>
             <polygon points="645,131 641,123 649,123" fill="#000000"/>
 
-            <!-- Sparse Positive Representation -->
             <rect x="470" y="132" width="350" height="38" rx="4" fill="#f9fafb" stroke="#000000" stroke-width="1.2"/>
             <text x="645" y="156" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#000000" text-anchor="middle">Sparse Positive Representation (High-Dim N)</text>
-
-            <!-- Down Arrow -->
             <line x1="645" y1="170" x2="645" y2="190" stroke="#000000" stroke-width="1.5"/>
             <polygon points="645,195 641,187 649,187" fill="#000000"/>
 
-            <!-- Inference-Time Synaptic State -->
             <rect x="470" y="196" width="350" height="52" rx="4" fill="#000000" stroke="#000000" stroke-width="1.5"/>
             <text x="645" y="218" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">Inference-Time Synaptic State</text>
-            <text x="645" y="236" font-family="JetBrains Mono, monospace" font-size="10" fill="#d1d5db" text-anchor="middle">S_t = Update(S_{t-1}, k_t, v_t) · Constant O(1) in T</text>
-
-            <!-- Down Arrow -->
+            <text x="645" y="236" font-family="JetBrains Mono, monospace" font-size="10" fill="#d1d5db" text-anchor="middle">S_t = Update(S_{t-1}, k_t, v_t) · Constant O(1)</text>
             <line x1="645" y1="248" x2="645" y2="268" stroke="#000000" stroke-width="1.5"/>
             <polygon points="645,273 641,265 649,265" fill="#000000"/>
 
-            <!-- Associative Readout -->
             <rect x="470" y="274" width="350" height="38" rx="4" fill="#f9fafb" stroke="#000000" stroke-width="1.2"/>
             <text x="645" y="297" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#000000" text-anchor="middle">Associative Readout: y_t = Read(S_t, q_t)</text>
-
-            <!-- Down Arrow -->
             <line x1="645" y1="312" x2="645" y2="326" stroke="#000000" stroke-width="1.5"/>
             <polygon points="645,331 641,323 649,323" fill="#000000"/>
-
-            <text x="645" y="347" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7280" text-anchor="middle">Output Token &amp; Bilinear Gated Sparse MLP</text>
+            <text x="645" y="347" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7280" text-anchor="middle">Output Token &amp; Gated Sparse MLP</text>
           </svg>
-        </div>
-        <div class="arch-diagram-footer">
-          Schematic architecture; not a visualization of a trained checkpoint. Grounded in Kosowski et al. (arXiv:2509.26507).
         </div>
       </div>
 
-      <!-- Theory vs. GPU Implementation Card -->
+      <!-- Theory vs. GPU -->
       <div class="dual-spec-card">
         <div class="dual-spec-header">
-          <h3 class="dual-spec-title">Theoretical Formulation vs. Practical GPU Implementation</h3>
-          <p class="dual-spec-sub">
-            Bridging biological plausibility with modern hardware execution.
-          </p>
+          <h3 class="dual-spec-title">Theory vs. Practical GPU Formulation</h3>
         </div>
         <div class="dual-spec-grid">
           <div class="spec-box">
@@ -1622,7 +1350,7 @@
               <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span>
             </h4>
             <p class="spec-desc">
-              BDH is mathematically formulated as a scale-free network of locally interacting discrete spiking neuron particles. Working memory operates via local synaptic plasticity: synaptic edge strengths update strictly from the co-activation of neighboring particles, providing a biologically plausible alternative to centralized memory buffers.
+              Scale-free network of locally interacting spiking neuron particles. Working memory operates through local synaptic plasticity updated strictly from co-activation.
             </p>
           </div>
           <div class="spec-box">
@@ -1631,158 +1359,109 @@
               <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span>
             </h4>
             <p class="spec-desc">
-              The authors provide a GPU-friendly formulation that approximates/implements the theoretical network using standard tensor operations. This maps local graph updates into dense tensor contractions executed efficiently on GPU Tensor Cores, enabling standard autoregressive training and fast inference.
+              Approximates the theoretical network with dense tensor contractions executed on standard GPU Tensor Cores, enabling standard autoregressive training and fast inference.
             </p>
           </div>
         </div>
-        <div style="margin-top: 14px; font-size: 0.78rem; color: #6b7280; font-family: var(--font-mono);">
-          Note on network terminology: BDH is accurately described as a <strong>fixed-size neuron network with dynamically changing synaptic state</strong> rather than simply an unqualified "fixed graph". The physical network topology is fixed, while inference-time synaptic plasticity modifies effective connectivity.
-        </div>
       </div>
 
-      <!-- Pedagogical Toy Model: Sparse Overlap -->
+      <!-- Pedagogical Toy Model -->
       <div class="toy-model-card">
         <div class="toy-model-header">
-          <h3 class="toy-model-title">Toy Sparse-Overlap Model of Representation Interference</h3>
-          <span class="evidence-badge badge-interpretation">[INTERPRETATION: Pedagogical Toy Model]</span>
+          <h3 class="toy-model-title">Toy Model of Representation Interference</h3>
+          <span class="evidence-badge badge-interpretation">[INTERPRETATION: Toy Model]</span>
         </div>
         <div class="toy-model-body">
-          <p>
-            Why does BDH expand input activations into a high-dimensional sparse neuron space? We can build educational intuition through an idealized independent-sparsity model:
-          </p>
-          <ul>
-            <li>Let the network possess <strong>N</strong> possible units in its high-dimensional neuron space.</li>
-            <li>Assume each active concept randomly and independently activates a fraction <strong>p</strong> of these units (so approximately <em>pN</em> units fire).</li>
-            <li>Under this idealized independent random model, the probability that any single unit is activated by both concept A and concept B is <em>p &times; p = p²</em>.</li>
-          </ul>
+          <p>If each concept randomly activates a fraction <em>p</em> of <em>N</em> sparse units, the expected co-activation overlap is:</p>
           <div class="math-formula-box">
-            Expected Co-activation Overlap: &nbsp; E[overlap] &approx; p² &middot; N
+            Expected Overlap &approx; p² &middot; N
           </div>
-          <p>
-            When <em>p</em> is small (high sparsity), the expected overlap between two independent concepts scales as <em>p²</em>, drastically reducing associative crosstalk compared to dense representations.
-          </p>
-          <div class="toy-model-caveat">
-            <strong>Educational Qualification:</strong> This is a simplified pedagogical derivation under idealized independent-uniform assumptions, not a measured empirical law of trained BDH checkpoints. In real neural networks, concepts exhibit structured semantic correlation, and capacity is governed by learned synaptic dynamics, representation dimensionality, and training.
-          </div>
+          <p>High sparsity (small <em>p</em>) drastically minimizes crosstalk between stored memories.</p>
         </div>
       </div>
 
-      <!-- BDH-CQ Reasoning System Section -->
+      <!-- BDH-CQ System -->
       <div class="bdh-cq-card">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
           <div>
-            <h3 style="font-size: 1.05rem; font-weight: 700; color: #000000; margin: 0 0 4px 0;">
-              BDH-CQ: In-Context Learning with Recurrent Latent Reasoning
+            <h3 style="font-size: 1rem; font-weight: 700; color: #000000; margin: 0 0 2px 0;">
+              BDH-CQ: Recurrent Latent Reasoning (Engdahl et al. 2026)
             </h3>
-            <p style="font-size: 0.82rem; color: #4b5563; margin: 0;">
-              Disambiguating the core 2025 memory architecture from the 2026 reasoning system (Engdahl et al., arXiv:2608.09888).
+            <p style="font-size: 0.78rem; color: #4b5563; margin: 0;">
+              Resolves complex reasoning tasks iteratively within internal latent memory without generating intermediate Chain-of-Thought tokens.
             </p>
           </div>
           <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span>
         </div>
 
-        <!-- Temporal Progression Strip -->
         <div class="bdh-cq-timeline">
           <div class="timeline-node">
-            <span class="timeline-year">September 2025</span>
-            <span class="timeline-name">BDH (Baby Dragon Hatchling)</span>
-            <div style="font-size: 0.72rem; color: #6b7280;">Architecture &amp; Synaptic Memory (arXiv:2509.26507)</div>
+            <span class="timeline-year">Sep 2025</span>
+            <span class="timeline-name">BDH Architecture</span>
           </div>
           <span class="timeline-arrow">&rarr;</span>
           <div class="timeline-node highlight">
-            <span class="timeline-year">August 2026</span>
+            <span class="timeline-year">Aug 2026</span>
             <span class="timeline-name">BDH-CQ Reasoning System</span>
-            <div style="font-size: 0.72rem; color: #9ca3af;">Recurrent Latent Reasoning for ARC-AGI (arXiv:2608.09888)</div>
           </div>
         </div>
 
-        <p style="font-size: 0.86rem; color: #374151; line-height: 1.6;">
-          BDH-CQ is a distinct, later reasoning system built upon the BDH architectural foundation. Unlike standard Chain-of-Thought (CoT) models that generate hundreds of verbalized natural-language tokens to reason, BDH-CQ updates recurrent internal memory during inference and resolves reasoning tasks through iterative computation within a continuous high-dimensional latent space—decoding only the final answer without intermediate token emission.
-        </p>
-
-        <!-- Verified Primary Benchmark Numbers -->
         <div class="bdh-cq-stats-grid">
           <div class="stat-metric-card">
             <span class="stat-metric-val">150M</span>
-            <span class="stat-metric-label">Model Parameters</span>
-            <div class="stat-metric-sub">Lightweight BDH-CQ configuration</div>
+            <span class="stat-metric-label">Parameters</span>
+            <div class="stat-metric-sub">Lightweight BDH-CQ model</div>
           </div>
           <div class="stat-metric-card">
             <span class="stat-metric-val">29.5%</span>
             <span class="stat-metric-label">Pass@2 Accuracy</span>
-            <div class="stat-metric-sub">Public ARC-AGI-1 evaluation set</div>
+            <div class="stat-metric-sub">Public ARC-AGI-1</div>
           </div>
           <div class="stat-metric-card">
             <span class="stat-metric-val">~$0.0007</span>
-            <span class="stat-metric-label">Reported Computed Cost</span>
-            <div class="stat-metric-sub">Per task (computed inference cost)</div>
+            <span class="stat-metric-label">Reported Cost</span>
+            <div class="stat-metric-sub">Per task (computed inference)</div>
           </div>
-        </div>
-
-        <div class="bdh-cq-caveat-box">
-          <strong>Scientific Framing &amp; Caveats:</strong>
-          <ul style="margin: 6px 0 0 0; padding-left: 18px;">
-            <li><strong>Cost-Accuracy Pareto Frontier:</strong> The authors report 29.5% pass@2 on the public ARC-AGI-1 evaluation set at a computed inference cost of approximately $0.0007 per task. This establishes a highly cost-efficient point on the reported cost-accuracy frontier, rather than the highest raw ARC accuracy.</li>
-            <li><strong>Computed vs. Deployment Cost:</strong> "$0.0007 per task" reflects the authors' reported computed inference cost based on benchmark GPU FLOP accounting, not third-party commercial API pricing.</li>
-            <li><strong>Domain Scope:</strong> The benchmark demonstrates that recurrent latent reasoning can achieve a nontrivial ARC-AGI-1 score at very low reported computed inference cost; it does not establish that recurrent latent reasoning is generally superior to chain-of-thought across arbitrary domains.</li>
-          </ul>
         </div>
       </div>
 
-      <!-- Final Thesis Card: What Memory Means -->
+      <!-- Final Synthesis -->
       <div class="final-synthesis-card">
         <h3 class="synthesis-lead">
           BDH does not make memory disappear. It changes what memory means.
         </h3>
         <p class="synthesis-body">
-          A Transformer stores history as explicitly addressable token states. BDH stores history in an evolving synaptic state. The former preserves direct access to individual tokens at the cost of growing memory; the latter fixes state size but forces information to coexist, interact, and potentially interfere.
+          A Transformer stores history as explicitly addressable token vectors. BDH stores history in an evolving synaptic state. The former preserves direct access to individual tokens at the cost of growing memory; the latter fixes state size but forces information to interact within shared synaptic connections.
         </p>
         <p class="synthesis-quote">
-          &ldquo;This is why BDH is not simply a better KV cache. It is a different computational model for memory.&rdquo;
+          &ldquo;BDH is not simply a better KV cache. It is a different computational model for memory.&rdquo;
         </p>
       </div>
 
-      <!-- Epilogue: Closing the Essay Arc (Chapters 1 to 6) -->
+      <!-- Epilogue & References -->
       <div class="epilogue-section">
         <h3 class="epilogue-title">Epilogue: The Frontier of AI Memory</h3>
         <p class="epilogue-text">
-          Across this visual essay, we have traced how modern language models navigate the physical reality of memory:
-        </p>
-        <ul style="padding-left: 20px; font-size: 0.88rem; color: #374151; line-height: 1.7; margin-bottom: 24px;">
-          <li><strong>Chapter 1:</strong> The dilemma between verbatim recording and compressed state.</li>
-          <li><strong>Chapter 2:</strong> The quadratic compute of naive recomputation and why KV caching was invented.</li>
-          <li><strong>Chapter 3:</strong> The physical memory footprint of storing millions of Key and Value vectors in GPU VRAM.</li>
-          <li><strong>Chapter 4:</strong> The memory-bandwidth wall separating compute-bound prefill from memory-bound decode.</li>
-          <li><strong>Chapter 5:</strong> The spectrum of alternatives—from eviction sinks to latent compression and state spaces.</li>
-          <li><strong>Chapter 6:</strong> The frontier of synaptic plasticity: transforming memory from an external token log into an evolving internal state.</li>
-        </ul>
-        <p class="epilogue-text">
-          As context windows expand from thousands to millions of tokens, the boundary between attention, caching, and synaptic memory continues to dissolve. Whether through lower-rank projections, selective state spaces, or biologically inspired plasticity, the future of AI inference lies in discovering how models can remember what matters without suffocating in the weight of their own past.
+          Whether through low-rank latent projections, selective state spaces, or synaptic plasticity, modern inference architectures seek a common objective: remembering what matters without suffocating under the weight of the past.
         </p>
 
-        <!-- Primary Source References -->
         <div class="references-card">
           <h4 class="references-title">Primary Sources &amp; Key References</h4>
           <ul class="references-list">
             <li><strong>Kosowski et al. (2025):</strong> <em>The Dragon Hatchling: The Missing Link between the Transformer and Models of the Brain</em>. arXiv:2509.26507.</li>
             <li><strong>Engdahl et al. (2026):</strong> <em>BDH-CQ: In-Context Learning with Recurrent Latent Reasoning</em>. arXiv:2608.09888.</li>
-            <li><strong>Adrian Kosowski (2025):</strong> Author clarification &amp; summary table on Hugging Face discussion (<a href="https://huggingface.co/papers/2509.26507" target="_blank" rel="noopener noreferrer" style="color:#000000; text-decoration:underline;">huggingface.co/papers/2509.26507</a>).</li>
+            <li><strong>Kosowski (2025):</strong> Author clarification &amp; summary table on Hugging Face (huggingface.co/papers/2509.26507).</li>
             <li><strong>Pope et al. (2023):</strong> <em>Efficiently Scaling Transformer Inference on TPU v4</em>. arXiv:2211.05102.</li>
-            <li><strong>Vaswani et al. (2017):</strong> <em>Attention Is All You Need</em>. Advances in Neural Information Processing Systems 30 (NeurIPS 2017).</li>
-            <li><strong>Xiao et al. (2023):</strong> <em>Efficient Streaming Language Models with Attention Sinks</em> (StreamingLLM). arXiv:2309.17453.</li>
-            <li><strong>DeepSeek-AI (2024):</strong> <em>DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model</em> (Multi-Head Latent Attention). arXiv:2405.04434.</li>
+            <li><strong>Vaswani et al. (2017):</strong> <em>Attention Is All You Need</em>. NeurIPS 2017.</li>
+            <li><strong>Xiao et al. (2023):</strong> <em>Efficient Streaming Language Models with Attention Sinks</em>. arXiv:2309.17453.</li>
+            <li><strong>DeepSeek-AI (2024):</strong> <em>DeepSeek-V2 Technical Report</em> (MLA). arXiv:2405.04434.</li>
             <li><strong>Gu &amp; Dao (2023):</strong> <em>Mamba: Linear-Time Sequence Modeling with Selective State Spaces</em>. arXiv:2312.00752.</li>
           </ul>
         </div>
       </div>
-
     </section>
-    <!-- END CHAPTER 6 -->
   </main>
 
   <script type="module" src="app.js"></script>
 </body>
 </html>
-
-
-
