@@ -8,6 +8,8 @@
 
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
 
@@ -225,6 +227,276 @@
       </div>
 
     </section>
+    <!-- END CHAPTER 1 -->
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- CHAPTER 2: NAIVE RECOMPUTE VS. THE CACHE                    -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <section class="act" id="chapter-2">
+      <div class="act-header">
+        <div class="act-number">Chapter 2</div>
+        <h2 class="act-title">Naive Recompute vs. The Cache</h2>
+        <p class="act-description">
+          During autoregressive generation, predicting each new token requires attending over all previous tokens in the sequence. Without caching, the model repeatedly recomputes the Key and Value projections for every historical token at every single generation step. KV caching stores these projections after their first computation, eliminating repeated projection work while attention continues to operate over the growing context.
+        </p>
+      </div>
+
+      <!-- Live Benchmark Controls -->
+      <div class="benchmark-controls-card">
+        <div class="controls-row">
+          <div class="control-group">
+            <label for="benchmark-seq-len" class="control-label">
+              Sequence Length (N): <span id="seq-len-val" class="control-num">80</span> tokens
+            </label>
+            <input type="range" id="benchmark-seq-len" min="10" max="200" step="10" value="80" class="tech-slider">
+          </div>
+          <div class="control-meta">
+            <span class="meta-tag">D = 32 (Hidden Dimension)</span>
+            <span class="meta-tag">TypedArray Float64</span>
+          </div>
+          <button id="btn-run-benchmark" class="tech-button primary">
+            ▶ Run Live Browser Benchmark
+          </button>
+        </div>
+      </div>
+
+      <!-- Quantitative Tier: Measured Runtime Metrics & 2D Canvas -->
+      <div class="section-sub-header">
+        <h3 class="sub-title">1. Quantitative Runtime Measurement</h3>
+        <p class="sub-desc">Actual wall-clock execution time measured in your browser via <code>performance.now()</code>.</p>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-box">
+          <span class="metric-label">No Cache — Total Runtime</span>
+          <div class="metric-value" id="metric-nocache-ms">-- ms</div>
+          <span class="metric-sub">Recomputing historical K/V projections</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">KV Cache — Total Runtime</span>
+          <div class="metric-value" id="metric-cached-ms">-- ms</div>
+          <span class="metric-sub">Single-pass K/V projection reuse</span>
+        </div>
+        <div class="metric-box highlight">
+          <span class="metric-label">Measured Speedup</span>
+          <div class="metric-value" id="metric-speedup-x">-- ×</div>
+          <span class="metric-sub">Measured wall-clock latency ratio</span>
+        </div>
+      </div>
+
+      <!-- 2D Canvas Container -->
+      <div class="canvas-card">
+        <div class="canvas-header">
+          <span class="canvas-title">Measured Cumulative Latency (ms) vs. Sequence Step</span>
+          <span class="canvas-badge">Real performance.now()</span>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas id="benchmark-canvas" height="340"></canvas>
+        </div>
+        <div class="canvas-caption">
+          <strong>No Cache:</strong> cumulative K/V projection work grows quadratically with sequence length (<span class="math-code">O(N²D²)</span>) because previous projections are repeatedly recomputed. <strong>With KV Cache:</strong> cumulative K/V projection work grows linearly (<span class="math-code">O(ND²)</span>) because each K/V projection is computed once, while attention interaction work continues to grow with context length (<span class="math-code">O(N²D)</span>).
+        </div>
+      </div>
+
+      <!-- Theoretical Tier: Analytical FLOP Accounting -->
+      <div class="section-sub-header">
+        <h3 class="sub-title">2. Analytical FLOP Accounting for Included Operations</h3>
+        <p class="sub-desc">Theoretical operation counts for the linear projections and attention interactions in this benchmark.</p>
+      </div>
+
+      <div class="table-card">
+        <table class="tech-table">
+          <thead>
+            <tr>
+              <th>Operation Stage</th>
+              <th>Formula (Step t)</th>
+              <th>Cumulative Work (N tokens)</th>
+              <th>Complexity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Naive K/V Projection</strong> (No Cache)</td>
+              <td><span class="math-code">4 · t · D²</span></td>
+              <td><span class="math-code">2N(N + 1)D²</span> = <span id="flop-naive-proj">--</span> FLOPs</td>
+              <td><span class="complexity-badge bad">O(N²D²)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Cached K/V Projection</strong> (KV Cache)</td>
+              <td><span class="math-code">4 · D²</span></td>
+              <td><span class="math-code">4ND²</span> = <span id="flop-cached-proj">--</span> FLOPs</td>
+              <td><span class="complexity-badge good">O(ND²)</span></td>
+            </tr>
+            <tr>
+              <td><strong>Attention Interaction</strong> (QKᵀ + AV)</td>
+              <td><span class="math-code">4 · t · D</span></td>
+              <td><span class="math-code">2N(N + 1)D</span> = <span id="flop-attn">--</span> FLOPs</td>
+              <td><span class="complexity-badge neutral">O(N²D)</span></td>
+            </tr>
+            <tr class="table-total-row">
+              <td><strong>Naive Benchmark Total</strong></td>
+              <td><span class="math-code">4tD² + 4tD</span></td>
+              <td><span class="math-code">2N(N + 1)D² + 2N(N + 1)D</span> = <span id="flop-naive-total">--</span> FLOPs</td>
+              <td><span class="complexity-badge bad">O(N²D² + N²D)</span></td>
+            </tr>
+            <tr class="table-total-row">
+              <td><strong>Cached Benchmark Total</strong></td>
+              <td><span class="math-code">4D² + 4tD</span></td>
+              <td><span class="math-code">4ND² + 2N(N + 1)D</span> = <span id="flop-cached-total">--</span> FLOPs</td>
+              <td><span class="complexity-badge good">O(ND² + N²D)</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="table-footnote">
+          <em>Scope Note:</em> Analytical FLOP accounting for the included operations (W<sub>K</sub>, W<sub>V</sub> linear projections, score dot products, and value weighting). Intentionally omits Q projection (2ND² common to both), output projection W<sub>O</sub>, non-linear softmax exponentiations, causal masking, layer normalization, and MLP blocks. Analytical FLOPs describe theoretical operation counts and are distinct from browser wall-clock runtime.
+        </div>
+      </div>
+
+      <!-- Mechanistic Tier: 3D Attention Microscope -->
+      <div class="section-sub-header">
+        <h3 class="sub-title">3. 3D Attention Microscope</h3>
+        <p class="sub-desc">Conceptual & mechanistic inspection of high-dimensional attention states (D=32) projected deterministically into 3D space.</p>
+      </div>
+
+      <div class="microscope-card">
+        <!-- 3D Toolbar -->
+        <div class="microscope-toolbar">
+          <div class="toolbar-group">
+            <label for="slider-timestep" class="toolbar-label">
+              Generation Step (t): <span id="disp-timestep" class="control-num">80</span> / <span id="disp-timestep-max">80</span>
+            </label>
+            <input type="range" id="slider-timestep" min="1" max="80" value="80" class="tech-slider mini">
+          </div>
+
+          <div class="toolbar-group mode-toggle-group">
+            <button id="btn-mode-cached" class="mode-btn active">KV CACHE</button>
+            <button id="btn-mode-nocache" class="mode-btn">NO CACHE</button>
+          </div>
+
+          <button id="btn-reset-cam" class="tech-button mini">
+            ⟲ Reset Camera
+          </button>
+        </div>
+
+        <!-- Live Status Badges -->
+        <div class="status-badges-row">
+          <div class="status-pill">
+            <span class="pill-label">Cached Tokens:</span>
+            <span class="pill-val" id="pill-cached-tokens">80</span>
+          </div>
+          <div class="status-pill">
+            <span class="pill-label">Stored K/V Vectors:</span>
+            <span class="pill-val" id="pill-stored-vectors">160</span>
+          </div>
+          <div class="status-pill highlight" id="pill-mode-status">
+            <span class="pill-label">Projection Status:</span>
+            <span class="pill-val" id="pill-proj-breakdown">Historical K/V reused: 79 · New: 1</span>
+          </div>
+        </div>
+
+        <!-- 3D Viewport & Inspector Side-by-Side -->
+        <div class="microscope-viewport-wrapper">
+          <div id="microscope-3d-container" class="microscope-viewport"></div>
+
+          <!-- Mechanistic Chain Inspector Card -->
+          <div class="inspector-card">
+            <div class="inspector-header">
+              <span class="inspector-title">Mechanistic Token Inspector</span>
+              <span class="inspector-tag" id="inspect-token-tag">Token k₈₀</span>
+            </div>
+
+            <div class="inspector-body">
+              <div class="chain-step">
+                <span class="chain-step-num">1</span>
+                <div class="chain-step-content">
+                  <span class="chain-name">Raw Dot Product Similarity</span>
+                  <span class="chain-math">q<sub>t</sub> · k<sub>i</sub></span>
+                  <span class="chain-value" id="inspect-dot">--</span>
+                </div>
+              </div>
+
+              <div class="chain-step">
+                <span class="chain-step-num">2</span>
+                <div class="chain-step-content">
+                  <span class="chain-name">Scaled Logit</span>
+                  <span class="chain-math">S<sub>i</sub><sup>(t)</sup> = (q<sub>t</sub> · k<sub>i</sub>) / √D</span>
+                  <span class="chain-value" id="inspect-logit">--</span>
+                </div>
+              </div>
+
+              <div class="chain-step">
+                <span class="chain-step-num">3</span>
+                <div class="chain-step-content">
+                  <span class="chain-name">Normalized Attention Weight</span>
+                  <span class="chain-math">α<sub>i</sub><sup>(t)</sup> = softmax(S<sup>(t)</sup>)<sub>i</sub></span>
+                  <span class="chain-value highlight" id="inspect-weight">--</span>
+                </div>
+              </div>
+
+              <div class="chain-step">
+                <span class="chain-step-num">4</span>
+                <div class="chain-step-content">
+                  <span class="chain-name">Value Vector Contribution</span>
+                  <span class="chain-math">α<sub>i</sub><sup>(t)</sup> · v<sub>i</sub>  (in ℝ³²)</span>
+                  <span class="chain-value" id="inspect-val-contrib">Calculated live</span>
+                </div>
+              </div>
+
+              <div class="chain-step">
+                <span class="chain-step-num">5</span>
+                <div class="chain-step-content">
+                  <span class="chain-name">Attention Output</span>
+                  <span class="chain-math">o<sub>t</sub> = ∑ α<sub>i</sub><sup>(t)</sup> v<sub>i</sub>  (in ℝ³²)</span>
+                  <span class="chain-value" id="inspect-output-vec">Projected in 3D (dodecahedron)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="inspector-footer">
+              <span class="flow-hint">Query → similarity → score → softmax → attention weight → value contribution</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scientific Honesty Legend -->
+        <div class="honesty-legend">
+          <div class="legend-item">
+            <strong>Actual computation:</strong> D = 32 vectors and matrix operations (Float64Array)
+          </div>
+          <div class="legend-item">
+            <strong>3D display:</strong> Deterministic projection of actual 32D vectors (P ∈ ℝ<sup>32×3</sup>). The 3D scene is a deterministic projection of the actual D=32 vectors; it is not the original attention space and does not claim to preserve all 32-dimensional geometric relationships.
+          </div>
+          <div class="legend-item">
+            <strong>Attention links:</strong> Line opacity & width computed directly from actual attention weights α<sub>i</sub><sup>(t)</sup>
+          </div>
+          <div class="legend-item">
+            <strong>Runtime:</strong> Measured separately using <code>performance.now()</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- Persistent Scientific Annotation -->
+      <div class="persistent-annotation">
+        <strong>Scientific Distinction:</strong> KV caching removes repeated K/V projection work. Attention still interacts with the growing context.
+      </div>
+
+      <!-- Vaswani et al. 2017 Citation Badge -->
+      <div class="attribution-card">
+        <div class="attribution-badge">● Established · Vaswani et al. 2017 (Attention formulation)</div>
+        <p class="attribution-text">
+          Vaswani et al. (2017) introduced the multi-head attention formulation: <span class="math-code">Attention(Q, K, V) = softmax(QKᵀ / √d)V</span>. KV-caching emerged as a standard inference optimization in subsequent autoregressive sequence serving systems.
+        </p>
+      </div>
+
+      <!-- Bridge Sentence to Chapter 3 -->
+      <div class="bridge-card">
+        <p class="bridge-text">
+          Caching saves compute — but everything you cache has to live somewhere. Let's see how much room it takes.
+        </p>
+      </div>
+
+    </section>
+    <!-- END CHAPTER 2 -->
   </main>
 
   <script type="module" src="app.js"></script>

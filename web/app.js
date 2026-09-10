@@ -1,7 +1,12 @@
-// app.js — Chapter 1: "What does an AI mean by 'remembering'?"
-// Implements typewriter animation on hero and dynamic interactive choice dilemma.
+// app.js — Chapters 1 & 2 Controller
+// Chapter 1: Typewriter hero + Dilemma widget
+// Chapter 2: Live TypedArray Benchmark + 2D Runtime Canvas + 3D Attention Microscope
 
-// ─── Typewriter Animation ──────────────────────────────────────
+import { MicroTransformerEngine } from './engine/micro_transformer.js';
+import { BenchmarkCanvas } from './visualizers/benchmark_canvas.js';
+import { AttentionMicroscope3D } from './visualizers/benchmark_3d.js';
+
+// ─── Chapter 1: Typewriter Animation ───────────────────────────
 function initTypewriter() {
   const titleEl = document.getElementById('typewriter-title');
   const subEl = document.getElementById('typewriter-sub');
@@ -15,7 +20,6 @@ function initTypewriter() {
   let titleIdx = 0;
   let subIdx = 0;
 
-  // Render cursor helper
   const renderCaret = () => '<span class="caret"></span>';
 
   function typeTitle() {
@@ -24,7 +28,7 @@ function initTypewriter() {
       titleIdx++;
       setTimeout(typeTitle, 40);
     } else {
-      titleEl.innerHTML = titleText; // Remove caret from title
+      titleEl.innerHTML = titleText;
       subEl.innerHTML = renderCaret();
       setTimeout(typeSub, 300);
     }
@@ -36,23 +40,19 @@ function initTypewriter() {
       subIdx++;
       setTimeout(typeSub, 30);
     } else {
-      subEl.innerHTML = subText; // Keep clean without caret or with static punctuation
+      subEl.innerHTML = subText;
       if (promptEl) {
         promptEl.style.opacity = '1';
       }
     }
   }
 
-  // Start typewriter after a short initial pause
   setTimeout(typeTitle, 400);
 }
 
 // ─── Chapter 1: Dilemma Widget State Handler ───────────────────
 function initDilemmaWidget() {
-  const choices = {
-    legal: null,
-    chat: null
-  };
+  const choices = { legal: null, chat: null };
 
   const buttons = document.querySelectorAll('.choice-btn');
   const summaryBox = document.getElementById('summary-box');
@@ -66,23 +66,19 @@ function initDilemmaWidget() {
       const scenario = btn.dataset.scenario;
       const choice = btn.dataset.choice;
 
-      // Update active state in group
       const siblingBtns = document.querySelectorAll(`.choice-btn[data-scenario="${scenario}"]`);
       siblingBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
       choices[scenario] = choice;
-
       updateSummary();
     });
   });
 
   function updateSummary() {
-    // Show summary once at least one choice is made
     if (!choices.legal && !choices.chat) return;
 
     summaryBox.style.display = 'block';
-
     const legalLabel = choices.legal === 'verbatim' ? 'Verbatim Store' : choices.legal === 'compressed' ? 'Compressed State' : 'Not selected';
     const chatLabel = choices.chat === 'verbatim' ? 'Verbatim Store' : choices.chat === 'compressed' ? 'Compressed State' : 'Not selected';
 
@@ -103,7 +99,6 @@ function initDilemmaWidget() {
 
     summaryExplanation.textContent = explanation;
 
-    // Highlight corresponding response cards subtly
     if (choices.legal === 'verbatim' || choices.chat === 'verbatim') {
       cardVerbatim.style.borderColor = 'rgba(0, 0, 0, 0.6)';
     } else {
@@ -118,10 +113,194 @@ function initDilemmaWidget() {
   }
 }
 
+// ─── Chapter 2: Live Benchmark & 3D Microscope ─────────────────
+function initChapter2() {
+  const engine = new MicroTransformerEngine(32);
+
+  // DOM Elements
+  const seqLenSlider = document.getElementById('benchmark-seq-len');
+  const seqLenVal = document.getElementById('seq-len-val');
+  const btnRunBenchmark = document.getElementById('btn-run-benchmark');
+
+  // Metrics
+  const metricNoCacheMs = document.getElementById('metric-nocache-ms');
+  const metricCachedMs = document.getElementById('metric-cached-ms');
+  const metricSpeedupX = document.getElementById('metric-speedup-x');
+
+  // Analytical FLOP fields
+  const flopNaiveProj = document.getElementById('flop-naive-proj');
+  const flopCachedProj = document.getElementById('flop-cached-proj');
+  const flopAttn = document.getElementById('flop-attn');
+  const flopNaiveTotal = document.getElementById('flop-naive-total');
+  const flopCachedTotal = document.getElementById('flop-cached-total');
+
+  // 2D Canvas
+  const canvasEl = document.getElementById('benchmark-canvas');
+  let benchmarkCanvas = null;
+  if (canvasEl) {
+    benchmarkCanvas = new BenchmarkCanvas(canvasEl);
+  }
+
+  // 3D Microscope
+  const microscopeContainer = document.getElementById('microscope-3d-container');
+  const sliderTimestep = document.getElementById('slider-timestep');
+  const dispTimestep = document.getElementById('disp-timestep');
+  const dispTimestepMax = document.getElementById('disp-timestep-max');
+  const btnModeCached = document.getElementById('btn-mode-cached');
+  const btnModeNoCache = document.getElementById('btn-mode-nocache');
+  const btnResetCam = document.getElementById('btn-reset-cam');
+
+  // Badges
+  const pillCachedTokens = document.getElementById('pill-cached-tokens');
+  const pillStoredVectors = document.getElementById('pill-stored-vectors');
+  const pillProjBreakdown = document.getElementById('pill-proj-breakdown');
+
+  // Inspector Elements
+  const inspectTokenTag = document.getElementById('inspect-token-tag');
+  const inspectDot = document.getElementById('inspect-dot');
+  const inspectLogit = document.getElementById('inspect-logit');
+  const inspectWeight = document.getElementById('inspect-weight');
+  const inspectValContrib = document.getElementById('inspect-val-contrib');
+  const inspectOutputVec = document.getElementById('inspect-output-vec');
+
+  let currentMode = 'kv_cache';
+  let latestBenchmarkResult = null;
+
+  // Inspector callback when token is selected in 3D
+  const onTokenSelected = (info) => {
+    if (!info) return;
+    inspectTokenTag.textContent = `Token k_${info.tokenIndex}`;
+    inspectDot.textContent = `${info.rawDotProduct >= 0 ? '+' : ''}${info.rawDotProduct.toFixed(3)}`;
+    inspectLogit.textContent = `${info.scaledLogit >= 0 ? '+' : ''}${info.scaledLogit.toFixed(3)}`;
+    const pct = (info.attentionWeight * 100).toFixed(2);
+    inspectWeight.textContent = `${pct}%  (α = ${info.attentionWeight.toFixed(4)})`;
+    inspectValContrib.textContent = `Weighted by α_${info.tokenIndex} (${pct}%) in ℝ³²`;
+
+    const po = info.projectedOutput;
+    inspectOutputVec.textContent = `Projected 3D: [${po[0].toFixed(1)}, ${po[1].toFixed(1)}, ${po[2].toFixed(1)}]`;
+  };
+
+  let microscope3D = null;
+  if (microscopeContainer) {
+    microscope3D = new AttentionMicroscope3D(microscopeContainer, onTokenSelected);
+  }
+
+  // Format integer with commas
+  const fmt = (num) => Number(num).toLocaleString('en-US');
+
+  function updateStatusBadges(t) {
+    if (pillCachedTokens) pillCachedTokens.textContent = t;
+    if (pillStoredVectors) pillStoredVectors.textContent = 2 * t;
+
+    if (pillProjBreakdown) {
+      if (currentMode === 'kv_cache') {
+        pillProjBreakdown.textContent = `Historical K/V reused: ${t - 1} · New: 1`;
+      } else {
+        pillProjBreakdown.textContent = `Historical K/V recomputed: ${t}`;
+      }
+    }
+  }
+
+  function runBenchmarkExecution() {
+    const N = parseInt(seqLenSlider.value, 10) || 80;
+
+    btnRunBenchmark.textContent = '⏳ Computing matrix operations…';
+    btnRunBenchmark.disabled = true;
+
+    // Isolate numerical benchmark in setTimeout so browser UI updates
+    setTimeout(() => {
+      // 1. Run live TypedArray benchmark (isolated from rendering)
+      const res = engine.runBenchmark(N, 20);
+      latestBenchmarkResult = res;
+
+      // 2. Update Wall-Clock Measured Metrics
+      metricNoCacheMs.textContent = `${res.measured.noCacheTotalMs.toFixed(2)} ms`;
+      metricCachedMs.textContent = `${res.measured.cachedTotalMs.toFixed(2)} ms`;
+      metricSpeedupX.textContent = `${res.measured.measuredSpeedup.toFixed(1)}×`;
+
+      // 3. Update Analytical FLOP Table
+      flopNaiveProj.textContent = fmt(res.analytical.naiveProjFlops);
+      flopCachedProj.textContent = fmt(res.analytical.cachedProjFlops);
+      flopAttn.textContent = fmt(res.analytical.attnFlops);
+      flopNaiveTotal.textContent = fmt(res.analytical.naiveTotalFlops);
+      flopCachedTotal.textContent = fmt(res.analytical.cachedTotalFlops);
+
+      // 4. Update 2D Canvas Chart
+      if (benchmarkCanvas) {
+        benchmarkCanvas.setData(res.measured);
+      }
+
+      // 5. Update 3D Attention Microscope
+      if (microscope3D) {
+        microscope3D.setSnapshots(res.snapshots);
+      }
+
+      // Configure Timestep slider
+      sliderTimestep.max = N;
+      sliderTimestep.value = N;
+      dispTimestep.textContent = N;
+      dispTimestepMax.textContent = N;
+
+      updateStatusBadges(N);
+
+      btnRunBenchmark.textContent = '▶ Run Live Browser Benchmark';
+      btnRunBenchmark.disabled = false;
+    }, 40);
+  }
+
+  // Sequence Length Slider Listener
+  seqLenSlider.addEventListener('input', () => {
+    seqLenVal.textContent = seqLenSlider.value;
+  });
+
+  // Run Benchmark Button Listener
+  btnRunBenchmark.addEventListener('click', runBenchmarkExecution);
+
+  // Timestep Slider Listener
+  sliderTimestep.addEventListener('input', () => {
+    const t = parseInt(sliderTimestep.value, 10);
+    dispTimestep.textContent = t;
+    if (microscope3D) {
+      microscope3D.setStep(t);
+    }
+    updateStatusBadges(t);
+  });
+
+  // Mode Toggle Listeners
+  btnModeCached.addEventListener('click', () => {
+    currentMode = 'kv_cache';
+    btnModeCached.classList.add('active');
+    btnModeNoCache.classList.remove('active');
+    if (microscope3D) microscope3D.setMode('kv_cache');
+    const t = parseInt(sliderTimestep.value, 10);
+    updateStatusBadges(t);
+  });
+
+  btnModeNoCache.addEventListener('click', () => {
+    currentMode = 'no_cache';
+    btnModeNoCache.classList.add('active');
+    btnModeCached.classList.remove('active');
+    if (microscope3D) microscope3D.setMode('no_cache');
+    const t = parseInt(sliderTimestep.value, 10);
+    updateStatusBadges(t);
+  });
+
+  // Reset Camera Button Listener
+  if (btnResetCam) {
+    btnResetCam.addEventListener('click', () => {
+      if (microscope3D) microscope3D.resetCamera();
+    });
+  }
+
+  // Initial Run on Page Load
+  runBenchmarkExecution();
+}
+
 // ─── Main Initialization ───────────────────────────────────────
 function init() {
   initTypewriter();
   initDilemmaWidget();
+  initChapter2();
 }
 
 if (document.readyState === 'loading') {
