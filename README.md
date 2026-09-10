@@ -19,9 +19,12 @@
 - **Publication-Grade Document (Vector PDF):**  
   👉 **[`What_does_an_AI_mean_by_remembering.pdf`](What_does_an_AI_mean_by_remembering.pdf)**  
   *(Complete 10-page standalone monograph with vector figures, benchmark outputs, and full derivations)*
+- **One-Page Concept Summary (PDF):**  
+  👉 **[`1-page_summary.pdf`](1-page_summary.pdf)**  
+  *(Official concise one-page PDF summary deliverable)*
 - **PyTorch Verification Notebook:**  
   👉 **[`notebook/bdh_verification.ipynb`](notebook/bdh_verification.ipynb)**
-- **One-Page Technical Abstract:**  
+- **One-Page Technical Abstract (Markdown):**  
   👉 **[`summary/concept_summary.md`](summary/concept_summary.md)**
 
 ---
@@ -303,6 +306,7 @@ Every component, third-party asset, mathematical library, and font used in this 
 - [x] **Public Artifact URL (zero sign-in):** [https://iit-kgp-kv-cache.vercel.app/](https://iit-kgp-kv-cache.vercel.app/) (Mirror: [GitHub Pages](https://veerabhadrayerram.github.io/IITKgp_KVCache/web/))
 - [x] **Public Source Code Repository:** [https://github.com/VeerabhadraYerram/IITKgp_KVCache](https://github.com/VeerabhadraYerram/IITKgp_KVCache)
 - [x] **Blog Publication PDF:** [`What_does_an_AI_mean_by_remembering.pdf`](What_does_an_AI_mean_by_remembering.pdf) (10-page vector export)
+- [x] **One-Page Concept Summary PDF:** [`1-page_summary.pdf`](1-page_summary.pdf) (Concise PDF deliverable)
 - [x] **Complete Technical README:** [`README.md`](README.md) (Rigorous technical release document)
 - [x] **Clear Setup Instructions:** Web server + PyTorch verification notebook setup in [Quick Start](#-quick-start--local-setup)
 - [x] **Primary Papers (2022–2026):** Cited beside technical claims (Kosowski 2025, Engdahl 2026, DeepSeek 2024, Gu & Dao 2023, Xiao 2023, Pope 2023, Dao 2022)
