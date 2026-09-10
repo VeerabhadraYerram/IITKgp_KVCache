@@ -53,6 +53,10 @@ function initTypewriter() {
       if (promptEl) {
         promptEl.style.opacity = '1';
       }
+      const heroActions = document.getElementById('hero-actions');
+      if (heroActions) {
+        heroActions.style.opacity = '1';
+      }
     }
   }
 
@@ -846,12 +850,17 @@ function init() {
   initChapter4();
   initChapter5();
   initChapter6();
-  // New features
+  // Nav, HUD, Charts, Quiz, Trigger
   initChapterNav();      // ③ Floating chapter nav rail
   initSurgeryHUD();      // ① Surgery HUD + ② Crime Scene
   initParetoChart();     // ⑤ Pareto scatter plot
   initEpilogueQuiz();    // ④ Epilogue quiz
   initScrollTrigger();   // ⑦ Auto-run benchmark on scroll
+  // Champion Enhancements
+  initThemeToggle();           // 🌟 1. Dark mode & OLED theme
+  initPromptPlayground();      // ✍️ 2. Custom prompt & token playground
+  initCloudFleetCalculator();  // 💰 3. GPU cloud fleet & ROI calculator
+  initGuidedTour();            // 🎬 4. 90-second guided presenter tour
 }
 
 if (document.readyState === 'loading') {
@@ -1219,13 +1228,18 @@ function initEpilogueQuiz() {
         <div class="quiz-score-label">${pct}% correct</div>
         <div class="quiz-grade">${grade}</div>
         <div class="quiz-grade-sub">${gradeSub}</div>
-        <button class="quiz-restart-btn" id="quiz-restart">↺ Try Again</button>
+        <button class="quiz-restart-btn" id="quiz-restart">↺ Retake Quiz</button>
       </div>`;
+
+    renderQuizCertificate(score, QUESTIONS.length, 60 - timerSec);
+
     document.getElementById('quiz-restart')?.addEventListener('click', () => {
       answers = new Array(QUESTIONS.length).fill(null);
       timerSec = 60; quizStarted = false; current = 0;
       timerInterval = null;
       if (timerEl) { timerEl.textContent = '60s'; timerEl.classList.remove('urgent'); }
+      const certContainer = document.getElementById('quiz-certificate-container');
+      if (certContainer) certContainer.innerHTML = '';
       renderQuestion(0);
     });
   }
@@ -1261,6 +1275,430 @@ function initScrollTrigger() {
   observer.observe(chapter2);
 }
 
+// ══════════════════════════════════════════════════════════════
+// 🌟 1. THEME TOGGLE (DARK / LIGHT MODE)
+// ══════════════════════════════════════════════════════════════
+function initThemeToggle() {
+  const toggleBtn = document.getElementById('theme-toggle');
+  const themeIcon = document.getElementById('theme-icon');
+  const themeLabel = document.getElementById('theme-label');
 
+  // Check saved theme or system preference
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
 
+  function applyTheme(dark) {
+    if (dark) {
+      document.body.classList.add('dark-mode');
+      if (themeIcon) themeIcon.textContent = '☀️';
+      if (themeLabel) themeLabel.textContent = 'Light';
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark-mode');
+      if (themeIcon) themeIcon.textContent = '🌙';
+      if (themeLabel) themeLabel.textContent = 'Dark';
+      localStorage.setItem('theme', 'light');
+    }
+    window.dispatchEvent(new CustomEvent('themechange', { detail: { dark } }));
+  }
 
+  applyTheme(isDark);
+
+  toggleBtn?.addEventListener('click', () => {
+    const willBeDark = !document.body.classList.contains('dark-mode');
+    applyTheme(willBeDark);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// ✍️ 2. LIVE CUSTOM PROMPT & TOKEN PLAYGROUND (Ch 1)
+// ══════════════════════════════════════════════════════════════
+function initPromptPlayground() {
+  const inputEl = document.getElementById('playground-prompt-input');
+  const simBtn = document.getElementById('playground-sim-btn');
+  const turnsSlider = document.getElementById('playground-turns-slider');
+  const turnsVal = document.getElementById('playground-turns-val');
+  const outputA = document.getElementById('sim-output-a');
+  const outputB = document.getElementById('sim-output-b');
+  const vramA = document.getElementById('sim-vram-a');
+  const presetBtns = document.querySelectorAll('.prompt-preset-btn');
+
+  if (!inputEl || !simBtn) return;
+
+  const PRESETS = {
+    legal: {
+      text: "Section 14.2: Maximum indemnity cap is set to $1,450,000 with net 30 payment terms.",
+      gist: "The agreement establishes an indemnity ceiling of ~$1.45M under net 30 settlement parameters."
+    },
+    medical: {
+      text: "Administer Amoxicillin 500mg oral suspension three times daily for 10 consecutive days.",
+      gist: "Prescription directs 500mg Amoxicillin TID across a 10-day therapeutic antimicrobial regimen."
+    },
+    api: {
+      text: "Production environment primary key: TOKEN_PROD_9942BF88194C77.",
+      gist: "Access credential authenticated with live cluster production administrative privileges."
+    },
+    pin: {
+      text: "Authorization PIN: 8402. Dual-custody vault override required after 18:00 UTC.",
+      gist: "Security protocol notes PIN 8402 requiring dual-custody evening supervisor override."
+    }
+  };
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      presetBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const p = PRESETS[btn.dataset.preset];
+      if (p) {
+        inputEl.value = p.text;
+        runSimulation(p.text, p.gist);
+      }
+    });
+  });
+
+  turnsSlider?.addEventListener('input', () => {
+    const turns = parseInt(turnsSlider.value);
+    if (turnsVal) turnsVal.textContent = `${turns} turns`;
+    updateMetrics(turns, inputEl.value);
+  });
+
+  simBtn.addEventListener('click', () => {
+    const text = inputEl.value.trim();
+    if (!text) return;
+    runSimulation(text);
+  });
+
+  function updateMetrics(turns, text) {
+    const tokenEst = Math.max(12, Math.round(text.length / 4));
+    const totalTokens = tokenEst + turns * 35;
+    // 32 layers, FP16, D=4096 (standard scale)
+    const kbAllocated = ((totalTokens * 32 * 2 * 4096 * 2) / 1024).toFixed(1);
+    if (vramA) {
+      vramA.innerHTML = `<strong>Memory Growth:</strong> ${turns} turns = +${kbAllocated} KB allocated`;
+    }
+  }
+
+  function runSimulation(text, predefGist = null) {
+    const turns = parseInt(turnsSlider?.value || 50);
+    // Strategy A: Bit-exact echo
+    if (outputA) outputA.textContent = `"${text}"`;
+    
+    // Strategy B: Semantic compression gist
+    let gist = predefGist;
+    if (!gist) {
+      const words = text.split(' ');
+      const keyWords = words.filter(w => w.length > 4 && !/the|that|with|this|from/i.test(w)).slice(0, 4);
+      gist = `Retains core associative concepts: [${keyWords.join(' · ')}], synthesized across sparse synaptic state without raw token log.`;
+    }
+    if (outputB) outputB.textContent = `"${gist}"`;
+
+    updateMetrics(turns, text);
+  }
+
+  runSimulation(inputEl.value, PRESETS.legal.gist);
+}
+
+// ══════════════════════════════════════════════════════════════
+// 💰 3. GPU CLOUD FLEET & DOLLAR ROI CALCULATOR (Ch 4)
+// ══════════════════════════════════════════════════════════════
+function initCloudFleetCalculator() {
+  const modelSelect = document.getElementById('roi-model-select');
+  const gpuSelect = document.getElementById('roi-gpu-select');
+  const concurrencySlider = document.getElementById('roi-concurrency-slider');
+  const concurrencyVal = document.getElementById('roi-concurrency-val');
+  const contextSlider = document.getElementById('roi-context-slider');
+  const contextVal = document.getElementById('roi-context-val');
+
+  const vramStdEl = document.getElementById('roi-vram-standard');
+  const gpusStdEl = document.getElementById('roi-gpus-standard');
+  const billStdEl = document.getElementById('roi-bill-standard');
+  const billStdBigEl = document.getElementById('roi-bill-standard-big');
+
+  const vramBdhEl = document.getElementById('roi-vram-bdh');
+  const gpusBdhEl = document.getElementById('roi-gpus-bdh');
+  const billBdhEl = document.getElementById('roi-bill-bdh');
+  const billBdhBigEl = document.getElementById('roi-bill-bdh-big');
+  const savingsDiffEl = document.getElementById('roi-savings-diff');
+
+  if (!modelSelect || !gpuSelect || !concurrencySlider) return;
+
+  const MODELS = {
+    llama70b:    { name: 'Llama 3.3 70B', weightsGB: 140, kvBytesPerTok: 320 },
+    deepseek671b: { name: 'DeepSeek-V3 671B', weightsGB: 335, kvBytesPerTok: 34.3 },
+    mistral123b: { name: 'Mistral Large 123B', weightsGB: 246, kvBytesPerTok: 352 },
+    bdhcq128:    { name: 'BDH-CQ 128D', weightsGB: 8, kvBytesPerTok: 0 }
+  };
+
+  const GPUS = {
+    h100: { name: 'H100 80GB', vramGB: 80, costPerHour: 3.50 },
+    a100: { name: 'A100 80GB', vramGB: 80, costPerHour: 2.20 },
+    l40s: { name: 'L40S 48GB', vramGB: 48, costPerHour: 1.15 }
+  };
+
+  function update() {
+    const model = MODELS[modelSelect.value] || MODELS.llama70b;
+    const gpu = GPUS[gpuSelect.value] || GPUS.h100;
+    const concurrency = parseInt(concurrencySlider.value);
+    const context = parseInt(contextSlider.value);
+
+    if (concurrencyVal) concurrencyVal.textContent = `${concurrency.toLocaleString()} users`;
+    if (contextVal) contextVal.textContent = `${context.toLocaleString()} tokens`;
+
+    // Standard KV cache calculations
+    const totalKvVramGB = (concurrency * context * (model.kvBytesPerTok * 1024)) / (1024 * 1024 * 1024);
+    const usableVramForCache = Math.max(10, gpu.vramGB - (model.weightsGB / Math.ceil(model.weightsGB / gpu.vramGB)));
+    const minGpusForWeights = Math.ceil(model.weightsGB / (gpu.vramGB * 0.9));
+    const gpusForCache = Math.ceil(totalKvVramGB / usableVramForCache);
+    const totalGpusStd = Math.max(minGpusForWeights, gpusForCache);
+    const monthlyBillStd = totalGpusStd * gpu.costPerHour * 720;
+
+    // BDH calculations (constant state ~32KB per stream)
+    const bdhStateVramGB = (concurrency * 32.7) / (1024 * 1024);
+    const totalGpusBdh = minGpusForWeights;
+    const monthlyBillBdh = totalGpusBdh * gpu.costPerHour * 720;
+
+    const savings = Math.max(0, monthlyBillStd - monthlyBillBdh);
+    const pct = monthlyBillStd > 0 ? Math.round((savings / monthlyBillStd) * 100) : 0;
+
+    if (vramStdEl) vramStdEl.textContent = `${Math.round(totalKvVramGB).toLocaleString()} GB`;
+    if (gpusStdEl) gpusStdEl.textContent = `${totalGpusStd} × ${gpu.name.split(' ')[0]}s`;
+    if (billStdEl) billStdEl.textContent = `$${Math.round(monthlyBillStd).toLocaleString()} / mo`;
+    if (billStdBigEl) billStdBigEl.textContent = `$${Math.round(monthlyBillStd).toLocaleString()}/mo`;
+
+    if (vramBdhEl) vramBdhEl.textContent = `${bdhStateVramGB.toFixed(2)} GB (Constant in T)`;
+    if (gpusBdhEl) gpusBdhEl.textContent = `${totalGpusBdh} × ${gpu.name.split(' ')[0]}s (Weights Only)`;
+    if (billBdhEl) billBdhEl.textContent = `$${Math.round(monthlyBillBdh).toLocaleString()} / mo`;
+    if (billBdhBigEl) billBdhBigEl.textContent = `$${Math.round(monthlyBillBdh).toLocaleString()}/mo`;
+
+    if (savingsDiffEl) {
+      savingsDiffEl.textContent = `Save $${Math.round(savings).toLocaleString()} / month (${pct}% Cloud Reduction)`;
+    }
+  }
+
+  modelSelect.addEventListener('change', update);
+  gpuSelect.addEventListener('change', update);
+  concurrencySlider.addEventListener('input', update);
+  contextSlider.addEventListener('input', update);
+
+  update();
+}
+
+// ══════════════════════════════════════════════════════════════
+// 🎬 4. 90-SECOND GUIDED TOUR (PRESENTER MODE)
+// ══════════════════════════════════════════════════════════════
+function initGuidedTour() {
+  const hud = document.getElementById('guided-tour-hud');
+  const heroBtn = document.getElementById('hero-tour-btn');
+  const navBtn = document.getElementById('nav-tour-btn');
+  const closeBtn = document.getElementById('tour-close-btn');
+  const prevBtn = document.getElementById('tour-prev-btn');
+  const playPauseBtn = document.getElementById('tour-play-pause-btn');
+  const nextBtn = document.getElementById('tour-next-btn');
+
+  const stepBadge = document.getElementById('tour-step-badge');
+  const stepTitle = document.getElementById('tour-step-title');
+  const commentaryText = document.getElementById('tour-commentary-text');
+  const progressFill = document.getElementById('tour-progress-fill');
+  const timerPill = document.getElementById('tour-timer-pill');
+
+  if (!hud) return;
+
+  const TOUR_STEPS = [
+    {
+      targetId: 'hero',
+      title: 'The AI Memory Dilemma',
+      badge: 'Step 1 of 6',
+      commentary: 'Transformers record every past token into memory buffers. But does true understanding require verbatim logs, or continuous synaptic compression?',
+      duration: 12
+    },
+    {
+      targetId: 'chapter-2',
+      title: 'KV Projections & Caching',
+      badge: 'Step 2 of 6',
+      commentary: 'Notice the live TypedArray benchmark below: caching Key/Value projections reduces computational complexity from O(T²) down to O(T) per generated token.',
+      duration: 15,
+      action: () => document.getElementById('btn-run-benchmark')?.click()
+    },
+    {
+      targetId: 'chapter-3',
+      title: 'The Working Memory Explosion',
+      badge: 'Step 3 of 6',
+      commentary: 'As context length T expands to 128k, cache memory explodes to 64.4 GB on Llama-70B, quickly eclipsing GPU physical capacity.',
+      duration: 14
+    },
+    {
+      targetId: 'cloud-fleet-calculator',
+      title: 'Hardware Ceiling & Cloud ROI',
+      badge: 'Step 4 of 6',
+      commentary: 'Decode is memory-bandwidth bound. Check our Cloud Fleet Calculator: eliminating KV cache cuts enterprise cloud hosting bills by over 90%.',
+      duration: 16
+    },
+    {
+      targetId: 'surgery-hud-canvas',
+      title: 'Live BDH Synaptic Surgery',
+      badge: 'Step 5 of 6',
+      commentary: 'Kosowski et al. (2025) replace token buffers with high-dimensional sparse synaptic plasticity (p ≈ 0.05), maintaining near-100% recall with strictly O(1) memory.',
+      duration: 16
+    },
+    {
+      targetId: 'quiz-section',
+      title: 'The Sixty-Second Test',
+      badge: 'Step 6 of 6',
+      commentary: 'You have explored KV caches, memory bandwidth, and synaptic plasticity. Complete the 60-Second synthesis quiz to earn your certified architect badge!',
+      duration: 15
+    }
+  ];
+
+  let currentStep = 0;
+  let isPlaying = false;
+  let timerSec = 0;
+  let timerInterval = null;
+
+  function startTour() {
+    hud.classList.add('active');
+    currentStep = 0;
+    isPlaying = true;
+    if (playPauseBtn) playPauseBtn.textContent = '⏸ Pause';
+    goToStep(0);
+  }
+
+  function stopTour() {
+    hud.classList.remove('active');
+    isPlaying = false;
+    clearInterval(timerInterval);
+    document.querySelectorAll('.tour-spotlight-active').forEach(el => el.classList.remove('tour-spotlight-active'));
+  }
+
+  function goToStep(idx) {
+    if (idx < 0) idx = 0;
+    if (idx >= TOUR_STEPS.length) {
+      stopTour();
+      return;
+    }
+    currentStep = idx;
+    const step = TOUR_STEPS[idx];
+
+    // Update HUD
+    if (stepBadge) stepBadge.textContent = step.badge;
+    if (stepTitle) stepTitle.textContent = step.title;
+    if (commentaryText) commentaryText.textContent = step.commentary;
+    if (progressFill) progressFill.style.width = `${((idx + 1) / TOUR_STEPS.length) * 100}%`;
+
+    // Remove old spotlights
+    document.querySelectorAll('.tour-spotlight-active').forEach(el => el.classList.remove('tour-spotlight-active'));
+
+    // Scroll to target
+    const targetEl = document.getElementById(step.targetId);
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetEl.classList.add('tour-spotlight-active');
+    }
+
+    if (step.action) {
+      setTimeout(step.action, 800);
+    }
+
+    // Reset countdown timer
+    clearInterval(timerInterval);
+    timerSec = step.duration;
+    updateTimerDisplay();
+
+    if (isPlaying) {
+      timerInterval = setInterval(() => {
+        timerSec--;
+        updateTimerDisplay();
+        if (timerSec <= 0) {
+          goToStep(currentStep + 1);
+        }
+      }, 1000);
+    }
+  }
+
+  function updateTimerDisplay() {
+    if (timerPill) {
+      timerPill.textContent = isPlaying ? `Next in ${timerSec}s` : 'Paused';
+    }
+  }
+
+  heroBtn?.addEventListener('click', startTour);
+  navBtn?.addEventListener('click', startTour);
+  closeBtn?.addEventListener('click', stopTour);
+
+  prevBtn?.addEventListener('click', () => goToStep(currentStep - 1));
+  nextBtn?.addEventListener('click', () => goToStep(currentStep + 1));
+
+  playPauseBtn?.addEventListener('click', () => {
+    isPlaying = !isPlaying;
+    playPauseBtn.textContent = isPlaying ? '⏸ Pause' : '▶ Resume';
+    if (isPlaying) {
+      timerInterval = setInterval(() => {
+        timerSec--;
+        updateTimerDisplay();
+        if (timerSec <= 0) goToStep(currentStep + 1);
+      }, 1000);
+    } else {
+      clearInterval(timerInterval);
+    }
+    updateTimerDisplay();
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 🏆 5. SHAREABLE "AI MEMORY ARCHITECT" CERTIFICATE
+// ══════════════════════════════════════════════════════════════
+function renderQuizCertificate(score, total, timeSec) {
+  const container = document.getElementById('quiz-certificate-container');
+  if (!container) return;
+
+  const pct = Math.round((score / total) * 100);
+  const ranks = [
+    { min: 100, title: 'Master Neural Memory Architect', ribbon: 'LEVEL 5 · GRANDMASTER' },
+    { min: 80,  title: 'Senior Inference Systems Engineer', ribbon: 'LEVEL 4 · SPECIALIST' },
+    { min: 60,  title: 'Associative State Researcher', ribbon: 'LEVEL 3 · PRACTITIONER' },
+    { min: 0,   title: 'Neural Memory Apprentice', ribbon: 'LEVEL 2 · EXPLORER' }
+  ];
+  const rank = ranks.find(r => pct >= r.min) || ranks[ranks.length - 1];
+  const hash = 'IITKGP-' + Math.random().toString(36).substring(2, 9).toUpperCase();
+
+  container.innerHTML = `
+    <div class="certificate-wrapper">
+      <div class="certificate-card">
+        <div class="cert-badge-ribbon">★ ${rank.ribbon} ★</div>
+        <h4 class="cert-title">${rank.title}</h4>
+        <p class="cert-subtitle">Verified Evaluation in KV Cache Scalability, Hardware Roofline &amp; BDH Synaptic Plasticity</p>
+
+        <div class="cert-meta-grid">
+          <div class="cert-meta-item">
+            <span class="cert-meta-val">${score}/${total} (${pct}%)</span>
+            <span class="cert-meta-lbl">Quiz Mastery</span>
+          </div>
+          <div class="cert-meta-item">
+            <span class="cert-meta-val">${timeSec}s</span>
+            <span class="cert-meta-lbl">Completion Time</span>
+          </div>
+          <div class="cert-meta-item">
+            <span class="cert-meta-val">${hash}</span>
+            <span class="cert-meta-lbl">Verification ID</span>
+          </div>
+        </div>
+
+        <div class="cert-actions">
+          <button class="cert-btn cert-btn-primary" id="btn-copy-cert">📋 Copy Verified Result</button>
+          <a class="cert-btn cert-btn-secondary" href="https://github.com/abhilash0042/IITKgp_KVCache" target="_blank" rel="noopener">⭐ Star Repository</a>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('btn-copy-cert')?.addEventListener('click', (e) => {
+    const copyText = `🧠 Certified AI Memory Architect: ${rank.title} (${score}/${total} - ${pct}% in ${timeSec}s)\n` +
+      `Validated on: IIT Kharagpur KV Cache & BDH Interactive Essay\n` +
+      `Verification Hash: ${hash}\n` +
+      `Explore: https://iit-kgp-kv-cache.vercel.app/`;
+    navigator.clipboard.writeText(copyText).then(() => {
+      e.target.textContent = '✓ Copied to Clipboard!';
+      setTimeout(() => { e.target.textContent = '📋 Copy Verified Result'; }, 2500);
+    });
+  });
+}

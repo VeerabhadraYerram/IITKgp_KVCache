@@ -45,6 +45,17 @@
     <button class="nav-pill" data-target="quiz-section">
       <span class="nav-pill-dot"></span>Quiz
     </button>
+
+    <div class="nav-rail-divider"></div>
+
+    <button class="nav-action-btn" id="theme-toggle" title="Toggle Dark/Light Mode">
+      <span class="nav-action-icon" id="theme-icon">🌙</span>
+      <span class="nav-action-label" id="theme-label">Dark</span>
+    </button>
+    <button class="nav-action-btn tour-btn" id="nav-tour-btn" title="Start 90-Second Guided Tour">
+      <span class="nav-action-icon">▶</span>
+      <span class="nav-action-label">Tour</span>
+    </button>
   </nav>
 
   <!-- ════════════════════════════════════════════════════════════ -->
@@ -115,6 +126,11 @@
         <span class="scroll-arrow">↓</span>
         <span class="scroll-text">Scroll to explore the dilemma</span>
       </div>
+      <div class="hero-actions" id="hero-actions" style="opacity: 0; transition: opacity 0.5s ease; text-align: center;">
+        <button class="hero-tour-btn" id="hero-tour-btn">
+          <span>▶</span> Start 90-Second Guided Tour
+        </button>
+      </div>
     </div>
   </section>
 
@@ -129,6 +145,14 @@
         <p class="act-description">
           A 50-turn conversation. Turn 3 sets a precise financial limit; Turn 50 asks for it back. How should an AI remember?
         </p>
+      </div>
+
+      <!-- Executive Summary: Chapter 1 -->
+      <div class="exec-summary-banner">
+        <div class="exec-takeaway">
+          <strong>⚡ The Fundamental Dilemma:</strong> Standard LLMs remember by verbatim token buffering (O(T) linear growth); biological cognition compresses experiences into evolving synaptic state (O(1) footprint).
+        </div>
+        <div class="exec-metric-pill">100% Exact Recall vs. O(1) Fixed State</div>
       </div>
 
       <!-- 50-Turn Conversation Scenario -->
@@ -241,6 +265,63 @@
         </div>
       </div>
 
+      <!-- ✍️ Live Custom Prompt & Token Playground -->
+      <div class="prompt-playground-card" id="custom-prompt-playground">
+        <div class="playground-header">
+          <h4 class="playground-title">🔬 Live Token Playground: Test Any Custom Prompt</h4>
+          <p class="playground-desc">Type any agreement, secret, or fact. Compare how a Transformer KV Cache vs. BDH Synaptic State stores and retrieves it across intervening turns.</p>
+        </div>
+
+        <div class="prompt-presets-row">
+          <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); align-self: center;">Presets:</span>
+          <button class="prompt-preset-btn active" data-preset="legal">Legal ($1.45M)</button>
+          <button class="prompt-preset-btn" data-preset="medical">Medical (Amoxicillin 500mg)</button>
+          <button class="prompt-preset-btn" data-preset="api">API Token (TOKEN_PROD_9942)</button>
+          <button class="prompt-preset-btn" data-preset="pin">Vault PIN (8402)</button>
+        </div>
+
+        <div class="prompt-input-row">
+          <input type="text" class="prompt-input-field" id="playground-prompt-input" value="Section 14.2: Maximum indemnity cap is set to $1,450,000 with net 30 payment terms." placeholder="Type your custom memory clause here...">
+          <button class="prompt-sim-btn" id="playground-sim-btn">Simulate Recall</button>
+        </div>
+
+        <div class="slider-control" style="margin-bottom: 14px;">
+          <div class="slider-header">
+            <span class="slider-label">Intervening Conversation Turns:</span>
+            <span class="slider-value" id="playground-turns-val">50 turns</span>
+          </div>
+          <input type="range" min="10" max="200" step="10" value="50" id="playground-turns-slider">
+        </div>
+
+        <div class="prompt-comparison-grid">
+          <div class="prompt-sim-col col-a">
+            <div class="prompt-sim-col-header">
+              <span class="prompt-sim-tag" style="color: #3b82f6;">Strategy A · Verbatim KV Cache</span>
+              <span class="evidence-badge badge-primary" style="font-size: 0.65rem;">100% Match</span>
+            </div>
+            <p class="prompt-sim-quote" id="sim-output-a">"Section 14.2: Maximum indemnity cap is set to $1,450,000 with net 30 payment terms."</p>
+            <div class="prompt-sim-metrics">
+              <div><strong>Recall:</strong> 100% Bit-Exact Verbatim</div>
+              <div id="sim-vram-a"><strong>Memory Growth:</strong> 50 turns = +51.2 KB allocated</div>
+              <div><strong>Scaling:</strong> O(T) Strictly Linear</div>
+            </div>
+          </div>
+
+          <div class="prompt-sim-col col-b">
+            <div class="prompt-sim-col-header">
+              <span class="prompt-sim-tag" style="color: #10b981;">Strategy B · Synaptic State (BDH)</span>
+              <span class="evidence-badge badge-derived" style="font-size: 0.65rem;">Semantic Gist</span>
+            </div>
+            <p class="prompt-sim-quote" id="sim-output-b">"The agreement establishes an indemnity ceiling of ~$1.45M under net 30 settlement parameters."</p>
+            <div class="prompt-sim-metrics">
+              <div><strong>Recall:</strong> Semantic Gist &amp; Relational Associations</div>
+              <div><strong>Memory Footprint:</strong> Constant 32.0 KB (Zero expansion)</div>
+              <div><strong>Scaling:</strong> O(1) Mathematically Constant</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="bridge-card">
         <p class="bridge-text">
           Why does this tradeoff exist? To understand, we must inspect what a Transformer computes and caches during generation.
@@ -258,6 +339,14 @@
         <p class="act-description">
           Autoregressive generation predicts one token at a time. Without caching, the model recalculates Key and Value projections for all past tokens at every step (O(N²D²) work). KV caching stores these projections once, cutting projection work to O(ND²).
         </p>
+      </div>
+
+      <!-- Executive Summary: Chapter 2 -->
+      <div class="exec-summary-banner">
+        <div class="exec-takeaway">
+          <strong>⚡ The Recompute Bottleneck:</strong> Without caching, an LLM recalculates projections for all historic tokens at every step (O(T²D²) total FLOPs); caching K and V projections reduces incremental step projection work to O(TD²).
+        </div>
+        <div class="exec-metric-pill">2× Direct FLOP Reduction per Generation Step</div>
       </div>
 
       <!-- Live Benchmark Controls -->
@@ -506,6 +595,14 @@
         </p>
       </div>
 
+      <!-- Executive Summary: Chapter 3 -->
+      <div class="exec-summary-banner">
+        <div class="exec-takeaway">
+          <strong>⚡ The Memory Explosion:</strong> Working KV cache memory scales strictly linearly with context length T and batch size B (M = 2 · B · L · H · D · s · T), rapidly outstripping high-bandwidth GPU memory.
+        </div>
+        <div class="exec-metric-pill">64.4 GB Cache for 128k on Llama-70B</div>
+      </div>
+
       <!-- Architectural Evolution -->
       <div class="architecture-progression-card">
         <h3 class="progression-title">Architectural Evolution: Reducing KV Footprint</h3>
@@ -730,6 +827,14 @@
         </p>
       </div>
 
+      <!-- Executive Summary: Chapter 4 -->
+      <div class="exec-summary-banner">
+        <div class="exec-takeaway">
+          <strong>⚡ The Hardware Ceiling:</strong> Decode step execution is strictly memory-bandwidth bound with arithmetic intensity &lt; 10 FLOP/byte, leaving &gt;90% of GPU tensor cores idle while reading KV cache memory from HBM.
+        </div>
+        <div class="exec-metric-pill">153.0 FLOP/byte Memory Knee (A100)</div>
+      </div>
+
       <!-- Two Phases Comparison Grid -->
       <div class="phases-grid">
         <div class="phase-card prefill">
@@ -864,6 +969,108 @@
         </p>
       </div>
 
+      <!-- 🔬 Collapsible Deep Dive: Hardware Roofline Equations -->
+      <details class="deep-dive-card">
+        <summary class="deep-dive-summary">🔬 View Analytical Hardware Derivations &amp; Roofline Equations</summary>
+        <div class="deep-dive-body">
+          <p><strong>Decode Arithmetic Intensity:</strong> <span class="math-code">I<sub>decode</sub> = FLOPs / Memory Traffic = (2 · P · B) / (2 · P + M<sub>KV</sub>)</span>.</p>
+          <p>Because model weights P (e.g. 70B = 140 GB FP16) must be streamed from HBM into on-chip cache for <em>each single token step</em>, memory traffic dominates. The GPU's memory bus quickly saturates while tensor cores sit mostly idle.</p>
+          <p><strong>Hardware Knee Point:</strong> <span class="math-code">I* = P<sub>peak</sub> / B<sub>mem</sub> = 312 TFLOPS / 2,039 GB/s = 153.0 FLOP/byte</span> (NVIDIA A100 80GB SXM). Any operation with intensity below 153.0 cannot achieve peak FLOPS.</p>
+        </div>
+      </details>
+
+      <!-- 💰 GPU Cloud Fleet & Dollar ROI Calculator -->
+      <div class="cloud-fleet-calculator" id="cloud-fleet-calculator">
+        <div class="calculator-header">
+          <div>
+            <h4 class="calculator-title">💰 GPU Cloud Fleet &amp; Dollar ROI Calculator</h4>
+            <p class="calculator-desc">Quantify real-world infrastructure bills. See how eliminating linear KV cache VRAM pressure shrinks required cloud GPU cluster sizes.</p>
+          </div>
+          <span class="evidence-badge badge-derived" style="font-size: 0.65rem;">PRODUCTION COST ANALYSIS</span>
+        </div>
+
+        <div class="calculator-controls-grid">
+          <div class="calc-input-group">
+            <label class="calc-input-label"><span>Target Model Architecture:</span></label>
+            <select class="calc-input-select" id="roi-model-select">
+              <option value="llama70b" selected>Llama 3.3 70B (FP16 · 140 GB weights)</option>
+              <option value="deepseek671b">DeepSeek-V3 671B (FP8 · 335 GB active)</option>
+              <option value="mistral123b">Mistral Large 123B (FP16 · 246 GB weights)</option>
+              <option value="bdhcq128">BDH-CQ 128D (O(1) Recurrent Plasticity)</option>
+            </select>
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-input-label">
+              <span>Concurrent Active Users (Streams):</span>
+              <span id="roi-concurrency-val" style="font-family:var(--font-mono);color:#3b82f6;">500 users</span>
+            </label>
+            <input type="range" min="50" max="2500" step="50" value="500" id="roi-concurrency-slider" class="knob-slider">
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-input-label">
+              <span>Average Context Window:</span>
+              <span id="roi-context-val" style="font-family:var(--font-mono);color:#10b981;">32,768 tokens</span>
+            </label>
+            <input type="range" min="4096" max="131072" step="4096" value="32768" id="roi-context-slider" class="knob-slider">
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-input-label"><span>Cloud GPU Hardware Target:</span></label>
+            <select class="calc-input-select" id="roi-gpu-select">
+              <option value="h100" selected>NVIDIA H100 80GB SXM5 ($3.50/hr)</option>
+              <option value="a100">NVIDIA A100 80GB SXM4 ($2.20/hr)</option>
+              <option value="l40s">NVIDIA L40S 48GB PCIe ($1.15/hr)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="roi-comparison-grid">
+          <div class="fleet-card standard">
+            <div class="fleet-card-title" style="color: #dc2626;">Standard Transformer KV Cache</div>
+            <div class="fleet-metric-row">
+              <span>Total KV Cache VRAM Needed:</span>
+              <strong id="roi-vram-standard">8,050 GB</strong>
+            </div>
+            <div class="fleet-metric-row">
+              <span>GPUs Required to Hold Working State:</span>
+              <strong id="roi-gpus-standard">101 × H100s</strong>
+            </div>
+            <div class="fleet-metric-row">
+              <span>Estimated Monthly Cloud Bill:</span>
+              <strong id="roi-bill-standard">$254,520 / mo</strong>
+            </div>
+            <div class="fleet-bill-big" id="roi-bill-standard-big">$254,520/mo</div>
+          </div>
+
+          <div class="fleet-card bdh">
+            <div class="fleet-card-title" style="color: #059669;">BDH Compressed State (O(1))</div>
+            <div class="fleet-metric-row">
+              <span>Total Working State VRAM Needed:</span>
+              <strong id="roi-vram-bdh">0.02 GB (Constant)</strong>
+            </div>
+            <div class="fleet-metric-row">
+              <span>GPUs Required to Hold Working State:</span>
+              <strong id="roi-gpus-bdh">2 × H100s (Weights only)</strong>
+            </div>
+            <div class="fleet-metric-row">
+              <span>Estimated Monthly Cloud Bill:</span>
+              <strong id="roi-bill-bdh">$5,040 / mo</strong>
+            </div>
+            <div class="fleet-bill-big" id="roi-bill-bdh-big">$5,040/mo</div>
+          </div>
+        </div>
+
+        <div class="roi-savings-banner">
+          <div>
+            <div class="savings-amount" id="roi-savings-diff">Save $249,480 / month (98% Cloud Reduction)</div>
+            <div class="savings-tagline">By decoupling working memory from token count T, servers run at weight-bound baseline without memory exhaustion.</div>
+          </div>
+          <span class="evidence-badge badge-primary" style="font-size:0.75rem;padding:6px 12px;">PRODUCTION READY ROI</span>
+        </div>
+      </div>
+
       <div class="bridge-card">
         <p class="bridge-text">
           Given these physical costs, how do alternative architectures avoid linear KV memory growth?
@@ -881,6 +1088,14 @@
         <p class="act-description">
           Normalized comparison under a 32-layer, FP16 scale (L=32, d<sub>model</sub>=4096). Reducing memory footprint always trades off addressability, recall, or precision.
         </p>
+      </div>
+
+      <!-- Executive Summary: Chapter 5 -->
+      <div class="exec-summary-banner">
+        <div class="exec-takeaway">
+          <strong>⚡ Architectural Trade-offs:</strong> PagedAttention and StreamingLLM reduce fragmentation or discard past context; Linear Attention and Mamba SSM compress context into O(1) vectors but surrender exact softmax attention focus.
+        </div>
+        <div class="exec-metric-pill">O(1) Recurrent State vs. O(T) Softmax</div>
       </div>
 
       <!-- Taxonomy of State Semantics -->
@@ -1160,6 +1375,14 @@
         <p class="act-description">
           The Dragon Hatchling (arXiv:2509.26507) replaces explicit token buffers with an evolving internal synaptic state, trading exact historical recall for constant memory (O(1) in T).
         </p>
+      </div>
+
+      <!-- Executive Summary: Chapter 6 -->
+      <div class="exec-summary-banner">
+        <div class="exec-takeaway">
+          <strong>⚡ The Architectural Redesign:</strong> BDH (Kosowski et al. 2025) records experiences in high-dimensional sparse synaptic plasticity ($p \approx 0.05$), breaking the linear memory wall while delivering ARC-AGI-1 reasoning at 88% lower cost.
+        </div>
+        <div class="exec-metric-pill">$0.0007 / Task ARC-AGI-1 (88% Cost Leader)</div>
       </div>
 
       <!-- Evidentiary Framework Legend -->
@@ -1563,9 +1786,35 @@
           <div class="quiz-progress-bar-fill" id="quiz-progress-bar" style="width:0%"></div>
         </div>
         <div id="quiz-body"></div>
+        <div id="quiz-certificate-container"></div>
       </div>
     </section>
   </main>
+
+  <!-- 🎬 90-Second Guided Tour Controller HUD -->
+  <aside id="guided-tour-hud" aria-label="Interactive Guided Tour">
+    <div class="tour-header-row">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="tour-step-badge" id="tour-step-badge">Step 1 of 6</span>
+        <span style="font-size:0.75rem;font-weight:700;letter-spacing:0.02em;" id="tour-step-title">The AI Memory Dilemma</span>
+      </div>
+      <button class="tour-close-btn" id="tour-close-btn" title="Exit Tour">✕</button>
+    </div>
+    <div class="tour-progress-track">
+      <div class="tour-progress-fill" id="tour-progress-fill"></div>
+    </div>
+    <p class="tour-commentary-text" id="tour-commentary-text">
+      Welcome to the interactive essay. Transformers record tokens verbatim into memory, but biological systems compress them into synaptic states.
+    </p>
+    <div class="tour-controls-row">
+      <div class="tour-btn-group">
+        <button class="tour-action-btn" id="tour-prev-btn">⏮ Back</button>
+        <button class="tour-action-btn primary" id="tour-play-pause-btn">⏸ Pause</button>
+        <button class="tour-action-btn" id="tour-next-btn">Next ⏭</button>
+      </div>
+      <div class="tour-timer-pill" id="tour-timer-pill">Next in 12s</div>
+    </div>
+  </aside>
 
   <script type="module" src="app.js"></script>
 </body>
