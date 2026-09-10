@@ -4,7 +4,7 @@
 // All computations run live in the browser from user-controlled parameters and seeds.
 
 import { MicroBDH } from './micro_bdh.js';
-import { MicroTransformer } from './micro_transformer.js';
+import { MicroTransformerEngine } from './micro_transformer.js';
 
 /**
  * Generate a set of key-value associations for the experiment.

@@ -385,3 +385,5 @@ export class MicroTransformerEngine {
     };
   }
 }
+
+export { MicroTransformerEngine as MicroTransformer };
