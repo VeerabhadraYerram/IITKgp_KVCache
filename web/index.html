@@ -1316,16 +1316,473 @@
       <!-- Bridge Sentence to Chapter 6 -->
       <div class="bridge-card">
         <p class="bridge-text">
-          Chapter 6 asks whether memory can be neither a growing token buffer nor a conventional recurrent vector, but a dynamically modified graph.
+          Chapter 6 asks whether memory can be neither a growing token buffer nor a conventional recurrent vector, but an integrated architecture of synaptic plasticity.
         </p>
       </div>
 
     </section>
     <!-- END CHAPTER 5 -->
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- CHAPTER 6: BDH AS AN INTEGRATED REDESIGN, NOT A TWEAK        -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <section class="act" id="chapter-6">
+      <div class="act-header">
+        <div class="act-number">Chapter 6</div>
+        <h2 class="act-title">BDH as an Integrated Redesign, Not a Tweak</h2>
+        <p class="act-description">
+          The Dragon Hatchling (BDH, arXiv:2509.26507) is often described as an attention alternative. But as its authors emphasize, BDH is an integrated architectural redesign rather than an isolated heuristic tweak. It does not make memory disappear—it changes what memory means: replacing explicit token-addressable storage with an evolving internal synaptic state that trades exact historical retrieval for constant-memory recurrence subject to finite capacity and interference.
+        </p>
+      </div>
+
+      <!-- Evidentiary Framework Legend -->
+      <div class="evidence-legend-bar">
+        <span class="evidence-legend-title">Evidentiary Framework:</span>
+        <div class="evidence-legend-items">
+          <div class="evidence-legend-item">
+            <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span> Directly stated or mathematically specified in arXiv:2509.26507 / arXiv:2608.09888
+          </div>
+          <div class="evidence-legend-item">
+            <span class="evidence-badge badge-derived">[DERIVED]</span> Direct mathematical consequence of the architecture
+          </div>
+          <div class="evidence-legend-item">
+            <span class="evidence-badge badge-interpretation">[INTERPRETATION]</span> Pedagogical analogy or educational toy model
+          </div>
+        </div>
+      </div>
+
+      <!-- Primary-Source Author Clarification Quote Card -->
+      <div class="quote-card">
+        <div class="quote-header">
+          <span class="quote-source-label">Primary-Source Author Statement · Hugging Face Paper Discussion</span>
+          <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span>
+        </div>
+        <div class="quote-body">
+          &ldquo;@xz259 There are about 5 main differences, which should not be tried in isolation - or they will indeed not work (and cannot work in isolation, as explained in the theory part of the paper). See also table in comments below.&rdquo;<br><br>
+          &ldquo;From the authors: For readers looking for a synthetic (less rigorous) comparison to the Transformer, here is a summary table of differences.&rdquo;
+        </div>
+        <div class="quote-footer">
+          <span>Adrian Kosowski (<code>dxtrous</code>), Chief Scientific Officer at Pathway · Reply on Oct 7, 2025</span>
+          <a href="https://huggingface.co/papers/2509.26507" target="_blank" rel="noopener noreferrer" class="quote-link">View Discussion Thread on Hugging Face ↗</a>
+        </div>
+      </div>
+
+      <!-- Restructured 6-Difference Comparison Table -->
+      <div class="author-table-card">
+        <div class="author-table-header">
+          <h3 class="author-table-title">Author-provided architectural summary — interpretation expanded for teaching</h3>
+          <p class="author-table-sub">
+            Grounded in primary-source author statements (arXiv:2509.26507). Each row identifies the architectural distinction alongside its evidentiary provenance.
+          </p>
+        </div>
+        <div class="author-table-wrapper">
+          <table class="author-table">
+            <thead>
+              <tr>
+                <th style="width: 20%;">Dimension</th>
+                <th style="width: 38%;">BDH (Baby Dragon Hatchling)</th>
+                <th style="width: 30%;">Standard Transformer</th>
+                <th style="width: 12%;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="dim-col">Attention / State Mechanism</td>
+                <td class="bdh-col">
+                  <span class="table-cell-lead">Recurrent associative / linear-attention state</span>
+                  <span class="table-cell-desc">Replaces explicit softmax attention over stored token keys/values with an associative recurrent state updated from the current activations.</span>
+                </td>
+                <td class="tf-col">
+                  <span class="table-cell-lead">Softmax attention with token-addressable K/V state</span>
+                  <span class="table-cell-desc">Standard attention <em>A<sub>t</sub> = softmax(Q<sub>t</sub> K<sub>1:t</sub>ᵀ)V<sub>1:t</sub></em> requires access to the sequence's token-level K/V states.</span>
+                </td>
+                <td class="status-col">
+                  <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span>
+                  <div style="font-size: 0.72rem; color: #6b7280; margin-top: 3px;">Architecture</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="dim-col">Representation</td>
+                <td class="bdh-col">
+                  <span class="table-cell-lead">High-dimensional sparse positive activations</span>
+                  <span class="table-cell-desc">BDH uses a high-dimensional neuron/activation space with sparse positive activations; exact dimensions depend on the configuration (e.g., <em>N=4096</em> or <em>8192</em> in reported configurations).</span>
+                </td>
+                <td class="tf-col">
+                  <span class="table-cell-lead">Dense continuous activations</span>
+                  <span class="table-cell-desc">Continuous floating-point vectors in moderate dimension (&sim; 10² per head).</span>
+                </td>
+                <td class="status-col">
+                  <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span>
+                  <div style="font-size: 0.72rem; color: #6b7280; margin-top: 3px;">Architecture</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="dim-col">Key-Query Interaction</td>
+                <td class="bdh-col">
+                  <span class="table-cell-lead">Sparse-overlap / hash-like interpretation</span>
+                  <span class="table-cell-desc">Conceptual analogy, not an explicit LSH index: high-dimensional sparse representations enable associative matching through sparse overlap.</span>
+                </td>
+                <td class="tf-col">
+                  <span class="table-cell-lead">Similarity-based attention interpretation</span>
+                  <span class="table-cell-desc">Scaled dot-product similarity followed by softmax normalization over candidate tokens.</span>
+                </td>
+                <td class="status-col">
+                  <span class="evidence-badge badge-interpretation">[INTERPRETATION]</span>
+                  <div style="font-size: 0.72rem; color: #6b7280; margin-top: 3px;">Conceptual Analogy</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="dim-col">Sequence-State Scaling</td>
+                <td class="bdh-col">
+                  <span class="table-cell-lead">Fixed-size recurrent state with respect to T</span>
+                  <span class="table-cell-desc">Physical memory scaling is O(1) with respect to sequence length <em>T</em>; state size does not grow with context.</span>
+                </td>
+                <td class="tf-col">
+                  <span class="table-cell-lead">KV state grows with T</span>
+                  <span class="table-cell-desc">Physical memory scaling is O(T), requiring one persistent KV cache entry per token position in VRAM.</span>
+                </td>
+                <td class="status-col">
+                  <span class="evidence-badge badge-derived">[DERIVED]</span>
+                  <div style="font-size: 0.72rem; color: #6b7280; margin-top: 3px;">Math Consequence</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="dim-col">Memory Mechanism</td>
+                <td class="bdh-col">
+                  <span class="table-cell-lead">Hebbian synaptic plasticity</span>
+                  <span class="table-cell-desc">Fixed-size neuron network with dynamically changing synaptic state: working memory is written into evolving synaptic connections.</span>
+                </td>
+                <td class="tf-col">
+                  <span class="table-cell-lead">Explicit KV cache</span>
+                  <span class="table-cell-desc">Externalized token memory buffer stored verbatim in GPU HBM.</span>
+                </td>
+                <td class="status-col">
+                  <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span>
+                  <div style="font-size: 0.72rem; color: #6b7280; margin-top: 3px;">Architecture</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="dim-col">State Capacity</td>
+                <td class="bdh-col">
+                  <span class="table-cell-lead">Finite capacity determined by network/synaptic state</span>
+                  <span class="table-cell-desc">Sequence-length-independent recurrent state; effective context is limited by the information capacity of the learned state. BDH removes the requirement to allocate one persistent KV entry per token, but it does not create infinite information capacity.</span>
+                </td>
+                <td class="tf-col">
+                  <span class="table-cell-lead">Explicit token storage capacity</span>
+                  <span class="table-cell-desc">Stores explicit token activations up to physical GPU memory limits.</span>
+                </td>
+                <td class="status-col">
+                  <span class="evidence-badge badge-derived">[DERIVED]</span>
+                  <div style="font-size: 0.72rem; color: #6b7280; margin-top: 3px;">Architectural Trade-off</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding: 10px 16px; background: #fafafa; border-top: 1px solid #e5e7eb; font-size: 0.75rem; color: #6b7280; font-family: var(--font-mono);">
+          Note: Key-query matching descriptions are mechanistic interpretations, not literal implementations of LSH or ANN data structures.
+        </div>
+      </div>
+
+      <!-- Interactive "What Changes?" Sequence Stepper -->
+      <div class="stepper-container">
+        <div class="stepper-header">
+          <div class="stepper-title-group">
+            <h3 class="stepper-title">Interactive Progression: What Changes Between Attention and State?</h3>
+            <p class="stepper-subtitle">Step through the architectural transition from explicit token-addressable buffers to an evolving synaptic state.</p>
+          </div>
+          <div class="stepper-nav" id="stepper-nav">
+            <button class="step-pill-btn active" data-step="0">01 · Transformer</button>
+            <button class="step-pill-btn" data-step="1">02 · The Growth Problem</button>
+            <button class="step-pill-btn" data-step="2">03 · BDH Synaptic State</button>
+            <button class="step-pill-btn" data-step="3">04 · The Trade-off</button>
+          </div>
+        </div>
+
+        <div class="step-card" id="stepper-content">
+          <!-- Populated dynamically by app.js initChapter6() -->
+        </div>
+
+        <div class="stepper-controls">
+          <button class="stepper-nav-btn" id="btn-step-prev" disabled>&larr; Previous Step</button>
+          <span style="font-family: var(--font-mono); font-size: 0.78rem; color: #6b7280;" id="stepper-step-indicator">Step 1 of 4</span>
+          <button class="stepper-nav-btn" id="btn-step-next">Next Step &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Static Architecture Schematic Diagram -->
+      <div class="arch-diagram-card">
+        <div class="arch-diagram-header">
+          <h3 class="arch-diagram-title">Architectural Schematic: Transformer Pipeline vs. BDH Pipeline</h3>
+          <p class="arch-diagram-sub">Contrasting the token-addressable KV buffer with an evolving inference-time synaptic state.</p>
+        </div>
+        <div class="arch-diagram-wrapper">
+          <svg class="arch-diagram-svg" viewBox="0 0 860 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Background panels -->
+            <rect x="10" y="10" width="410" height="350" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+            <rect x="440" y="10" width="410" height="350" rx="6" fill="#ffffff" stroke="#000000" stroke-width="1.5"/>
+
+            <!-- Panel Headers -->
+            <text x="30" y="38" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="700" fill="#000000">STANDARD TRANSFORMER</text>
+            <text x="30" y="54" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7280">Softmax Attention · Token-Addressable Memory</text>
+
+            <text x="460" y="38" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="700" fill="#000000">BABY DRAGON HATCHLING (BDH)</text>
+            <text x="460" y="54" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7280">Hebbian Synaptic Plasticity · Evolving Recurrent State</text>
+
+            <!-- LEFT SIDE: TRANSFORMER -->
+            <!-- Input Token -->
+            <rect x="135" y="70" width="160" height="36" rx="4" fill="#f9fafb" stroke="#000000" stroke-width="1.2"/>
+            <text x="215" y="93" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#000000" text-anchor="middle">Input Token x_t</text>
+
+            <!-- Down Arrow -->
+            <line x1="215" y1="106" x2="215" y2="126" stroke="#000000" stroke-width="1.5"/>
+            <polygon points="215,131 211,123 219,123" fill="#000000"/>
+
+            <!-- Q, K, V Projections -->
+            <rect x="65" y="132" width="300" height="38" rx="4" fill="#f9fafb" stroke="#000000" stroke-width="1.2"/>
+            <text x="215" y="156" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#000000" text-anchor="middle">Dense Projections: W_Q, W_K, W_V</text>
+
+            <!-- Down Arrow -->
+            <line x1="215" y1="170" x2="215" y2="190" stroke="#000000" stroke-width="1.5"/>
+            <polygon points="215,195 211,187 219,187" fill="#000000"/>
+
+            <!-- KV Buffer (Linear Scaling) -->
+            <rect x="40" y="196" width="350" height="52" rx="4" fill="#fafafa" stroke="#000000" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <text x="215" y="218" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="700" fill="#111827" text-anchor="middle">Token-Addressable KV State Buffer</text>
+            <text x="215" y="236" font-family="JetBrains Mono, monospace" font-size="10" fill="#4b5563" text-anchor="middle">Stores K_{1:t}, V_{1:t} · Grows linearly O(T) with context</text>
+
+            <!-- Down Arrow -->
+            <line x1="215" y1="248" x2="215" y2="268" stroke="#000000" stroke-width="1.5"/>
+            <polygon points="215,273 211,265 219,265" fill="#000000"/>
+
+            <!-- Softmax Attention -->
+            <rect x="65" y="274" width="300" height="38" rx="4" fill="#f9fafb" stroke="#000000" stroke-width="1.2"/>
+            <text x="215" y="297" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#000000" text-anchor="middle">A_t = softmax(Q_t K_{1:t}ᵀ / √d) V_{1:t}</text>
+
+            <!-- Down Arrow -->
+            <line x1="215" y1="312" x2="215" y2="326" stroke="#000000" stroke-width="1.5"/>
+            <polygon points="215,331 211,323 219,323" fill="#000000"/>
+
+            <text x="215" y="347" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7280" text-anchor="middle">Output Token &amp; Dense FFN</text>
+
+            <!-- RIGHT SIDE: BDH -->
+            <!-- Input Token -->
+            <rect x="565" y="70" width="160" height="36" rx="4" fill="#f9fafb" stroke="#000000" stroke-width="1.2"/>
+            <text x="645" y="93" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#000000" text-anchor="middle">Input Token x_t</text>
+
+            <!-- Down Arrow -->
+            <line x1="645" y1="106" x2="645" y2="126" stroke="#000000" stroke-width="1.5"/>
+            <polygon points="645,131 641,123 649,123" fill="#000000"/>
+
+            <!-- Sparse Positive Representation -->
+            <rect x="470" y="132" width="350" height="38" rx="4" fill="#f9fafb" stroke="#000000" stroke-width="1.2"/>
+            <text x="645" y="156" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#000000" text-anchor="middle">Sparse Positive Representation (High-Dim N)</text>
+
+            <!-- Down Arrow -->
+            <line x1="645" y1="170" x2="645" y2="190" stroke="#000000" stroke-width="1.5"/>
+            <polygon points="645,195 641,187 649,187" fill="#000000"/>
+
+            <!-- Inference-Time Synaptic State -->
+            <rect x="470" y="196" width="350" height="52" rx="4" fill="#000000" stroke="#000000" stroke-width="1.5"/>
+            <text x="645" y="218" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">Inference-Time Synaptic State</text>
+            <text x="645" y="236" font-family="JetBrains Mono, monospace" font-size="10" fill="#d1d5db" text-anchor="middle">S_t = Update(S_{t-1}, k_t, v_t) · Constant O(1) in T</text>
+
+            <!-- Down Arrow -->
+            <line x1="645" y1="248" x2="645" y2="268" stroke="#000000" stroke-width="1.5"/>
+            <polygon points="645,273 641,265 649,265" fill="#000000"/>
+
+            <!-- Associative Readout -->
+            <rect x="470" y="274" width="350" height="38" rx="4" fill="#f9fafb" stroke="#000000" stroke-width="1.2"/>
+            <text x="645" y="297" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600" fill="#000000" text-anchor="middle">Associative Readout: y_t = Read(S_t, q_t)</text>
+
+            <!-- Down Arrow -->
+            <line x1="645" y1="312" x2="645" y2="326" stroke="#000000" stroke-width="1.5"/>
+            <polygon points="645,331 641,323 649,323" fill="#000000"/>
+
+            <text x="645" y="347" font-family="JetBrains Mono, monospace" font-size="10" fill="#6b7280" text-anchor="middle">Output Token &amp; Bilinear Gated Sparse MLP</text>
+          </svg>
+        </div>
+        <div class="arch-diagram-footer">
+          Schematic architecture; not a visualization of a trained checkpoint. Grounded in Kosowski et al. (arXiv:2509.26507).
+        </div>
+      </div>
+
+      <!-- Theory vs. GPU Implementation Card -->
+      <div class="dual-spec-card">
+        <div class="dual-spec-header">
+          <h3 class="dual-spec-title">Theoretical Formulation vs. Practical GPU Implementation</h3>
+          <p class="dual-spec-sub">
+            Bridging biological plausibility with modern hardware execution.
+          </p>
+        </div>
+        <div class="dual-spec-grid">
+          <div class="spec-box">
+            <h4 class="spec-title">
+              <span>Theoretical Network Formulation</span>
+              <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span>
+            </h4>
+            <p class="spec-desc">
+              BDH is mathematically formulated as a scale-free network of locally interacting discrete spiking neuron particles. Working memory operates via local synaptic plasticity: synaptic edge strengths update strictly from the co-activation of neighboring particles, providing a biologically plausible alternative to centralized memory buffers.
+            </p>
+          </div>
+          <div class="spec-box">
+            <h4 class="spec-title">
+              <span>Practical GPU Implementation</span>
+              <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span>
+            </h4>
+            <p class="spec-desc">
+              The authors provide a GPU-friendly formulation that approximates/implements the theoretical network using standard tensor operations. This maps local graph updates into dense tensor contractions executed efficiently on GPU Tensor Cores, enabling standard autoregressive training and fast inference.
+            </p>
+          </div>
+        </div>
+        <div style="margin-top: 14px; font-size: 0.78rem; color: #6b7280; font-family: var(--font-mono);">
+          Note on network terminology: BDH is accurately described as a <strong>fixed-size neuron network with dynamically changing synaptic state</strong> rather than simply an unqualified "fixed graph". The physical network topology is fixed, while inference-time synaptic plasticity modifies effective connectivity.
+        </div>
+      </div>
+
+      <!-- Pedagogical Toy Model: Sparse Overlap -->
+      <div class="toy-model-card">
+        <div class="toy-model-header">
+          <h3 class="toy-model-title">Toy Sparse-Overlap Model of Representation Interference</h3>
+          <span class="evidence-badge badge-interpretation">[INTERPRETATION: Pedagogical Toy Model]</span>
+        </div>
+        <div class="toy-model-body">
+          <p>
+            Why does BDH expand input activations into a high-dimensional sparse neuron space? We can build educational intuition through an idealized independent-sparsity model:
+          </p>
+          <ul>
+            <li>Let the network possess <strong>N</strong> possible units in its high-dimensional neuron space.</li>
+            <li>Assume each active concept randomly and independently activates a fraction <strong>p</strong> of these units (so approximately <em>pN</em> units fire).</li>
+            <li>Under this idealized independent random model, the probability that any single unit is activated by both concept A and concept B is <em>p &times; p = p²</em>.</li>
+          </ul>
+          <div class="math-formula-box">
+            Expected Co-activation Overlap: &nbsp; E[overlap] &approx; p² &middot; N
+          </div>
+          <p>
+            When <em>p</em> is small (high sparsity), the expected overlap between two independent concepts scales as <em>p²</em>, drastically reducing associative crosstalk compared to dense representations.
+          </p>
+          <div class="toy-model-caveat">
+            <strong>Educational Qualification:</strong> This is a simplified pedagogical derivation under idealized independent-uniform assumptions, not a measured empirical law of trained BDH checkpoints. In real neural networks, concepts exhibit structured semantic correlation, and capacity is governed by learned synaptic dynamics, representation dimensionality, and training.
+          </div>
+        </div>
+      </div>
+
+      <!-- BDH-CQ Reasoning System Section -->
+      <div class="bdh-cq-card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: #000000; margin: 0 0 4px 0;">
+              BDH-CQ: In-Context Learning with Recurrent Latent Reasoning
+            </h3>
+            <p style="font-size: 0.82rem; color: #4b5563; margin: 0;">
+              Disambiguating the core 2025 memory architecture from the 2026 reasoning system (Engdahl et al., arXiv:2608.09888).
+            </p>
+          </div>
+          <span class="evidence-badge badge-primary">[PRIMARY SOURCE]</span>
+        </div>
+
+        <!-- Temporal Progression Strip -->
+        <div class="bdh-cq-timeline">
+          <div class="timeline-node">
+            <span class="timeline-year">September 2025</span>
+            <span class="timeline-name">BDH (Baby Dragon Hatchling)</span>
+            <div style="font-size: 0.72rem; color: #6b7280;">Architecture &amp; Synaptic Memory (arXiv:2509.26507)</div>
+          </div>
+          <span class="timeline-arrow">&rarr;</span>
+          <div class="timeline-node highlight">
+            <span class="timeline-year">August 2026</span>
+            <span class="timeline-name">BDH-CQ Reasoning System</span>
+            <div style="font-size: 0.72rem; color: #9ca3af;">Recurrent Latent Reasoning for ARC-AGI (arXiv:2608.09888)</div>
+          </div>
+        </div>
+
+        <p style="font-size: 0.86rem; color: #374151; line-height: 1.6;">
+          BDH-CQ is a distinct, later reasoning system built upon the BDH architectural foundation. Unlike standard Chain-of-Thought (CoT) models that generate hundreds of verbalized natural-language tokens to reason, BDH-CQ updates recurrent internal memory during inference and resolves reasoning tasks through iterative computation within a continuous high-dimensional latent space—decoding only the final answer without intermediate token emission.
+        </p>
+
+        <!-- Verified Primary Benchmark Numbers -->
+        <div class="bdh-cq-stats-grid">
+          <div class="stat-metric-card">
+            <span class="stat-metric-val">150M</span>
+            <span class="stat-metric-label">Model Parameters</span>
+            <div class="stat-metric-sub">Lightweight BDH-CQ configuration</div>
+          </div>
+          <div class="stat-metric-card">
+            <span class="stat-metric-val">29.5%</span>
+            <span class="stat-metric-label">Pass@2 Accuracy</span>
+            <div class="stat-metric-sub">Public ARC-AGI-1 evaluation set</div>
+          </div>
+          <div class="stat-metric-card">
+            <span class="stat-metric-val">~$0.0007</span>
+            <span class="stat-metric-label">Reported Computed Cost</span>
+            <div class="stat-metric-sub">Per task (computed inference cost)</div>
+          </div>
+        </div>
+
+        <div class="bdh-cq-caveat-box">
+          <strong>Scientific Framing &amp; Caveats:</strong>
+          <ul style="margin: 6px 0 0 0; padding-left: 18px;">
+            <li><strong>Cost-Accuracy Pareto Frontier:</strong> The authors report 29.5% pass@2 on the public ARC-AGI-1 evaluation set at a computed inference cost of approximately $0.0007 per task. This establishes a highly cost-efficient point on the reported cost-accuracy frontier, rather than the highest raw ARC accuracy.</li>
+            <li><strong>Computed vs. Deployment Cost:</strong> "$0.0007 per task" reflects the authors' reported computed inference cost based on benchmark GPU FLOP accounting, not third-party commercial API pricing.</li>
+            <li><strong>Domain Scope:</strong> The benchmark demonstrates that recurrent latent reasoning can achieve a nontrivial ARC-AGI-1 score at very low reported computed inference cost; it does not establish that recurrent latent reasoning is generally superior to chain-of-thought across arbitrary domains.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Final Thesis Card: What Memory Means -->
+      <div class="final-synthesis-card">
+        <h3 class="synthesis-lead">
+          BDH does not make memory disappear. It changes what memory means.
+        </h3>
+        <p class="synthesis-body">
+          A Transformer stores history as explicitly addressable token states. BDH stores history in an evolving synaptic state. The former preserves direct access to individual tokens at the cost of growing memory; the latter fixes state size but forces information to coexist, interact, and potentially interfere.
+        </p>
+        <p class="synthesis-quote">
+          &ldquo;This is why BDH is not simply a better KV cache. It is a different computational model for memory.&rdquo;
+        </p>
+      </div>
+
+      <!-- Epilogue: Closing the Essay Arc (Chapters 1 to 6) -->
+      <div class="epilogue-section">
+        <h3 class="epilogue-title">Epilogue: The Frontier of AI Memory</h3>
+        <p class="epilogue-text">
+          Across this visual essay, we have traced how modern language models navigate the physical reality of memory:
+        </p>
+        <ul style="padding-left: 20px; font-size: 0.88rem; color: #374151; line-height: 1.7; margin-bottom: 24px;">
+          <li><strong>Chapter 1:</strong> The dilemma between verbatim recording and compressed state.</li>
+          <li><strong>Chapter 2:</strong> The quadratic compute of naive recomputation and why KV caching was invented.</li>
+          <li><strong>Chapter 3:</strong> The physical memory footprint of storing millions of Key and Value vectors in GPU VRAM.</li>
+          <li><strong>Chapter 4:</strong> The memory-bandwidth wall separating compute-bound prefill from memory-bound decode.</li>
+          <li><strong>Chapter 5:</strong> The spectrum of alternatives—from eviction sinks to latent compression and state spaces.</li>
+          <li><strong>Chapter 6:</strong> The frontier of synaptic plasticity: transforming memory from an external token log into an evolving internal state.</li>
+        </ul>
+        <p class="epilogue-text">
+          As context windows expand from thousands to millions of tokens, the boundary between attention, caching, and synaptic memory continues to dissolve. Whether through lower-rank projections, selective state spaces, or biologically inspired plasticity, the future of AI inference lies in discovering how models can remember what matters without suffocating in the weight of their own past.
+        </p>
+
+        <!-- Primary Source References -->
+        <div class="references-card">
+          <h4 class="references-title">Primary Sources &amp; Key References</h4>
+          <ul class="references-list">
+            <li><strong>Kosowski et al. (2025):</strong> <em>The Dragon Hatchling: The Missing Link between the Transformer and Models of the Brain</em>. arXiv:2509.26507.</li>
+            <li><strong>Engdahl et al. (2026):</strong> <em>BDH-CQ: In-Context Learning with Recurrent Latent Reasoning</em>. arXiv:2608.09888.</li>
+            <li><strong>Adrian Kosowski (2025):</strong> Author clarification &amp; summary table on Hugging Face discussion (<a href="https://huggingface.co/papers/2509.26507" target="_blank" rel="noopener noreferrer" style="color:#000000; text-decoration:underline;">huggingface.co/papers/2509.26507</a>).</li>
+            <li><strong>Pope et al. (2023):</strong> <em>Efficiently Scaling Transformer Inference on TPU v4</em>. arXiv:2211.05102.</li>
+            <li><strong>Vaswani et al. (2017):</strong> <em>Attention Is All You Need</em>. Advances in Neural Information Processing Systems 30 (NeurIPS 2017).</li>
+            <li><strong>Xiao et al. (2023):</strong> <em>Efficient Streaming Language Models with Attention Sinks</em> (StreamingLLM). arXiv:2309.17453.</li>
+            <li><strong>DeepSeek-AI (2024):</strong> <em>DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model</em> (Multi-Head Latent Attention). arXiv:2405.04434.</li>
+            <li><strong>Gu &amp; Dao (2023):</strong> <em>Mamba: Linear-Time Sequence Modeling with Selective State Spaces</em>. arXiv:2312.00752.</li>
+          </ul>
+        </div>
+      </div>
+
+    </section>
+    <!-- END CHAPTER 6 -->
   </main>
 
   <script type="module" src="app.js"></script>
 </body>
 </html>
+
 
 

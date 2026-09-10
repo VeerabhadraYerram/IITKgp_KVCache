@@ -675,6 +675,166 @@ function initChapter5() {
   updateComparisonView();
 }
 
+// ─── Chapter 6: What Changes Stepper ───────────────────────────
+function initChapter6() {
+  const contentEl = document.getElementById('stepper-content');
+  const indicatorEl = document.getElementById('stepper-step-indicator');
+  const btnPrev = document.getElementById('btn-step-prev');
+  const btnNext = document.getElementById('btn-step-next');
+  const stepBtns = document.querySelectorAll('.step-pill-btn');
+
+  if (!contentEl) return;
+
+  let currentStep = 0;
+
+  const STEPS = [
+    {
+      tag: 'Step 01 · Transformer Architecture',
+      badgeClass: 'badge-primary',
+      badgeText: '[PRIMARY SOURCE]',
+      badgeSub: 'Architecture',
+      heading: '1. Transformer: Explicit Token-Addressable History',
+      body: 'In standard Transformer attention, every historical token generates an independent Key and Value representation stored directly in GPU High-Bandwidth Memory (HBM). When attending, the model directly evaluates pairwise dot-product similarities against every past position.',
+      diagramHtml: `
+        <div><strong>Input Sequence:</strong> [x₁, x₂, ..., x_T]</div>
+        <div><strong>VRAM Storage:</strong> &nbsp; [k₁, v₁], [k₂, v₂], ..., [k_T, v_T] &nbsp;&rarr;&nbsp; <em>T distinct token memory vectors in VRAM</em></div>
+        <div><strong>Attention:</strong> &nbsp;&nbsp;&nbsp;&nbsp; A_t = softmax(Q_t K_{1:t}ᵀ / &radic;d) V_{1:t}</div>
+      `,
+      footerNote: 'Characteristic: Every historical token preserves its exact individual position and vector representation.'
+    },
+    {
+      tag: 'Step 02 · The Physical Problem',
+      badgeClass: 'badge-derived',
+      badgeText: '[DERIVED]',
+      badgeSub: 'Mathematical Consequence',
+      heading: '2. The Bottleneck: State Size Scales with Context',
+      body: 'Because every token requires dedicated storage across all L layers and n_KV heads, the memory footprint expands linearly with sequence length T. As T grows from thousands to tens of thousands of tokens, multi-gigabyte KV caches must be repeatedly streamed across the memory bus for every single decode step.',
+      diagramHtml: `
+        <div><strong>Memory Footprint:</strong> VRAM_KV = 2 &times; L &times; n_KV &times; d_head &times; T &times; B &times; bytes_per_element</div>
+        <div><strong>Scaling:</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; T &uarr; &nbsp;&implies;&nbsp; VRAM_KV &prop; O(T) &uarr; &nbsp;&implies;&nbsp; <em>Memory-Bandwidth Saturation</em></div>
+        <div><strong>At T=128k:</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Llama-3-70B, FP16) &sim;160 GB VRAM consumed purely by past token cache.</div>
+      `,
+      footerNote: 'Consequence: The GPU Tensor Cores sit idle waiting for memory transfers, collapsing decode arithmetic intensity to ~1.5 FLOP/byte (Chapter 4).'
+    },
+    {
+      tag: 'Step 03 · BDH Architectural Shift',
+      badgeClass: 'badge-primary',
+      badgeText: '[PRIMARY SOURCE]',
+      badgeSub: 'Architecture',
+      heading: '3. BDH: History Compressed into Recurrent Synaptic State',
+      body: 'BDH replaces external token buffers with an evolving internal synaptic state. Input activations are projected into a high-dimensional sparse non-negative neuron space, and history is repeatedly accumulated into the synaptic connections S_t via associative plasticity.',
+      diagramHtml: `
+        <div><strong>Input Token:</strong> &nbsp;&nbsp;&nbsp;&nbsp; x_t &nbsp;&rarr;&nbsp; Sparse Positive Activation: a_t &ge; 0 (High dimension N)</div>
+        <div><strong>Synaptic Update:</strong> S_t = Update(S_{t-1}, k_t, v_t)</div>
+        <div><strong>Memory Scaling:</strong> &nbsp; Fixed size O(1) with respect to sequence length T</div>
+      `,
+      footerNote: 'Characteristic: No external KV cache is retained. The physical state footprint is constant whether T=100 or T=100,000.'
+    },
+    {
+      tag: 'Step 04 · The Fundamental Trade-off',
+      badgeClass: 'badge-derived',
+      badgeText: '[DERIVED]',
+      badgeSub: 'Architectural Trade-off',
+      heading: '4. The Trade-off: What We Gain vs. What We Give Up',
+      body: 'BDH removes the requirement to allocate one persistent KV entry per token, but it does not create infinite information capacity. Memory is transformed from an externalized lookup table into an evolving internal state.',
+      isTradeoff: true,
+      tradeoffGain: [
+        'Sequence-length-independent state size (O(1) w.r.t. T)',
+        'Elimination of decode-time multi-gigabyte KV cache streaming transfers',
+        'Substantially higher concurrent serving throughput under fixed GPU VRAM',
+        'Inherent recurrent working memory updated in place'
+      ],
+      tradeoffCost: [
+        'Finite information capacity: cannot store unbounded historical precision',
+        'Associative interference: concurrent concepts share high-dimensional synaptic pathways',
+        'No exact token-addressable retrieval of arbitrary past states',
+        'System behavior is governed by learned recurrent dynamics rather than verbatim lookup'
+      ],
+      footerNote: 'Conclusion: BDH does not make memory disappear—it changes what memory means.'
+    }
+  ];
+
+  function renderStep(idx) {
+    currentStep = idx;
+    const s = STEPS[idx];
+
+    let html = `
+      <div class="step-badge-row">
+        <span class="step-num-tag">${s.tag}</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span class="evidence-badge ${s.badgeClass}">${s.badgeText}</span>
+          <span style="font-size: 0.72rem; color: #6b7280; font-family: var(--font-mono);">${s.badgeSub}</span>
+        </div>
+      </div>
+      <h4 class="step-heading">${s.heading}</h4>
+      <p class="step-body-text">${s.body}</p>
+    `;
+
+    if (s.isTradeoff) {
+      html += `
+        <div class="step-tradeoff-grid">
+          <div class="tradeoff-col tradeoff-gain">
+            <h5 class="tradeoff-title">What We Gain &uarr;</h5>
+            <ul class="tradeoff-list">
+              ${s.tradeoffGain.map(g => `<li>${g}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="tradeoff-col tradeoff-cost">
+            <h5 class="tradeoff-title">What We Give Up &darr;</h5>
+            <ul class="tradeoff-list">
+              ${s.tradeoffCost.map(c => `<li>${c}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      `;
+    } else {
+      html += `
+        <div class="step-diagram-box">
+          ${s.diagramHtml}
+        </div>
+      `;
+    }
+
+    html += `
+      <div style="font-size: 0.78rem; color: #6b7280; font-family: var(--font-mono); margin-top: 14px; border-top: 1px dashed #e5e7eb; padding-top: 10px;">
+        ${s.footerNote}
+      </div>
+    `;
+
+    contentEl.innerHTML = html;
+
+    // Update nav pills
+    stepBtns.forEach((btn, bIdx) => {
+      btn.classList.toggle('active', bIdx === idx);
+    });
+
+    // Update controls
+    if (indicatorEl) {
+      indicatorEl.textContent = `Step ${idx + 1} of ${STEPS.length}`;
+    }
+    if (btnPrev) btnPrev.disabled = (idx === 0);
+    if (btnNext) btnNext.disabled = (idx === STEPS.length - 1);
+  }
+
+  stepBtns.forEach((btn, idx) => {
+    btn.addEventListener('click', () => renderStep(idx));
+  });
+
+  if (btnPrev) {
+    btnPrev.addEventListener('click', () => {
+      if (currentStep > 0) renderStep(currentStep - 1);
+    });
+  }
+
+  if (btnNext) {
+    btnNext.addEventListener('click', () => {
+      if (currentStep < STEPS.length - 1) renderStep(currentStep + 1);
+    });
+  }
+
+  renderStep(0);
+}
+
 // ─── Main Initialization ───────────────────────────────────────
 function init() {
   initTypewriter();
@@ -683,6 +843,7 @@ function init() {
   initChapter3();
   initChapter4();
   initChapter5();
+  initChapter6();
 }
 
 if (document.readyState === 'loading') {
@@ -690,5 +851,6 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+
 
 

@@ -2433,3 +2433,780 @@ body::before {
   margin: 0;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   CHAPTER 6: BDH AS AN INTEGRATED REDESIGN, NOT A TWEAK
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Evidence Badging System */
+.evidence-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 7px;
+  border-radius: 3px;
+  line-height: 1;
+}
+
+.badge-primary {
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+}
+
+.badge-derived {
+  background: #f3f4f6;
+  color: #111827;
+  border: 1px solid #9ca3af;
+}
+
+.badge-interpretation {
+  background: #ffffff;
+  color: #374151;
+  border: 1px dashed #6b7280;
+}
+
+.evidence-legend-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-sm);
+  margin-bottom: 24px;
+}
+
+.evidence-legend-title {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #111827;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.evidence-legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 0.76rem;
+  color: #4b5563;
+}
+
+.evidence-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Primary Source Quote Card */
+.quote-card {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-left: 6px solid #000000;
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  margin-bottom: 28px;
+}
+
+.quote-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quote-source-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+}
+
+.quote-body {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.6;
+  color: #111827;
+  margin-bottom: 14px;
+}
+
+.quote-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 0.8rem;
+  color: #4b5563;
+}
+
+.quote-link {
+  color: #000000;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.quote-link:hover {
+  color: #4b5563;
+}
+
+/* 6-Difference Restructured Table */
+.author-table-card {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+
+.author-table-header {
+  padding: 16px 20px;
+  background: #f9fafb;
+  border-bottom: 1px solid #000000;
+}
+
+.author-table-title {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 4px 0;
+}
+
+.author-table-sub {
+  font-size: 0.8rem;
+  color: #4b5563;
+  margin: 0;
+}
+
+.author-table-wrapper {
+  overflow-x: auto;
+}
+
+.author-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+  text-align: left;
+}
+
+.author-table th,
+.author-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.author-table th {
+  background: #ffffff;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #111827;
+  font-weight: 700;
+  border-bottom: 1.5px solid #000000;
+}
+
+.author-table td.dim-col {
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+  width: 18%;
+  background: #fafafa;
+}
+
+.author-table td.bdh-col {
+  width: 38%;
+}
+
+.author-table td.tf-col {
+  width: 32%;
+  color: #4b5563;
+}
+
+.author-table td.status-col {
+  width: 12%;
+  white-space: nowrap;
+}
+
+.author-table tr:hover td {
+  background-color: #fcfcfc;
+}
+
+.table-cell-lead {
+  font-weight: 700;
+  color: #000000;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.table-cell-desc {
+  font-size: 0.78rem;
+  color: #4b5563;
+}
+
+/* Interactive "What Changes?" Sequence Stepper */
+.stepper-container {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.stepper-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.stepper-title-group {
+  max-width: 600px;
+}
+
+.stepper-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 4px 0;
+}
+
+.stepper-subtitle {
+  font-size: 0.82rem;
+  color: #4b5563;
+  margin: 0;
+}
+
+.stepper-nav {
+  display: flex;
+  gap: 8px;
+}
+
+.step-pill-btn {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.step-pill-btn:hover {
+  border-color: #000000;
+  color: #000000;
+}
+
+.step-pill-btn.active {
+  background: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.step-card {
+  border: 1px solid #e5e7eb;
+  background: #fafafa;
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.step-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.step-num-tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.step-heading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 12px 0;
+}
+
+.step-body-text {
+  font-size: 0.88rem;
+  color: #374151;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.step-diagram-box {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #111827;
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+
+.step-tradeoff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.tradeoff-col {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.tradeoff-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 8px 0;
+}
+
+.tradeoff-gain {
+  color: #111827;
+  border-top: 2px solid #000000;
+}
+
+.tradeoff-cost {
+  color: #4b5563;
+  border-top: 2px dashed #6b7280;
+}
+
+.tradeoff-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.8rem;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.tradeoff-list li {
+  margin-bottom: 6px;
+}
+
+.stepper-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.stepper-nav-btn {
+  background: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #000000;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.stepper-nav-btn:hover:not(:disabled) {
+  background: #000000;
+  color: #ffffff;
+}
+
+.stepper-nav-btn:disabled {
+  border-color: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Static Architecture Schematic Diagram */
+.arch-diagram-card {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.arch-diagram-header {
+  margin-bottom: 16px;
+}
+
+.arch-diagram-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 4px 0;
+}
+
+.arch-diagram-sub {
+  font-size: 0.8rem;
+  color: #4b5563;
+  margin: 0;
+}
+
+.arch-diagram-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.arch-diagram-svg {
+  width: 100%;
+  min-width: 720px;
+  height: auto;
+  display: block;
+}
+
+.arch-diagram-footer {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-family: var(--font-mono);
+}
+
+/* Dual Specification (Theory vs GPU) Card */
+.dual-spec-card {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.dual-spec-header {
+  margin-bottom: 16px;
+}
+
+.dual-spec-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 4px 0;
+}
+
+.dual-spec-sub {
+  font-size: 0.8rem;
+  color: #4b5563;
+  margin: 0;
+}
+
+.dual-spec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.spec-box {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.spec-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.spec-desc {
+  font-size: 0.82rem;
+  color: #4b5563;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Toy Sparse Overlap Box */
+.toy-model-card {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.toy-model-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.toy-model-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #000000;
+  margin: 0;
+}
+
+.toy-model-body {
+  font-size: 0.84rem;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.math-formula-box {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 14px 18px;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  color: #111827;
+  text-align: center;
+  margin: 14px 0;
+}
+
+.toy-model-caveat {
+  font-size: 0.78rem;
+  color: #6b7280;
+  border-left: 3px solid #9ca3af;
+  padding-left: 10px;
+  margin-top: 12px;
+}
+
+/* BDH-CQ Reasoning System Section */
+.bdh-cq-card {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.bdh-cq-timeline {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.timeline-node {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 8px 14px;
+}
+
+.timeline-node.highlight {
+  background: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.timeline-year {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: block;
+}
+
+.timeline-node.highlight .timeline-year {
+  color: #9ca3af;
+}
+
+.timeline-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.timeline-arrow {
+  font-size: 1.2rem;
+  color: #9ca3af;
+}
+
+.bdh-cq-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.stat-metric-card {
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+}
+
+.stat-metric-val {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000000;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.stat-metric-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4b5563;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.stat-metric-sub {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.bdh-cq-caveat-box {
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 14px 16px;
+  font-size: 0.8rem;
+  color: #374151;
+  line-height: 1.55;
+  margin-top: 16px;
+}
+
+/* Final Synthesis Card */
+.final-synthesis-card {
+  background: #000000;
+  color: #ffffff;
+  border-radius: var(--radius-sm);
+  padding: 32px;
+  margin-bottom: 32px;
+}
+
+.synthesis-lead {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0 0 16px 0;
+  letter-spacing: -0.01em;
+}
+
+.synthesis-body {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #d1d5db;
+  margin-bottom: 16px;
+}
+
+.synthesis-quote {
+  font-size: 1rem;
+  font-style: italic;
+  color: #ffffff;
+  border-left: 3px solid #ffffff;
+  padding-left: 16px;
+  margin: 20px 0 0 0;
+  line-height: 1.6;
+}
+
+/* Epilogue / Closing Perspective */
+.epilogue-section {
+  border-top: 2px solid #000000;
+  padding-top: 40px;
+  margin-top: 40px;
+  margin-bottom: 60px;
+}
+
+.epilogue-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 16px 0;
+}
+
+.epilogue-text {
+  font-size: 0.9rem;
+  color: #374151;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.references-card {
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  margin-top: 24px;
+}
+
+.references-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #111827;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 12px 0;
+}
+
+.references-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 0.78rem;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.references-list li {
+  margin-bottom: 6px;
+}
+
+@media (max-width: 768px) {
+  .step-tradeoff-grid,
+  .dual-spec-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stepper-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+
