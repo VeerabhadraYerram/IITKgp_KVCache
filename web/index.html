@@ -19,6 +19,34 @@
 </head>
 <body>
 
+  <!-- ③ CHAPTER NAV RAIL (Fixed Left Sidebar) -->
+  <nav id="chapter-nav" aria-label="Chapter navigation">
+    <button class="nav-pill active" data-target="hero">
+      <span class="nav-pill-dot"></span>Intro
+    </button>
+    <button class="nav-pill" data-target="chapter-1">
+      <span class="nav-pill-dot"></span>Ch 1
+    </button>
+    <button class="nav-pill" data-target="chapter-2">
+      <span class="nav-pill-dot"></span>Ch 2
+    </button>
+    <button class="nav-pill" data-target="chapter-3">
+      <span class="nav-pill-dot"></span>Ch 3
+    </button>
+    <button class="nav-pill" data-target="chapter-4">
+      <span class="nav-pill-dot"></span>Ch 4
+    </button>
+    <button class="nav-pill" data-target="chapter-5">
+      <span class="nav-pill-dot"></span>Ch 5
+    </button>
+    <button class="nav-pill" data-target="chapter-6">
+      <span class="nav-pill-dot"></span>Ch 6
+    </button>
+    <button class="nav-pill" data-target="quiz-section">
+      <span class="nav-pill-dot"></span>Quiz
+    </button>
+  </nav>
+
   <!-- ════════════════════════════════════════════════════════════ -->
   <!-- BACKGROUND GEOMETRIC ELEMENTS (Fixed Technical Wallpaper)    -->
   <!-- ════════════════════════════════════════════════════════════ -->
@@ -249,6 +277,11 @@
             ▶ Run Live Browser Benchmark
           </button>
         </div>
+      </div>
+
+      <!-- ⑦ Scroll-Trigger Auto-Run Banner -->
+      <div class="auto-run-banner hidden" id="auto-run-banner">
+        <span>⚡</span> Auto-running live benchmark — scroll triggered computation
       </div>
 
       <!-- Measured Runtime Metrics -->
@@ -1380,6 +1413,63 @@
         </div>
       </div>
 
+      <!-- ① SURGERY HUD: 3-Knob Interactive Sandbox -->
+      <div class="surgery-hud-section">
+        <div class="surgery-hud-header">
+          <div>
+            <h3 class="surgery-hud-title">Live BDH Memory Surgery</h3>
+            <p class="surgery-hud-desc">Adjust density, capacity, and key similarity to observe how the Recall–Interference trade-off shifts in real time.</p>
+          </div>
+          <span class="evidence-badge badge-audited">◈ LIVE EMPIRICAL</span>
+        </div>
+        <div class="surgery-hud-layout">
+          <div class="surgery-controls-panel">
+            <div id="surgery-controls"></div>
+          </div>
+          <div class="surgery-canvas-panel">
+            <canvas id="surgery-hud-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- ② CRIME SCENE VISUALIZER: Interference Forensics -->
+      <div class="crime-scene-section">
+        <div class="crime-scene-header">
+          <h3 class="crime-scene-title">🔍 Memory Crime Scene — Interference Forensics</h3>
+          <span class="evidence-badge badge-audited">◈ LIVE EMPIRICAL</span>
+        </div>
+        <p class="crime-scene-desc">
+          For each queried concept, which other stored memories share active neurons and cause retrieval interference? Updates live with slider changes above.
+        </p>
+        <div id="crime-scene-table-wrapper">
+          <table class="crime-scene-table" id="crime-scene-table">
+            <thead>
+              <tr>
+                <th>Query Concept</th>
+                <th>Recall Match</th>
+                <th>Top Interferer #1</th>
+                <th>Top Interferer #2</th>
+                <th>Top Interferer #3</th>
+              </tr>
+            </thead>
+            <tbody id="crime-scene-tbody">
+              <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px;">Adjust sliders above to run experiment…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ⑤ BDH-CQ PARETO CHART: Cost vs Accuracy -->
+      <div class="pareto-section">
+        <div class="pareto-header">
+          <h3 class="pareto-title">BDH-CQ Pareto Frontier: Cost vs. Accuracy</h3>
+          <p class="pareto-desc">Each model plotted on cost-per-task (log scale) vs. ARC-AGI-1 accuracy. BDH-CQ dominates the cost-efficiency frontier at $0.0007/task.</p>
+        </div>
+        <div class="pareto-canvas-wrapper">
+          <canvas id="pareto-canvas"></canvas>
+        </div>
+      </div>
+
       <!-- BDH-CQ System -->
       <div class="bdh-cq-card">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
@@ -1458,6 +1548,21 @@
             <li><strong>Gu &amp; Dao (2023):</strong> <em>Mamba: Linear-Time Sequence Modeling with Selective State Spaces</em>. arXiv:2312.00752.</li>
           </ul>
         </div>
+      </div>
+
+      <!-- ④ EPILOGUE QUIZ: The Sixty-Second Test -->
+      <div class="quiz-section" id="quiz-section">
+        <div class="quiz-header">
+          <h3 class="quiz-title">⏱ The Sixty-Second Test</h3>
+          <div class="quiz-timer" id="quiz-timer">60s</div>
+        </div>
+        <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:16px;line-height:1.5;">
+          You have explored KV caches, memory bandwidth, and synaptic plasticity. Answer these 5 questions to close the loop on the opening thesis.
+        </p>
+        <div class="quiz-progress-bar-track">
+          <div class="quiz-progress-bar-fill" id="quiz-progress-bar" style="width:0%"></div>
+        </div>
+        <div id="quiz-body"></div>
       </div>
     </section>
   </main>

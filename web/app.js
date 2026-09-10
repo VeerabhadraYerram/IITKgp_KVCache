@@ -12,6 +12,8 @@ import { calculateKVCacheMemory, MODEL_PRESETS, GPU_SPECS, PRECISIONS } from './
 import { KV3DVisualizer } from './visualizers/kv_3d_visualizer.js';
 import { BandwidthCanvas } from './visualizers/bandwidth_canvas.js';
 import { MemoryComparisonCanvas, APPROACHES } from './visualizers/memory_comparison_canvas.js';
+import { SurgeryHUD } from './visualizers/surgery_hud.js';
+import { runRecallExperiment } from './engine/memory_experiment.js';
 
 // ─── Chapter 1: Typewriter Animation ───────────────────────────
 function initTypewriter() {
@@ -844,6 +846,12 @@ function init() {
   initChapter4();
   initChapter5();
   initChapter6();
+  // New features
+  initChapterNav();      // ③ Floating chapter nav rail
+  initSurgeryHUD();      // ① Surgery HUD + ② Crime Scene
+  initParetoChart();     // ⑤ Pareto scatter plot
+  initEpilogueQuiz();    // ④ Epilogue quiz
+  initScrollTrigger();   // ⑦ Auto-run benchmark on scroll
 }
 
 if (document.readyState === 'loading') {
@@ -851,6 +859,408 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+
+// ══════════════════════════════════════════════════════════════
+// ③ CHAPTER NAV RAIL
+// ══════════════════════════════════════════════════════════════
+function initChapterNav() {
+  const nav = document.getElementById('chapter-nav');
+  if (!nav) return;
+
+  const pills = nav.querySelectorAll('.nav-pill');
+  const sections = ['hero', 'chapter-1', 'chapter-2', 'chapter-3', 'chapter-4', 'chapter-5', 'chapter-6', 'quiz-section'];
+
+  // Click → smooth scroll
+  pills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      const target = document.getElementById(pill.dataset.target);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // IntersectionObserver → highlight active pill
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        pills.forEach(p => p.classList.toggle('active', p.dataset.target === id));
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '-10% 0px -50% 0px' });
+
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// ① SURGERY HUD + ② CRIME SCENE VISUALIZER
+// ══════════════════════════════════════════════════════════════
+function initSurgeryHUD() {
+  const canvas = document.getElementById('surgery-hud-canvas');
+  const controls = document.getElementById('surgery-controls');
+  if (!canvas || !controls) return;
+
+  // Instantiate the Surgery HUD — it builds its own controls and draws the curve
+  const hud = new SurgeryHUD('surgery-hud-canvas', 'surgery-controls');
+
+  // ② Listen for result events to populate the Crime Scene table
+  window.addEventListener('surgery-result', (e) => {
+    renderCrimeScene(e.detail.result);
+  });
+
+  // Trigger initial crime scene render once HUD has data
+  hud.runExperiment();
+}
+
+function renderCrimeScene(result) {
+  const tbody = document.getElementById('crime-scene-tbody');
+  if (!tbody || !result) return;
+
+  const { recalls, crimeScenes } = result;
+
+  if (!recalls || recalls.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px;">No data yet…</td></tr>';
+    return;
+  }
+
+  const overlapCell = (overlap) => {
+    if (!overlap) return '<td style="color:var(--text-muted)">—</td>';
+    const pct = Math.round(overlap.overlapFraction * 100);
+    const cls = pct >= 40 ? 'overlap-high' : pct >= 15 ? 'overlap-med' : 'overlap-low';
+    const barW = Math.max(2, Math.round(pct * 0.6));
+    return `<td class="${cls}"><span class="overlap-bar" style="width:${barW}px"></span>${overlap.label} <span style="opacity:.6">(${pct}%)</span></td>`;
+  };
+
+  tbody.innerHTML = recalls.map((r, i) => {
+    const scene = crimeScenes[i] || { overlaps: [] };
+    const matchClass = r.match ? 'match-yes' : 'match-no';
+    const matchIcon = r.match ? '✓ Match' : '✗ Miss';
+    return `
+      <tr>
+        <td><strong>${r.label}</strong></td>
+        <td class="${matchClass}">${matchIcon}</td>
+        ${overlapCell(scene.overlaps[0])}
+        ${overlapCell(scene.overlaps[1])}
+        ${overlapCell(scene.overlaps[2])}
+      </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// ⑤ BDH-CQ PARETO SCATTER CHART
+// ══════════════════════════════════════════════════════════════
+function initParetoChart() {
+  const canvas = document.getElementById('pareto-canvas');
+  if (!canvas) return;
+
+  // Set canvas physical resolution
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = (rect.width || 600) * dpr;
+  canvas.height = 320 * dpr;
+  canvas.style.width = (rect.width || 600) + 'px';
+  canvas.style.height = '320px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const W = rect.width || 600;
+  const H = 320;
+  const pad = { top: 40, right: 40, bottom: 55, left: 70 };
+  const plotW = W - pad.left - pad.right;
+  const plotH = H - pad.top - pad.bottom;
+
+  // Data: [label, cost_per_task_usd, arc_agi_accuracy_pct, isBDH]
+  const models = [
+    ['BDH-CQ (150M)', 0.0007, 29.5, true],
+    ['Gemini Flash', 0.003, 32, false],
+    ['o1-mini', 0.08, 62, false],
+    ['GPT-4o', 0.12, 55, false],
+    ['Claude 3.5 Sonnet', 0.15, 68, false],
+  ];
+
+  // Log scale for cost: from 0.0001 to 1.0
+  const costMin = Math.log10(0.0005);
+  const costMax = Math.log10(0.5);
+  const accMin = 0;
+  const accMax = 80;
+
+  const xScale = (cost) => pad.left + ((Math.log10(cost) - costMin) / (costMax - costMin)) * plotW;
+  const yScale = (acc) => pad.top + plotH - ((acc - accMin) / (accMax - accMin)) * plotH;
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#fafafa';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+  ctx.lineWidth = 1;
+  [20, 40, 60, 80].forEach(acc => {
+    const y = yScale(acc);
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + plotW, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.font = '10px Inter';
+    ctx.textAlign = 'right';
+    ctx.fillText(acc + '%', pad.left - 6, y + 4);
+  });
+  [-3, -2, -1, 0].forEach(exp => {
+    const x = xScale(Math.pow(10, exp));
+    if (x < pad.left || x > pad.left + plotW) return;
+    ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + plotH); ctx.stroke();
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.font = '10px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText('$' + Math.pow(10, exp).toFixed(exp < 0 ? Math.abs(exp) : 0), x, pad.top + plotH + 18);
+  });
+
+  // Axes
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top);
+  ctx.lineTo(pad.left, pad.top + plotH);
+  ctx.lineTo(pad.left + plotW, pad.top + plotH);
+  ctx.stroke();
+
+  // Axis labels
+  ctx.fillStyle = '#000000';
+  ctx.font = 'bold 11px Inter';
+  ctx.textAlign = 'center';
+  ctx.fillText('Cost per Task (USD, log scale) →', pad.left + plotW / 2, H - 8);
+  ctx.save();
+  ctx.translate(14, pad.top + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('ARC-AGI-1 Accuracy (%) →', 0, 0);
+  ctx.restore();
+
+  // Title
+  ctx.font = 'bold 12px Inter';
+  ctx.textAlign = 'center';
+  ctx.fillText('Cost–Efficiency Pareto Frontier', pad.left + plotW / 2, 20);
+
+  // Pareto frontier line (connect BDH-CQ to best accuracy model going right)
+  const sorted = [...models].sort((a, b) => a[1] - b[1]);
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  sorted.forEach(([, cost, acc], i) => {
+    const x = xScale(cost), y = yScale(acc);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Plot each model
+  models.forEach(([label, cost, acc, isBDH]) => {
+    const x = xScale(cost);
+    const y = yScale(acc);
+    const r = isBDH ? 9 : 6;
+
+    // Outer ring for BDH
+    if (isBDH) {
+      ctx.beginPath();
+      ctx.arc(x, y, 16, 0, Math.PI * 2);
+      ctx.strokeStyle = '#065f46';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([3, 3]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Dot
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = isBDH ? '#065f46' : '#000000';
+    ctx.fill();
+
+    // Label
+    ctx.font = isBDH ? 'bold 11px Inter' : '10px Inter';
+    ctx.fillStyle = '#000000';
+    ctx.textAlign = 'center';
+    const labelY = isBDH ? y - 22 : (acc > 50 ? y - 14 : y + 20);
+    ctx.fillText(label, x, labelY);
+
+    if (isBDH) {
+      ctx.font = '9px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#065f46';
+      ctx.fillText('← Cost-Efficiency Leader', x + 60, y + 4);
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// ④ EPILOGUE QUIZ
+// ══════════════════════════════════════════════════════════════
+function initEpilogueQuiz() {
+  const body = document.getElementById('quiz-body');
+  const timerEl = document.getElementById('quiz-timer');
+  const progressBar = document.getElementById('quiz-progress-bar');
+  if (!body) return;
+
+  const QUESTIONS = [
+    {
+      q: 'In Chapter 1, a legal compliance AI asks for the exact dollar figure from Turn 3. Which memory strategy guarantees it can retrieve "$1,450,000" verbatim 50 turns later?',
+      options: ['A. Compressed associative state (BDH)', 'B. Verbatim KV cache store', 'C. Sliding window with attention sinks', 'D. It doesn\'t matter — all approaches recall this equally'],
+      correct: 1,
+      explanation: 'Only the verbatim KV cache preserves exact token-level recall. BDH and SSMs trade this for constant memory.'
+    },
+    {
+      q: 'What is the memory complexity of a standard KV cache as context length T grows?',
+      options: ['A. O(1) — constant, independent of T', 'B. O(log T) — logarithmic growth', 'C. O(T) — linear growth with sequence length', 'D. O(T²) — quadratic growth'],
+      correct: 2,
+      explanation: 'VRAM_KV = 2 × L × n_KV × d_head × T × B × bytes — linear in T. This is the core bottleneck.'
+    },
+    {
+      q: 'The GPU Roofline model in Chapter 4 shows that autoregressive decode has arithmetic intensity of ~1–2 FLOP/byte. This means decode is:',
+      options: ['A. Compute-bound — Tensor Cores are the bottleneck', 'B. Memory-bandwidth bound — HBM transfers are the bottleneck', 'C. Neither — the GPU is perfectly balanced', 'D. I/O bound — disk access is the bottleneck'],
+      correct: 1,
+      explanation: 'At 1–2 FLOP/byte, decode is far below the Roofline knee (~153 FLOP/byte on A100). The HBM memory bus is the bottleneck, not compute.'
+    },
+    {
+      q: 'BDH\'s key architectural property is that its inference-time state footprint is:',
+      options: ['A. O(T) — grows linearly with context length', 'B. O(d²) — grows with the square of embedding dimension', 'C. O(1) — constant regardless of sequence length T', 'D. O(log T) — grows logarithmically'],
+      correct: 2,
+      explanation: 'BDH stores history in a fixed synaptic matrix S ∈ R^(N×D). This state is constant in T — the memory footprint does not grow as the conversation lengthens.'
+    },
+    {
+      q: 'When two concepts "Alpha" and "Beta" share active neurons in the BDH sparse representation, the expected cross-talk (interference) scales as:',
+      options: ['A. Proportional to p (density)', 'B. Proportional to p² (density squared)', 'C. Proportional to N (total neuron count)', 'D. Independent of density — always constant'],
+      correct: 1,
+      explanation: 'E[overlap] ∝ p² — this is the key mathematical result. Sparse representations (small p) drive interference down quadratically, which is why BDH targets ~5% active density.'
+    }
+  ];
+
+  let current = 0;
+  let answers = new Array(QUESTIONS.length).fill(null);
+  let timerSec = 60;
+  let timerInterval = null;
+  let quizStarted = false;
+
+  function startTimer() {
+    if (timerInterval) return;
+    timerInterval = setInterval(() => {
+      timerSec--;
+      if (timerEl) {
+        timerEl.textContent = timerSec + 's';
+        timerEl.classList.toggle('urgent', timerSec <= 15);
+      }
+      if (timerSec <= 0) {
+        clearInterval(timerInterval);
+        showResult();
+      }
+    }, 1000);
+  }
+
+  function renderQuestion(idx) {
+    if (idx >= QUESTIONS.length) { showResult(); return; }
+    const q = QUESTIONS[idx];
+    if (progressBar) progressBar.style.width = `${(idx / QUESTIONS.length) * 100}%`;
+
+    const answered = answers[idx] !== null;
+    body.innerHTML = `
+      <div class="quiz-question-card">
+        <div class="quiz-q-number">Question ${idx + 1} of ${QUESTIONS.length}</div>
+        <p class="quiz-q-text">${q.q}</p>
+        <div class="quiz-options">
+          ${q.options.map((opt, i) => {
+            let cls = 'quiz-option-btn';
+            if (answered) {
+              if (i === q.correct) cls += ' correct';
+              else if (i === answers[idx]) cls += ' wrong';
+            } else if (i === answers[idx]) cls += ' selected';
+            return `<button class="${cls}" data-idx="${i}" ${answered ? 'disabled' : ''}>
+              <span class="quiz-option-letter">${String.fromCharCode(65 + i)}</span>${opt.substring(3)}
+            </button>`;
+          }).join('')}
+        </div>
+        ${answered ? `<p style="margin-top:12px;font-size:0.76rem;color:var(--text-muted);border-left:2px solid rgba(0,0,0,0.2);padding-left:8px;">${q.explanation}</p>` : ''}
+      </div>
+      <div class="quiz-nav">
+        <button class="quiz-nav-btn" id="quiz-prev" ${idx === 0 ? 'disabled' : ''}>← Prev</button>
+        <span class="quiz-q-status">${answers.filter(a => a !== null).length}/${QUESTIONS.length} answered</span>
+        <button class="quiz-nav-btn" id="quiz-next">${idx === QUESTIONS.length - 1 ? 'See Results →' : 'Next →'}</button>
+      </div>`;
+
+    // Option click
+    body.querySelectorAll('.quiz-option-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!quizStarted) { quizStarted = true; startTimer(); }
+        answers[idx] = parseInt(btn.dataset.idx);
+        renderQuestion(idx);
+      });
+    });
+
+    document.getElementById('quiz-prev')?.addEventListener('click', () => renderQuestion(idx - 1));
+    document.getElementById('quiz-next')?.addEventListener('click', () => {
+      if (idx === QUESTIONS.length - 1) showResult();
+      else renderQuestion(idx + 1);
+    });
+  }
+
+  function showResult() {
+    clearInterval(timerInterval);
+    const score = answers.reduce((s, a, i) => s + (a === QUESTIONS[i].correct ? 1 : 0), 0);
+    const pct = Math.round((score / QUESTIONS.length) * 100);
+    if (progressBar) progressBar.style.width = '100%';
+    const grades = [
+      [100, '🏆 Perfect — You understand the frontier!', 'You nailed every concept from KV cache complexity to BDH synaptic interference.'],
+      [80, '🎯 Excellent — Deep understanding demonstrated.', 'You grasp the core trade-offs between verbatim recall and constant-memory architectures.'],
+      [60, '✓ Good — Solid grasp of the fundamentals.', 'Review the Roofline model (Ch 4) and the E[overlap] ∝ p² interference result (Ch 6).'],
+      [40, '📖 Partial — A few concepts to revisit.', 'Re-read Chapters 3 and 6 on VRAM scaling and BDH\'s synaptic state properties.'],
+      [0, '🔁 Keep exploring — the essay is your guide.', 'Scroll back to Chapter 1 and follow the narrative from KV cache to synaptic memory.'],
+    ];
+    const [, grade, gradeSub] = grades.find(([min]) => pct >= min);
+    body.innerHTML = `
+      <div class="quiz-result-card">
+        <div class="quiz-score-big">${score}/${QUESTIONS.length}</div>
+        <div class="quiz-score-label">${pct}% correct</div>
+        <div class="quiz-grade">${grade}</div>
+        <div class="quiz-grade-sub">${gradeSub}</div>
+        <button class="quiz-restart-btn" id="quiz-restart">↺ Try Again</button>
+      </div>`;
+    document.getElementById('quiz-restart')?.addEventListener('click', () => {
+      answers = new Array(QUESTIONS.length).fill(null);
+      timerSec = 60; quizStarted = false; current = 0;
+      timerInterval = null;
+      if (timerEl) { timerEl.textContent = '60s'; timerEl.classList.remove('urgent'); }
+      renderQuestion(0);
+    });
+  }
+
+  renderQuestion(0);
+}
+
+// ══════════════════════════════════════════════════════════════
+// ⑦ SCROLL-TRIGGERED BENCHMARK AUTO-RUN
+// ══════════════════════════════════════════════════════════════
+function initScrollTrigger() {
+  const chapter2 = document.getElementById('chapter-2');
+  const banner = document.getElementById('auto-run-banner');
+  const btn = document.getElementById('btn-run-benchmark');
+  if (!chapter2 || !btn) return;
+
+  let hasAutoRun = false;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !hasAutoRun) {
+        hasAutoRun = true;
+        observer.disconnect();
+        if (banner) banner.classList.remove('hidden');
+        setTimeout(() => {
+          btn.click();
+          setTimeout(() => { if (banner) banner.classList.add('hidden'); }, 3000);
+        }, 500);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  observer.observe(chapter2);
+}
+
 
 
 

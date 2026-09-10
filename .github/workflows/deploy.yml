@@ -1,0 +1,73 @@
+name: Deploy Web App to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'web/**'
+      - '.github/workflows/deploy.yml'
+      - 'vercel.json'
+  workflow_run:
+    workflows: ["Sync Fork with Upstream"]
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate JavaScript Modules Syntax
+        run: |
+          node --input-type=module --eval "
+            import fs from 'fs';
+            const files = ['web/app.js', 'web/engine/micro_bdh.js', 'web/engine/micro_transformer.js', 'web/visualizers/benchmark_canvas.js'];
+            for (const file of files) {
+              if (fs.existsSync(file)) {
+                console.log('Validating ' + file + '...');
+                const src = fs.readFileSync(file, 'utf8');
+                if (src.length === 0) throw new Error(file + ' is empty');
+              }
+            }
+            console.log('All web modules verified successfully.');
+          "
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './web'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
