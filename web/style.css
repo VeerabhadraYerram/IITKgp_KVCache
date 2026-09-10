@@ -3264,3 +3264,261 @@ body.dark-mode option {
     box-sizing: border-box !important;
   }
 }
+
+
+/* ===================================================================
+   CYBER OLED DARK THEME: ZERO-WHITE-BOX TOTAL CONTRAST ENGINE
+   =================================================================== */
+
+/* 1. All Cards, Boxes, Inspectors, and Panels in Dark Mode */
+body.dark-mode .inspector-card,
+body.dark-mode .breakdown-card,
+body.dark-mode .microscope-toolbar,
+body.dark-mode .status-pill,
+body.dark-mode .axis-legend-overlay,
+body.dark-mode .capacity-warning-card,
+body.dark-mode .aggregate-note-card,
+body.dark-mode .turn-box,
+body.dark-mode .bridge-card,
+body.dark-mode .persistent-annotation,
+body.dark-mode .attribution-card,
+body.dark-mode .progression-col,
+body.dark-mode .formula-box,
+body.dark-mode .metric-card,
+body.dark-mode .taxonomy-item,
+body.dark-mode .scrubber-strip,
+body.dark-mode .step-card,
+body.dark-mode .spec-box,
+body.dark-mode .timeline-node,
+body.dark-mode .stat-metric-card,
+body.dark-mode .bdh-cq-caveat-box,
+body.dark-mode .summary-box,
+body.dark-mode .math-formula-box,
+body.dark-mode .quiz-question-card,
+body.dark-mode .approach-formula-box,
+body.dark-mode .exec-summary-banner,
+body.dark-mode .deep-dive-card,
+body.dark-mode .prompt-sim-col,
+body.dark-mode .calculator-controls-grid,
+body.dark-mode .choice-btn,
+body.dark-mode .vram-stat-card,
+body.dark-mode .sandbox-card,
+body.dark-mode .conversation-card,
+body.dark-mode .response-card,
+body.dark-mode .benchmark-card,
+body.dark-mode .calc-card,
+body.dark-mode .roofline-card,
+body.dark-mode .serving-card,
+body.dark-mode .comparison-card,
+body.dark-mode .toy-model-card,
+body.dark-mode .bdh-cq-card,
+body.dark-mode .prompt-playground-card,
+body.dark-mode .cloud-fleet-calculator,
+body.dark-mode .quiz-section,
+body.dark-mode .stat-card,
+body.dark-mode .serving-stat-card,
+body.dark-mode .canvas-card,
+body.dark-mode .decision-section,
+body.dark-mode .arch-diagram-card,
+body.dark-mode .interactive-vram-sandbox {
+  background: rgba(15, 19, 32, 0.94) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* 2. Text Hierarchy & Contrast Inside All Cards */
+body.dark-mode .inspector-card *,
+body.dark-mode .breakdown-card *,
+body.dark-mode .microscope-toolbar *,
+body.dark-mode .status-pill *,
+body.dark-mode .axis-legend-overlay *,
+body.dark-mode .vram-breakdown-grid * {
+  color: #f1f5f9;
+}
+
+body.dark-mode .inspector-title,
+body.dark-mode .toolbar-label,
+body.dark-mode .breakdown-val,
+body.dark-mode .pill-val,
+body.dark-mode .chain-math,
+body.dark-mode .kv3d-title {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+body.dark-mode .breakdown-label,
+body.dark-mode .pill-label,
+body.dark-mode .chain-step-num,
+body.dark-mode .chain-name,
+body.dark-mode .chain-value,
+body.dark-mode .flow-hint,
+body.dark-mode .breakdown-sub,
+body.dark-mode .kv3d-subtitle,
+body.dark-mode .legend-item,
+body.dark-mode .honesty-legend {
+  color: #94a3b8 !important;
+}
+
+body.dark-mode .chain-value.highlight,
+body.dark-mode .status-pill.highlight .pill-val,
+body.dark-mode .breakdown-card.highlight .breakdown-val,
+body.dark-mode #inspect-weight {
+  color: #38bdf8 !important;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+}
+
+body.dark-mode .breakdown-card.highlight {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.25) !important;
+}
+
+body.dark-mode .breakdown-formula {
+  color: #cbd5e1 !important;
+  background: rgba(0, 0, 0, 0.35) !important;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* 3. Toolbar Mode Toggles & Buttons */
+body.dark-mode .mode-toggle-group {
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  background: rgba(10, 14, 24, 0.9) !important;
+}
+
+body.dark-mode .mode-btn {
+  background: transparent !important;
+  color: #94a3b8 !important;
+}
+
+body.dark-mode .mode-btn.active {
+  background: #38bdf8 !important;
+  color: #090a0f !important;
+  font-weight: 800 !important;
+}
+
+body.dark-mode .inspector-tag {
+  background: #38bdf8 !important;
+  color: #090a0f !important;
+  font-weight: 800 !important;
+}
+
+/* 4. Sliders (Microscope step, VRAM context, ROI sliders) */
+body.dark-mode input[type="range"],
+body.dark-mode .microscope-slider,
+body.dark-mode .knob-slider {
+  background: rgba(255, 255, 255, 0.16) !important;
+  accent-color: #38bdf8 !important;
+  height: 6px;
+  border-radius: 3px;
+}
+
+body.dark-mode input[type="range"]::-webkit-slider-runnable-track {
+  background: rgba(255, 255, 255, 0.16) !important;
+  height: 6px;
+  border-radius: 3px;
+}
+
+body.dark-mode input[type="range"]::-webkit-slider-thumb {
+  background: #38bdf8 !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.8) !important;
+  cursor: pointer;
+}
+
+body.dark-mode input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16) !important;
+  height: 6px;
+  border-radius: 3px;
+}
+
+body.dark-mode input[type="range"]::-moz-range-thumb {
+  background: #38bdf8 !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.8) !important;
+  cursor: pointer;
+}
+
+/* 5. Slider Values & Badges */
+body.dark-mode .slider-val-badge,
+body.dark-mode .context-val-badge,
+body.dark-mode .slider-bubble,
+body.dark-mode .canvas-badge,
+body.dark-mode .formula-badge,
+body.dark-mode .param-badge {
+  background: rgba(30, 41, 59, 0.95) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+}
+
+/* 6. Precision Buttons & Form Selects */
+body.dark-mode .precision-pill,
+body.dark-mode .toggle-pill {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #cbd5e1 !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+}
+
+body.dark-mode .precision-pill.active,
+body.dark-mode .toggle-pill.active {
+  background: #38bdf8 !important;
+  color: #090a0f !important;
+  font-weight: 700 !important;
+}
+
+body.dark-mode select,
+body.dark-mode .form-select,
+body.dark-mode input[type="text"],
+body.dark-mode textarea {
+  background: rgba(15, 23, 42, 0.95) !important;
+  color: #f1f5f9 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 7. Tables, Th, and Td */
+body.dark-mode table,
+body.dark-mode .matrix-table,
+body.dark-mode .arch-table,
+body.dark-mode .crime-scene-table {
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  background: rgba(15, 19, 32, 0.7) !important;
+}
+
+body.dark-mode table th,
+body.dark-mode .matrix-table th,
+body.dark-mode .arch-table th,
+body.dark-mode .crime-scene-table th {
+  background: rgba(26, 34, 54, 0.95) !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+body.dark-mode table td,
+body.dark-mode .matrix-table td,
+body.dark-mode .arch-table td,
+body.dark-mode .crime-scene-table td {
+  color: #cbd5e1 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode tr:hover td {
+  background: rgba(56, 189, 248, 0.08) !important;
+}
+
+/* 8. Choice Buttons in Chapter 1 Dilemma */
+body.dark-mode .choice-btn {
+  background: rgba(20, 26, 42, 0.9) !important;
+  color: #f1f5f9 !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+body.dark-mode .choice-btn:hover {
+  background: rgba(30, 40, 65, 0.95) !important;
+  border-color: #38bdf8 !important;
+}
+
+body.dark-mode .choice-btn.active {
+  background: #38bdf8 !important;
+  color: #090a0f !important;
+  font-weight: 700 !important;
+}

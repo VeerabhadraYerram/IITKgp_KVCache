@@ -97,24 +97,29 @@ export class AttentionMicroscope3D {
     this.scene.add(this.rayGroup);
 
     // 8. Query Marker: Octahedron with wireframe outer ring
+    const isDark = this._isDark();
     const qGeom = new THREE.OctahedronGeometry(0.85, 0);
-    const qMat = new THREE.MeshLambertMaterial({ color: 0x000000 });
+    const qMat = new THREE.MeshLambertMaterial({ color: isDark ? 0x38bdf8 : 0x000000 });
     this.queryMesh = new THREE.Mesh(qGeom, qMat);
     this.queryMesh.visible = false;
     this.scene.add(this.queryMesh);
 
     const qRingGeom = new THREE.RingGeometry(1.15, 1.35, 28);
-    const qRingMat = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide });
+    const qRingMat = new THREE.MeshBasicMaterial({ color: isDark ? 0x38bdf8 : 0x000000, side: THREE.DoubleSide });
     this.queryRing = new THREE.Mesh(qRingGeom, qRingMat);
     this.queryRing.visible = false;
     this.scene.add(this.queryRing);
 
     // 9. Output Marker (Projected Attention Output o_t)
     const outGeom = new THREE.DodecahedronGeometry(0.75, 0);
-    const outMat = new THREE.MeshLambertMaterial({ color: 0x333333 });
+    const outMat = new THREE.MeshLambertMaterial({ color: isDark ? 0xf59e0b : 0x333333 });
     this.outputMesh = new THREE.Mesh(outGeom, outMat);
     this.outputMesh.visible = false;
     this.scene.add(this.outputMesh);
+
+    window.addEventListener('themechange', () => {
+      this._updateThemeColors();
+    });
 
     // 10. Raycasting
     this.raycaster = new THREE.Raycaster();
@@ -130,6 +135,34 @@ export class AttentionMicroscope3D {
 
     // Initial resize to settle layout
     setTimeout(() => this.onResize(), 60);
+  }
+
+  _isDark() {
+    return document.body ? document.body.classList.contains('dark-mode') : false;
+  }
+
+  _updateThemeColors() {
+    const isDark = this._isDark();
+    if (this.queryMesh && this.queryMesh.material) {
+      this.queryMesh.material.color.setHex(isDark ? 0x38bdf8 : 0x000000);
+    }
+    if (this.queryRing && this.queryRing.material) {
+      this.queryRing.material.color.setHex(isDark ? 0x38bdf8 : 0x000000);
+    }
+    if (this.outputMesh && this.outputMesh.material) {
+      this.outputMesh.material.color.setHex(isDark ? 0xf59e0b : 0x333333);
+    }
+    if (this.gridHelper) {
+      this.scene.remove(this.gridHelper);
+      this.gridHelper.geometry.dispose();
+      this.gridHelper.material.dispose();
+      this.gridHelper = new THREE.GridHelper(26, 13, isDark ? 0x334155 : 0xbbbbbb, isDark ? 0x1e293b : 0xeeeeee);
+      this.gridHelper.position.y = -6;
+      this.scene.add(this.gridHelper);
+    }
+    if (this.snapshots && this.snapshots.length > 0) {
+      this.renderStep(this.currentStep);
+    }
   }
 
   onResize() {
@@ -281,18 +314,31 @@ export class AttentionMicroscope3D {
       const isSelected = i === this.selectedTokenIndex;
       const weight = snap.attentionWeights[i - 1];
 
-      // Material based on Cache Mode and Selection
-      let nodeColor = 0x222222;
-      let nodeOpacity = 0.9;
+      // Material based on Cache Mode, Selection, and Theme
+      const isDark = this._isDark();
+      let nodeColor;
+      let nodeOpacity = 0.92;
 
-      if (this.currentMode === 'no_cache') {
-        nodeColor = isCurrentToken ? 0x000000 : 0x333333;
+      if (isDark) {
+        if (isSelected) {
+          nodeColor = 0x38bdf8; // Electric Cyan
+          nodeOpacity = 1.0;
+        } else if (isCurrentToken) {
+          nodeColor = 0x60a5fa; // Radiant Sapphire
+          nodeOpacity = 1.0;
+        } else if (this.currentMode === 'no_cache') {
+          nodeColor = 0x64748b; // Slate
+        } else {
+          nodeColor = 0x94a3b8; // Metallic Silver
+        }
       } else {
-        nodeColor = isCurrentToken ? 0x000000 : 0x555555;
-      }
-
-      if (isSelected) {
-        nodeColor = 0x000000;
+        if (isSelected) {
+          nodeColor = 0x000000;
+        } else if (this.currentMode === 'no_cache') {
+          nodeColor = isCurrentToken ? 0x000000 : 0x333333;
+        } else {
+          nodeColor = isCurrentToken ? 0x000000 : 0x555555;
+        }
       }
 
       const mat = new THREE.MeshLambertMaterial({
@@ -309,8 +355,14 @@ export class AttentionMicroscope3D {
       // Outer indicator ring for selected or current token
       if (isSelected || isCurrentToken) {
         const ringG = new THREE.RingGeometry(0.9, 1.1, 24);
+        let ringColor;
+        if (isDark) {
+          ringColor = isSelected ? 0x38bdf8 : 0x0284c7;
+        } else {
+          ringColor = isSelected ? 0x000000 : 0x666666;
+        }
         const ringM = new THREE.MeshBasicMaterial({
-          color: isSelected ? 0x000000 : 0x666666,
+          color: ringColor,
           side: THREE.DoubleSide
         });
         const ringMesh = new THREE.Mesh(ringG, ringM);
@@ -325,10 +377,11 @@ export class AttentionMicroscope3D {
         new THREE.Vector3(pk[0], pk[1], pk[2])
       ];
       const rayGeom = new THREE.BufferGeometry().setFromPoints(rayPoints);
-      const rayOpacity = Math.max(0.2, Math.min(1.0, weight * 2.8 + 0.15));
+      const rayOpacity = Math.max(0.25, Math.min(1.0, weight * 2.8 + 0.2));
+      const rayColor = isDark ? (isSelected ? 0x38bdf8 : 0x0284c7) : (isSelected ? 0x000000 : 0x444444);
 
       const rayMat = new THREE.LineBasicMaterial({
-        color: isSelected ? 0x000000 : 0x444444,
+        color: rayColor,
         transparent: true,
         opacity: rayOpacity
       });
@@ -343,12 +396,13 @@ export class AttentionMicroscope3D {
       new THREE.Vector3(po[0], po[1], po[2])
     ];
     const outRayGeom = new THREE.BufferGeometry().setFromPoints(outRayPoints);
+    const isDark = this._isDark();
     const outRayMat = new THREE.LineDashedMaterial({
-      color: 0x000000,
+      color: isDark ? 0xf59e0b : 0x000000,
       dashSize: 0.5,
       gapSize: 0.3,
       transparent: true,
-      opacity: 0.6
+      opacity: 0.8
     });
     const outRay = new THREE.Line(outRayGeom, outRayMat);
     outRay.computeLineDistances();
