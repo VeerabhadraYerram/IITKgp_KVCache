@@ -1,16 +1,36 @@
 // bandwidth_canvas.js
 // Visualizer for Chapter 4: Prefill vs Decode & Memory Bandwidth Roofline Bottleneck.
-// Renders Arithmetic Intensity (FLOPs/Byte) and Max Serving Concurrency (Batch Size B) vs Sequence Length.
+// Renders the analytical Roofline Model (Williams et al. 2009) for NVIDIA A100 80GB SXM.
+// Ground truth specs:
+//   - Peak Dense FP16 Tensor Core: 312 TFLOPS (312e12 FLOP/s)
+//   - HBM2e Memory Bandwidth: 2,039 GB/s (2.039e12 B/s)
+//   - Knee Point (Ridge Point): I* = 312 / 2.039 ≈ 153.016 FLOP/byte
 
 export class BandwidthCanvas {
   constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
+    if (!this.canvas) return;
     this.ctx = this.canvas.getContext('2d');
-    this.currentMode = 'roofline'; // 'roofline' or 'concurrency'
-    this.seqLen = 4096;
-    this.batchSize = 16;
-    this.gpuBandwidth = 2039; // A100: 2039 GB/s
-    this.gpuComputeTFLOPS = 312; // A100 FP16 Tensor Core: 312 TFLOPs
+    
+    // Hardware specifications
+    this.gpuBandwidth = 2039; // GB/s (2.039 TB/s)
+    this.gpuComputeTFLOPS = 312; // Dense FP16 Tensor Core peak TFLOPS
+    this.kneeAI = this.gpuComputeTFLOPS / (this.gpuBandwidth / 1000); // ≈ 153.016 FLOP/B
+
+    // Dynamic operating state
+    this.batchSize = 1;
+    this.contextLen = 1024;
+    this.promptLen = 1024;
+    
+    // Model parameters: Llama-3-8B baseline
+    this.modelParams = {
+      P: 8.03e9,
+      L: 32,
+      n_Q: 32,
+      n_KV: 8,
+      d_head: 128,
+      s: 2 // FP16 (2 bytes/element)
+    };
 
     this._resizeHandler = () => this._resize();
     window.addEventListener('resize', this._resizeHandler);
@@ -18,124 +38,198 @@ export class BandwidthCanvas {
   }
 
   _resize() {
-    const rect = this.canvas.parentElement.getBoundingClientRect();
+    if (!this.canvas) return;
+    const parent = this.canvas.parentElement;
+    const rect = parent ? parent.getBoundingClientRect() : { width: 700, height: 380 };
     const dpr = window.devicePixelRatio || 1;
-    this.canvas.width = rect.width * dpr;
-    this.canvas.height = (rect.height || 300) * dpr;
-    this.canvas.style.width = rect.width + 'px';
-    this.canvas.style.height = (rect.height || 300) + 'px';
+    const w = rect.width > 0 ? rect.width : 700;
+    const h = rect.height > 100 ? rect.height : 380;
+
+    this.canvas.width = w * dpr;
+    this.canvas.height = h * dpr;
+    this.canvas.style.width = `${w}px`;
+    this.canvas.style.height = `${h}px`;
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    this.width = rect.width;
-    this.height = rect.height || 300;
+    this.width = w;
+    this.height = h;
     this.draw();
   }
 
-  updateParams(seqLen, batchSize) {
-    this.seqLen = seqLen;
+  updateState(batchSize, contextLen, promptLen = 1024) {
     this.batchSize = batchSize;
+    this.contextLen = contextLen;
+    this.promptLen = promptLen;
     this.draw();
   }
 
-  setMode(mode) {
-    this.currentMode = mode;
-    this.draw();
+  // Analytical Prefill Arithmetic Intensity (FLOPs / Bytes transferred)
+  getPrefillMetrics() {
+    const { P, L, n_Q, d_head, s, n_KV } = this.modelParams;
+    const T = this.promptLen;
+    const k_token = 2 * L * n_KV * d_head * s; // 131,072 bytes/token
+
+    // Weight projections + attention interactions
+    const flops = 2 * P * T + 2 * L * n_Q * d_head * (T * T);
+    // Idealized memory traffic: weights read once + KV cache written
+    const bytes = 2 * P + k_token * T;
+    const ai = flops / bytes;
+    const perfTFlops = Math.min(this.gpuComputeTFLOPS, ai * (this.gpuBandwidth / 1000));
+    return { ai, perfTFlops, flops, bytes };
+  }
+
+  // Analytical Decode Arithmetic Intensity (FLOPs / Bytes transferred)
+  getDecodeMetrics() {
+    const { P, L, n_Q, d_head, s, n_KV } = this.modelParams;
+    const B = this.batchSize;
+    const T = this.contextLen;
+    const k_token = 2 * L * n_KV * d_head * s; // 131,072 bytes/token
+
+    // Simplified analytical decode FLOP model:
+    // 2PB (dense weights) + 4 B L n_Q d_head T (attention QK^T + SV)
+    const flops = 2 * P * B + 4 * B * L * n_Q * d_head * T;
+    // Idealized memory traffic: weights streamed once + full KV cache
+    const bytes = 2 * P + B * k_token * T;
+    const ai = flops / bytes;
+    const perfTFlops = Math.min(this.gpuComputeTFLOPS, ai * (this.gpuBandwidth / 1000));
+    return { ai, perfTFlops, flops, bytes };
   }
 
   draw() {
-    if (this.currentMode === 'roofline') {
-      this.drawRoofline();
-    } else {
-      this.drawConcurrency();
-    }
-  }
-
-  drawRoofline() {
-    const { ctx, width, height, seqLen, batchSize } = this;
+    if (!this.ctx) return;
+    const { ctx, width, height } = this;
     ctx.clearRect(0, 0, width, height);
 
-    // Pure black background
-    ctx.fillStyle = '#000000';
+    // Clean white background (Monochromatic Light Theme)
+    ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
 
-    const pad = { top: 40, right: 30, bottom: 50, left: 70 };
+    const pad = { top: 40, right: 35, bottom: 55, left: 65 };
     const plotW = width - pad.left - pad.right;
     const plotH = height - pad.top - pad.bottom;
 
-    // Grid lines
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    if (plotW <= 20 || plotH <= 20) return;
+
+    // Log scales for Arithmetic Intensity (0.1 to 3,500 FLOP/Byte)
+    const minLogAI = -1;   // log10(0.1) = -1
+    const maxLogAI = 3.6;  // log10(~4000) ≈ 3.6
+
+    // Log scales for Performance (0.1 to 400 TFLOPS)
+    const minLogPerf = -1;  // log10(0.1) = -1
+    const maxLogPerf = 2.65; // log10(~450) ≈ 2.65
+
+    const xLogScale = (ai) => {
+      const clamped = Math.max(0.1, Math.min(4000, ai));
+      const log = Math.log10(clamped);
+      return pad.left + ((log - minLogAI) / (maxLogAI - minLogAI)) * plotW;
+    };
+
+    const yLogScale = (perf) => {
+      const clamped = Math.max(0.1, Math.min(450, perf));
+      const log = Math.log10(clamped);
+      return pad.top + plotH - ((log - minLogPerf) / (maxLogPerf - minLogPerf)) * plotH;
+    };
+
+    // Draw Grid Lines & Ticks
+    ctx.strokeStyle = '#e5e7eb';
     ctx.lineWidth = 1;
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.top + (i / 4) * plotH;
+    ctx.setLineDash([]);
+
+    // Horizontal grid lines (0.1, 1, 10, 100, 312 TFLOPS)
+    const yGridVals = [0.1, 1, 10, 100, 312];
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#6b7280';
+    ctx.textAlign = 'right';
+
+    yGridVals.forEach(val => {
+      const y = yLogScale(val);
       ctx.beginPath();
       ctx.moveTo(pad.left, y);
       ctx.lineTo(pad.left + plotW, y);
       ctx.stroke();
-    }
 
-    // Theoretical Roofline line:
-    // Memory bound slope = GPU Bandwidth (e.g. 2039 GB/s = 2.039 TB/s)
-    // Compute peak ceiling = 312 TFLOPs
-    // Knee point Arithmetic Intensity = Peak TFLOPs / Bandwidth = ~153 FLOPs/Byte
-    const kneeAI = 150; // FLOPs / byte
+      const label = val === 312 ? '312' : `${val}`;
+      ctx.fillText(label, pad.left - 8, y + 3);
+    });
 
-    const minLogAI = -1; // 0.1 FLOPs/Byte
-    const maxLogAI = 3.5; // ~3000 FLOPs/Byte
+    // Vertical grid lines (0.1, 1, 10, 100, 153, 1000 FLOP/B)
+    const xGridVals = [0.1, 1, 10, 100, 1000];
+    ctx.textAlign = 'center';
+    xGridVals.forEach(val => {
+      const x = xLogScale(val);
+      ctx.beginPath();
+      ctx.moveTo(x, pad.top);
+      ctx.lineTo(x, pad.top + plotH);
+      ctx.stroke();
 
-    const xLogScale = (ai) => {
-      const log = Math.log10(Math.max(0.1, ai));
-      return pad.left + ((log - minLogAI) / (maxLogAI - minLogAI)) * plotW;
-    };
+      ctx.fillText(`${val}`, x, pad.top + plotH + 18);
+    });
 
-    const yLogScale = (perfTFlops) => {
-      const minLogPerf = -1;
-      const maxLogPerf = 3;
-      const log = Math.log10(Math.max(0.1, perfTFlops));
-      return pad.top + plotH - ((log - minLogPerf) / (maxLogPerf - minLogPerf)) * plotH;
-    };
+    // Fill under the roofline curve
+    const kneeX = xLogScale(this.kneeAI);
+    const kneeY = yLogScale(this.gpuComputeTFLOPS);
+    const startX = xLogScale(0.1);
+    const startY = yLogScale(0.1 * (this.gpuBandwidth / 1000));
+    const endX = xLogScale(3500);
+    const baseY = pad.top + plotH;
+
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.03)';
+    ctx.beginPath();
+    ctx.moveTo(startX, baseY);
+    ctx.lineTo(startX, startY);
+    ctx.lineTo(kneeX, kneeY);
+    ctx.lineTo(endX, kneeY);
+    ctx.lineTo(endX, baseY);
+    ctx.closePath();
+    ctx.fill();
 
     // Draw Roofline Curve
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
-    // Slope (Memory bound)
-    ctx.moveTo(xLogScale(0.1), yLogScale(0.1 * 2.039));
-    ctx.lineTo(xLogScale(kneeAI), yLogScale(312));
-    // Ceiling (Compute bound)
-    ctx.lineTo(xLogScale(3000), yLogScale(312));
+    // Memory-bound slope
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(kneeX, kneeY);
+    // Compute-bound flat ceiling
+    ctx.lineTo(endX, kneeY);
     ctx.stroke();
 
-    // Prefill Operating Point:
-    // In Prefill, GEMM arithmetic intensity = O(T_prompt) ~ 200 to 800 FLOPs/Byte
-    const prefillAI = Math.min(800, 50 + seqLen * 0.1);
-    const prefillPerf = Math.min(312, prefillAI * 2.039 * 0.85);
-
-    // Decode Operating Point:
-    // In Decode, GEMV arithmetic intensity is strictly 1 to 2 FLOPs/Byte per token!
-    const decodeAI = Math.min(4, 1 + batchSize * 0.1);
-    const decodePerf = decodeAI * 2.039 * 0.8;
-
-    // Plot Prefill Point (Square marker)
-    const px = xLogScale(prefillAI);
-    const py = yLogScale(prefillPerf);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(px - 6, py - 6, 12, 12);
-    ctx.font = 'bold 11px "Inter", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('⚡ PREFILL (Compute-Bound)', px, py - 12);
-    ctx.font = '10px "JetBrains Mono", monospace';
-    ctx.fillText(`${prefillAI.toFixed(0)} FLOP/B · ${prefillPerf.toFixed(0)} TFLOPS`, px, py + 18);
-
-    // Plot Decode Point (Circle marker)
-    const dx = xLogScale(decodeAI);
-    const dy = yLogScale(decodePerf);
+    // Knee Point (Ridge Point) annotation
+    ctx.fillStyle = '#000000';
     ctx.beginPath();
-    ctx.arc(dx, dy, 6, 0, 2 * Math.PI);
+    ctx.arc(kneeX, kneeY, 4.5, 0, 2 * Math.PI);
     ctx.fill();
-    ctx.fillText('🐢 DECODE (Memory-Bound)', dx + 60, dy - 12);
-    ctx.fillText(`${decodeAI.toFixed(1)} FLOP/B · ${decodePerf.toFixed(1)} TFLOPS`, dx + 60, dy + 18);
 
-    // Draw connecting dashed line
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    // Knee dashed vertical line
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(kneeX, kneeY);
+    ctx.lineTo(kneeX, baseY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Knee marker label
+    ctx.font = '600 10px "Inter", sans-serif';
+    ctx.fillStyle = '#000000';
+    ctx.textAlign = 'left';
+    ctx.fillText(`Knee: 153.0 FLOP/B`, kneeX + 8, kneeY + 14);
+    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#4b5563';
+    ctx.fillText(`(312 TFLOPS)`, kneeX + 8, kneeY + 26);
+
+    // Compute Dynamic Points
+    const prefill = this.getPrefillMetrics();
+    const decode = this.getDecodeMetrics();
+
+    const px = xLogScale(prefill.ai);
+    const py = yLogScale(prefill.perfTFlops);
+    const dx = xLogScale(decode.ai);
+    const dy = yLogScale(decode.perfTFlops);
+
+    // Dashed trajectory connector between prefill and decode
+    ctx.strokeStyle = '#9ca3af';
+    ctx.lineWidth = 1.5;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
     ctx.moveTo(px, py);
@@ -143,119 +237,74 @@ export class BandwidthCanvas {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Labels
-    ctx.font = '500 12px "Inter", system-ui, sans-serif';
-    ctx.fillStyle = '#ffffff';
-    ctx.textAlign = 'center';
-    ctx.fillText('Arithmetic Intensity (FLOPs / Byte transferred)', pad.left + plotW / 2, height - 8);
-
-    ctx.save();
-    ctx.translate(16, pad.top + plotH / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.fillText('Attained Throughput (TFLOPs)', 0, 0);
-    ctx.restore();
-
-    // Title / Legend
-    ctx.font = 'bold 12px "Inter", sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('A100 GPU Roofline: Prefill vs Decode Arithmetic Intensity Gap', pad.left, pad.top - 12);
-  }
-
-  drawConcurrency() {
-    const { ctx, width, height, seqLen } = this;
-    ctx.clearRect(0, 0, width, height);
-
+    // ── Prefill Operating Point (Square Marker) ─────────────────
     ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, width, height);
-
-    const pad = { top: 40, right: 30, bottom: 50, left: 70 };
-    const plotW = width - pad.left - pad.right;
-    const plotH = height - pad.top - pad.bottom;
-
-    // Grid lines
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.top + (i / 4) * plotH;
-      ctx.beginPath();
-      ctx.moveTo(pad.left, y);
-      ctx.lineTo(pad.left + plotW, y);
-      ctx.stroke();
-    }
-
-    // Sequence lengths from 1k to 128k
-    const seqs = [1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072];
-    // Max batch size on A100 (80GB) with Llama-3-8B (16GB weights, 64GB KV headroom)
-    // KV per token = 0.5 MB -> at 4k: 2GB/stream -> Max Batch = 32
-    // at 32k: 16GB/stream -> Max Batch = 4
-    // at 128k: 64GB/stream -> Max Batch = 1 (OOM risk)
-    const maxBatches = seqs.map(s => {
-      const bytesPerSeq = 2 * 32 * 8 * 128 * 2 * s; // 8B model FP16
-      const gbPerSeq = bytesPerSeq / (1024 * 1024 * 1024);
-      return Math.max(0.5, Math.floor(60 / gbPerSeq));
-    });
-
-    const xScale = (i) => pad.left + (i / (seqs.length - 1)) * plotW;
-    const maxB = 64;
-    const yScale = (b) => pad.top + plotH - (Math.min(b, maxB) / maxB) * plotH;
-
-    // Draw Max Batch Line (Solid White)
+    ctx.fillRect(px - 6, py - 6, 12, 12);
     ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    for (let i = 0; i < seqs.length; i++) {
-      const x = xScale(i);
-      const y = yScale(maxBatches[i]);
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(px - 6, py - 6, 12, 12);
 
-    // Fill under curve
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.font = 'bold 11px "Inter", sans-serif';
+    ctx.fillStyle = '#000000';
+    ctx.textAlign = 'center';
+    ctx.fillText('⚡ PREFILL (Prompt Ingestion)', px, py - 18);
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#374151';
+    ctx.fillText(`${prefill.ai.toFixed(0)} FLOP/B · ${prefill.perfTFlops.toFixed(0)} TFLOPS`, px, py - 6);
+
+    // ── Decode Operating Point (Circle Marker) ──────────────────
+    ctx.fillStyle = '#000000';
     ctx.beginPath();
-    ctx.moveTo(xScale(0), yScale(0));
-    for (let i = 0; i < seqs.length; i++) {
-      ctx.lineTo(xScale(i), yScale(maxBatches[i]));
-    }
-    ctx.lineTo(xScale(seqs.length - 1), yScale(0));
-    ctx.closePath();
+    ctx.arc(dx, dy, 7, 0, 2 * Math.PI);
     ctx.fill();
-
-    // Draw BDH Constant Concurrency Line (Dashed Line at B=64)
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 2;
-    ctx.setLineDash([6, 4]);
-    ctx.beginPath();
-    ctx.moveTo(pad.left, yScale(64));
-    ctx.lineTo(pad.left + plotW, yScale(64));
     ctx.stroke();
-    ctx.setLineDash([]);
 
-    // Labels & Ticks
-    ctx.font = '500 12px "Inter", sans-serif';
-    ctx.fillStyle = '#ffffff';
-    ctx.textAlign = 'center';
-    ctx.fillText('Context Length (T tokens)', pad.left + plotW / 2, height - 8);
-
-    ctx.save();
-    ctx.translate(16, pad.top + plotH / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.fillText('Max Concurrency (Batch Size B)', 0, 0);
-    ctx.restore();
-
-    // X Axis Ticks
-    ctx.font = '10px "JetBrains Mono", monospace';
-    for (let i = 0; i < seqs.length; i++) {
-      const label = seqs[i] >= 1024 ? `${seqs[i] / 1024}k` : `${seqs[i]}`;
-      ctx.fillText(label, xScale(i), height - pad.bottom + 18);
+    ctx.font = 'bold 11px "Inter", sans-serif';
+    ctx.fillStyle = '#000000';
+    // Position decode text carefully so it doesn't clip
+    const decodeAlignLeft = dx < pad.left + plotW * 0.45;
+    if (decodeAlignLeft) {
+      ctx.textAlign = 'left';
+      ctx.fillText('🐢 DECODE (Token Generation)', dx + 12, dy - 6);
+      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#374151';
+      ctx.fillText(`${decode.ai.toFixed(2)} FLOP/B · ${decode.perfTFlops.toFixed(2)} TFLOPS`, dx + 12, dy + 8);
+    } else {
+      ctx.textAlign = 'center';
+      ctx.fillText('🐢 DECODE (Token Generation)', dx, dy - 16);
+      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#374151';
+      ctx.fillText(`${decode.ai.toFixed(2)} FLOP/B · ${decode.perfTFlops.toFixed(2)} TFLOPS`, dx, dy - 4);
     }
 
-    // Legend
-    ctx.font = 'bold 11px "Inter", sans-serif';
+    // Regime Labels
+    ctx.font = '600 11px "Inter", sans-serif';
+    ctx.fillStyle = '#6b7280';
     ctx.textAlign = 'left';
-    ctx.fillText('Transformer: Max Batch Collapses as T Grows [Solid]', pad.left, pad.top - 16);
-    ctx.fillText('BDH: Constant Batch Concurrency w.r.t. T [Dashed]', pad.left + 320, pad.top - 16);
+    ctx.fillText('◄ MEMORY-BANDWIDTH BOUND (Slope = 2,039 GB/s)', pad.left + 15, pad.top + 55);
+
+    ctx.textAlign = 'right';
+    ctx.fillText('COMPUTE BOUND (Peak = 312 TFLOPS) ►', pad.left + plotW - 10, pad.top + 20);
+
+    // Axis Titles
+    ctx.font = '600 11px "Inter", sans-serif';
+    ctx.fillStyle = '#111827';
+    ctx.textAlign = 'center';
+    ctx.fillText('Arithmetic Intensity I (FLOPs / Byte transferred, log scale)', pad.left + plotW / 2, height - 12);
+
+    ctx.save();
+    ctx.translate(18, pad.top + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Attained Performance P (TFLOPS, log scale)', 0, 0);
+    ctx.restore();
+
+    // Chart Title
+    ctx.font = 'bold 12px "Inter", sans-serif';
+    ctx.fillStyle = '#000000';
+    ctx.textAlign = 'left';
+    ctx.fillText('A100 SXM4 Roofline: Analytical Prefill vs. Decode Operating Regimes', pad.left, pad.top - 15);
   }
 
   destroy() {

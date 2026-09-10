@@ -763,8 +763,224 @@
 
     </section>
     <!-- END CHAPTER 3 -->
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- CHAPTER 4: LIMITATIONS IN PRODUCTION: PREFILL VS. DECODE   -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <section class="act" id="chapter-4">
+      <div class="act-header">
+        <div class="act-number">Chapter 4</div>
+        <h2 class="act-title">Limitations in Production: Prefill vs. Decode</h2>
+        <p class="act-description">
+          A common misconception is that the KV cache is merely a capacity concern — an issue of having enough gigabytes on the GPU. In real production serving systems, the physical mechanics of KV cache retrieval dictate throughput and execution latency, bifurcating transformer inference into two radically different operating regimes.
+        </p>
+      </div>
+
+      <!-- Two Phases Comparison Grid -->
+      <div class="phases-grid">
+        <!-- Prefill Phase Card -->
+        <div class="phase-card prefill">
+          <div class="phase-header">
+            <h3 class="phase-title">Phase 1: Prefill</h3>
+            <span class="phase-badge compute">Compute-Bound</span>
+          </div>
+          <div class="phase-math-tag">Matrix-Matrix (GEMM) · Highly Parallel</div>
+          <p class="phase-desc">
+            Processing the full input prompt at once. The model computes Key and Value projections for all prompt tokens in parallel across thousands of tensor cores.
+          </p>
+          <ul class="phase-features-list">
+            <li class="phase-feature-item">
+              <strong>Execution:</strong> Ingests all <em>T<sub>prompt</sub></em> tokens simultaneously in a single forward pass.
+            </li>
+            <li class="phase-feature-item">
+              <strong>Arithmetic Intensity:</strong> High (<em>I<sub>prefill</sub></em> &gt;&gt; 150 FLOP/byte). High compute-to-memory ratio keeps GPU tensor cores saturated.
+            </li>
+            <li class="phase-feature-item">
+              <strong>Hardware State:</strong> Tensor cores run near peak; memory bus is not the primary bottleneck.
+            </li>
+          </ul>
+        </div>
+
+        <!-- Decode Phase Card -->
+        <div class="phase-card decode">
+          <div class="phase-header">
+            <h3 class="phase-title">Phase 2: Decode</h3>
+            <span class="phase-badge bandwidth">Memory-Bandwidth-Bound</span>
+          </div>
+          <div class="phase-math-tag">Matrix-Vector (GEMV) · Strictly Sequential</div>
+          <p class="phase-desc">
+            Generating one token at a time using the accumulated cache. For small batches, major layers behave approximately like matrix-vector operations; larger batches become matrix-matrix-like across the batch.
+          </p>
+          <ul class="phase-features-list">
+            <li class="phase-feature-item">
+              <strong>Execution:</strong> Autoregressive loop generating 1 token per step per sequence.
+            </li>
+            <li class="phase-feature-item">
+              <strong>Arithmetic Intensity:</strong> Very low (<em>I<sub>decode</sub></em> ≈ 0.99 – 4 FLOP/byte). Each step must stream the entire KV cache from HBM just to generate a single token.
+            </li>
+            <li class="phase-feature-item">
+              <strong>Hardware State:</strong> Tensor cores sit idle most of the cycle, waiting on memory transfers from High Bandwidth Memory (HBM).
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Roofline Model Card -->
+      <div class="roofline-card">
+        <div class="roofline-header">
+          <div class="roofline-title-group">
+            <h3 class="roofline-title">Analytical Roofline Model: Hardware Bottlenecks</h3>
+            <span class="roofline-subtitle">Attainable Performance P = min(P<sub>peak</sub>, I × B<sub>mem</sub>) · Williams, Waterman, Patterson (2009)</span>
+          </div>
+          <div class="hardware-spec-badge">
+            A100 80GB SXM · 312 TFLOPS Dense FP16 · 2,039 GB/s HBM2e
+          </div>
+        </div>
+
+        <div class="bandwidth-canvas-wrapper">
+          <canvas id="bandwidth-canvas"></canvas>
+        </div>
+
+        <!-- Attribution & Citation Badge -->
+        <div class="attribution-card" style="margin-top: 14px; margin-bottom: 0;">
+          <div class="attribution-badge">● Foundational Methodology · Williams et al. 2009 (Roofline Model)</div>
+          <p class="attribution-text">
+            Williams, Waterman, and Patterson (2009) introduced the Roofline model to relate floating-point performance to memory bandwidth and arithmetic intensity. The knee point (<em>I* = P<sub>peak</sub> / B<sub>mem</sub> ≈ 153.0 FLOP/byte</em> on the A100) demarcates memory-bandwidth-bound from compute-bound execution.
+          </p>
+        </div>
+      </div>
+
+      <!-- Interactive Concurrency & Bandwidth Degradation Sandbox -->
+      <div class="serving-sandbox-card">
+        <div class="serving-sandbox-header">
+          <h3 class="serving-sandbox-title">Interactive Serving Sandbox: Memory Bandwidth Competition</h3>
+          <p class="serving-sandbox-desc">
+            Explore how concurrent requests (batch size <em>B</em>) and context length (<em>T</em>) alter memory traffic per decode step, moving the decode operating point along the roofline and revealing the KV-bandwidth ceiling.
+          </p>
+        </div>
+
+        <!-- Controls Grid -->
+        <div class="serving-controls-grid">
+          <!-- Control: Batch Size B -->
+          <div class="serving-control-item">
+            <div class="slider-label-row">
+              <label for="slider-serving-batch" class="sandbox-label">Concurrent Requests / Batch Size (B)</label>
+              <span class="slider-val-badge" id="badge-serving-batch">1 request</span>
+            </div>
+            <input type="range" id="slider-serving-batch" min="1" max="128" step="1" value="1" class="tech-slider">
+            <div class="slider-ticks">
+              <span>1</span>
+              <span>32</span>
+              <span>64</span>
+              <span>96</span>
+              <span>128</span>
+            </div>
+          </div>
+
+          <!-- Control: Context Length T -->
+          <div class="serving-control-item">
+            <div class="slider-label-row">
+              <label for="slider-serving-context" class="sandbox-label">Average Context Length (T)</label>
+              <span class="slider-val-badge" id="badge-serving-context">1,024 tokens</span>
+            </div>
+            <input type="range" id="slider-serving-context" min="512" max="32768" step="512" value="1024" class="tech-slider">
+            <div class="slider-ticks">
+              <span>512</span>
+              <span>4k</span>
+              <span>8k</span>
+              <span>16k</span>
+              <span>32k</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Real-Time Metrics Grid -->
+        <div class="serving-metrics-grid">
+          <div class="metric-card">
+            <span class="metric-card-label">Idealized Memory Traffic (M<sub>step</sub>)</span>
+            <div class="metric-card-val" id="val-serving-mem-traffic">-- GB</div>
+            <span class="metric-card-sub" id="sub-serving-mem-traffic">Weights + KV Cache per step</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-card-label">Decode Arithmetic Intensity (I)</span>
+            <div class="metric-card-val" id="val-serving-ai">-- FLOP/B</div>
+            <span class="metric-card-sub" id="sub-serving-ai">FLOPs / Bytes transferred</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-card-label">Attained Compute (P<sub>decode</sub>)</span>
+            <div class="metric-card-val" id="val-serving-perf">-- TFLOPS</div>
+            <span class="metric-card-sub" id="sub-serving-perf">--% of 312 TFLOPS peak</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-card-label">Simplified Batch Step Latency</span>
+            <div class="metric-card-val" id="val-serving-latency">-- ms</div>
+            <span class="metric-card-sub">Time to generate 1 token/stream</span>
+          </div>
+
+          <div class="metric-card">
+            <span class="metric-card-label">Per-Request Token Rate</span>
+            <div class="metric-card-val" id="val-serving-user-rate">-- tok/s</div>
+            <span class="metric-card-sub">R<sub>user</sub> = 1 / t<sub>step</sub></span>
+          </div>
+
+          <div class="metric-card primary">
+            <span class="metric-card-label">Aggregate System Throughput</span>
+            <div class="metric-card-val" id="val-serving-agg-rate">-- tok/s</div>
+            <span class="metric-card-sub" id="sub-serving-agg-rate">R<sub>aggregate</sub> = B / t<sub>step</sub></span>
+          </div>
+        </div>
+
+        <!-- Nuance Note on Batch Scaling -->
+        <p class="phase-desc" style="font-size: 0.82rem; margin-top: 12px; color: #4b5563;">
+          <strong>Batching Dynamic:</strong> Increasing batch size increases work and contention per decode step, while allowing more requests to share weight reads and GPU computation. Aggregate throughput can improve substantially before approaching a bandwidth/compute limit; individual-request latency depends on the serving and batching strategy.
+        </p>
+      </div>
+
+      <!-- Systems Engineering Consequence: Disaggregation & PagedAttention -->
+      <div class="systems-card">
+        <h4 class="systems-card-title">Systems Engineering Consequence: Prefill/Decode Disaggregation & PagedAttention</h4>
+        <p class="systems-card-text">
+          Because prefill and decode exhibit fundamentally opposite hardware bottlenecks — compute-bound matrix-matrix multiplication versus memory-bandwidth-bound streaming of the growing KV cache — co-scheduling them on the same GPU creates severe resource interference. Bursty prefill passes monopolize tensor cores, while decode steps stall waiting for memory bandwidth. To resolve this, modern production inference architectures physically separate the two phases:
+        </p>
+        <p class="systems-card-text" style="margin-top: 10px;">
+          <strong>vLLM (Kwon et al. 2023, PagedAttention):</strong> Introduces virtual memory paging for KV caches, eliminating fragmentation and near-doubling effective capacity without changing the underlying bandwidth requirements.
+          <br><br>
+          <strong>DistServe (Zhong et al. 2024):</strong> Formally disaggregates prefill and decode onto physically separate GPU pools or dedicated scheduling phases. By separating compute-heavy prompt ingestion from latency-critical token generation, DistServe eliminates "prefill interference" and head-of-line blocking, allowing each phase to be provisioned and optimized for its own hardware bottleneck.
+        </p>
+      </div>
+
+      <!-- Scientific Honesty Persistent Box -->
+      <div class="scientific-honesty-box">
+        <span class="honesty-box-title">Scientific Honesty & Methodology Notes</span>
+        <div class="honesty-box-item">
+          <strong>Roofline model:</strong> Analytical upper-bound model (Williams et al. 2009), not a direct measurement of A100 kernel performance. Actual measured performance can be lower due to kernel launch overhead, tensor core efficiency, cache hierarchy, synchronization, and communication.
+        </div>
+        <div class="honesty-box-item">
+          <strong>Memory traffic:</strong> Idealized analytical estimate of effective weight read plus KV cache streaming (<em>M<sub>step</sub> = 2P + B · k<sub>token</sub> · T</em>); actual HBM traffic depends on kernel implementation and cache hierarchy.
+        </div>
+        <div class="honesty-box-item">
+          <strong>Dense vs. Sparse compute:</strong> NVIDIA lists 624 TFLOPS FP16 for the A100 80GB SXM with structured sparsity; this chapter's roofline uses the 312 TFLOPS dense FP16 figure.
+        </div>
+        <div class="honesty-box-item">
+          <strong>Per-request token rate:</strong> Simplified analytical approximation under synchronized batch-step assumptions; production asynchronous continuous-batching engines exhibit request-level latency variance.
+        </div>
+      </div>
+
+      <!-- Bridge Sentence to Chapter 5 -->
+      <div class="bridge-card">
+        <p class="bridge-text">
+          Given these costs, researchers have tried several ways to avoid ever growing this cache in the first place.
+        </p>
+      </div>
+
+    </section>
+    <!-- END CHAPTER 4 -->
   </main>
 
   <script type="module" src="app.js"></script>
 </body>
 </html>
+

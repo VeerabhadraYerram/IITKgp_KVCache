@@ -1,13 +1,15 @@
-// app.js — Chapters 1, 2, & 3 Controller
+// app.js — Chapters 1, 2, 3, & 4 Controller
 // Chapter 1: Typewriter hero + Dilemma widget
 // Chapter 2: Live TypedArray Benchmark + 2D Runtime Canvas + 3D Attention Microscope
 // Chapter 3: Architecture-Aware VRAM Sandbox + 3D Structural KV Cache Tensor Visualizer
+// Chapter 4: Prefill vs. Decode Analytical Roofline + Serving Concurrency Sandbox
 
 import { MicroTransformerEngine } from './engine/micro_transformer.js';
 import { BenchmarkCanvas } from './visualizers/benchmark_canvas.js';
 import { AttentionMicroscope3D } from './visualizers/benchmark_3d.js';
 import { calculateKVCacheMemory, MODEL_PRESETS, GPU_SPECS, PRECISIONS } from './engine/gpu_calculator.js';
 import { KV3DVisualizer } from './visualizers/kv_3d_visualizer.js';
+import { BandwidthCanvas } from './visualizers/bandwidth_canvas.js';
 
 // ─── Chapter 1: Typewriter Animation ───────────────────────────
 function initTypewriter() {
@@ -437,12 +439,94 @@ function initChapter3() {
   updateSandbox();
 }
 
+// ─── Chapter 4: Prefill vs. Decode & Serving Sandbox ────────────
+function initChapter4() {
+  const canvasEl = document.getElementById('bandwidth-canvas');
+  if (!canvasEl) return;
+
+  const bandwidthCanvas = new BandwidthCanvas('bandwidth-canvas');
+
+  const batchSlider = document.getElementById('slider-serving-batch');
+  const contextSlider = document.getElementById('slider-serving-context');
+  const batchBadge = document.getElementById('badge-serving-batch');
+  const contextBadge = document.getElementById('badge-serving-context');
+
+  const valMemTraffic = document.getElementById('val-serving-mem-traffic');
+  const subMemTraffic = document.getElementById('sub-serving-mem-traffic');
+  const valAI = document.getElementById('val-serving-ai');
+  const valPerf = document.getElementById('val-serving-perf');
+  const subPerf = document.getElementById('sub-serving-perf');
+  const valLatency = document.getElementById('val-serving-latency');
+  const valUserRate = document.getElementById('val-serving-user-rate');
+  const valAggRate = document.getElementById('val-serving-agg-rate');
+  const subAggRate = document.getElementById('sub-serving-agg-rate');
+
+  function updateServingSandbox() {
+    const B = parseInt(batchSlider ? batchSlider.value : 1, 10);
+    const T = parseInt(contextSlider ? contextSlider.value : 1024, 10);
+
+    if (batchBadge) batchBadge.textContent = `${B} request${B > 1 ? 's' : ''}`;
+    if (contextBadge) contextBadge.textContent = `${T.toLocaleString()} tokens`;
+
+    // Update Roofline canvas operating state
+    bandwidthCanvas.updateState(B, T, 1024);
+
+    // Compute dynamic metrics
+    const decode = bandwidthCanvas.getDecodeMetrics();
+    const memBytes = decode.bytes;
+    const memGB = memBytes / 1e9; // Decimal GB consistent with 2039 GB/s
+
+    // Time per step
+    const gpuBandwidthBytesSec = 2039 * 1e9; // 2.039e12 B/s
+    const gpuPeakFlopsSec = 312 * 1e12; // 312e12 FLOP/s
+    const tMem = memBytes / gpuBandwidthBytesSec;
+    const tCompute = decode.flops / gpuPeakFlopsSec;
+    const tStepSec = Math.max(tMem, tCompute);
+    const tStepMs = tStepSec * 1000;
+
+    // Token rates
+    const userRate = 1 / tStepSec;
+    const aggRate = B / tStepSec;
+
+    // Asymptotic saturation limit: B_mem / (k_token * T)
+    const kToken = 2 * 32 * 8 * 128 * 2; // 131,072 bytes
+    const maxAggRate = gpuBandwidthBytesSec / (kToken * T);
+
+    // Update DOM readouts
+    if (valMemTraffic) valMemTraffic.textContent = `${memGB.toFixed(2)} GB`;
+    if (subMemTraffic) {
+      const kvGB = (B * kToken * T) / 1e9;
+      subMemTraffic.textContent = `Weights: 16.06 GB · KV: ${kvGB.toFixed(2)} GB`;
+    }
+
+    if (valAI) valAI.textContent = `${decode.ai.toFixed(2)} FLOP/B`;
+    if (valPerf) valPerf.textContent = `${decode.perfTFlops.toFixed(2)} TFLOPS`;
+    if (subPerf) {
+      const pct = (decode.perfTFlops / 312) * 100;
+      subPerf.textContent = `${pct.toFixed(1)}% of 312 TFLOPS dense peak`;
+    }
+
+    if (valLatency) valLatency.textContent = `${tStepMs.toFixed(1)} ms`;
+    if (valUserRate) valUserRate.textContent = `${userRate.toFixed(1)} tok/s`;
+    if (valAggRate) valAggRate.textContent = `${Math.round(aggRate).toLocaleString()} tok/s`;
+    if (subAggRate) {
+      subAggRate.textContent = `Bandwidth limit ceiling: ~${Math.round(maxAggRate).toLocaleString()} tok/s`;
+    }
+  }
+
+  if (batchSlider) batchSlider.addEventListener('input', updateServingSandbox);
+  if (contextSlider) contextSlider.addEventListener('input', updateServingSandbox);
+
+  updateServingSandbox();
+}
+
 // ─── Main Initialization ───────────────────────────────────────
 function init() {
   initTypewriter();
   initDilemmaWidget();
   initChapter2();
   initChapter3();
+  initChapter4();
 }
 
 if (document.readyState === 'loading') {
@@ -450,3 +534,4 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+
