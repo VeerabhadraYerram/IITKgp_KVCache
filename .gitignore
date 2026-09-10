@@ -12,7 +12,5 @@ venv/
 .ipynb_checkpoints/
 *-checkpoint.ipynb
 
-# OS / IDE
-.DS_Store
-.vscode/
-.idea/
+# Archives
+*.zip
