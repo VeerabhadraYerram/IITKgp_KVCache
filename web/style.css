@@ -1647,3 +1647,65 @@ body::before {
   .tech-button { padding: 6px 12px; font-size: 0.74rem; }
   .microscope-viewport, .kv3d-viewport-wrapper, .kv-3d-viewport { height: 320px; }
 }
+
+/* ─── Publication Print & PDF Export Styles ─── */
+@media print {
+  body::before, .bg-decorations {
+    display: none !important;
+  }
+  .hero {
+    min-height: auto !important;
+    padding: 30px 0 20px 0 !important;
+    page-break-after: avoid;
+  }
+  .scroll-prompt {
+    display: none !important;
+  }
+  .caret {
+    display: none !important;
+  }
+  .tech-button, .mode-toggle-group, .stepper-controls {
+    display: none !important;
+  }
+  .act {
+    padding: 24px 0 !important;
+    page-break-inside: auto;
+  }
+  .conversation-card,
+  .response-card,
+  .benchmark-controls-card,
+  .canvas-card,
+  .table-card,
+  .architecture-progression-card,
+  .formula-card,
+  .sandbox-container,
+  .phases-grid .phase-card,
+  .roofline-card,
+  .serving-sandbox-card,
+  .systems-card,
+  .taxonomy-card,
+  .approach-card,
+  .comparison-workspace,
+  .framing-card,
+  .quote-card,
+  .author-table-card,
+  .stepper-container,
+  .dual-spec-card,
+  .toy-model-card,
+  .bdh-cq-card,
+  .references-card {
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .final-synthesis-card {
+    background: #000000 !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
